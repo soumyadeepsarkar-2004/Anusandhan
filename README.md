@@ -124,18 +124,34 @@ The application will be live at: **`http://localhost:5000`**
 
 ---
 
-## 🐳 Docker Production Deployment
+## 🐳 Production Deployment Options
 
-Run the complete multi-tier stack (Express Gateway + FastAPI + Background Scraper + SQLite persistence) with a single command:
+### Option A: 1-Click Unified Container (Render, Railway, Fly.io, AWS ECS)
+A single self-contained multi-stage Docker container that builds the Vite SPA and serves both frontend and API on port 5000:
+
+```bash
+# Build & run unified image locally
+docker build -t anusandhan-pro -f Dockerfile.unified .
+docker run -p 5000:5000 -e JWT_SECRET="your_secure_secret" anusandhan-pro
+```
+
+- **Render.com**: Connect repo and select **Blueprint** using [render.yaml](file:///c:/PROJECTS/ResearchIntern_Pro/render.yaml).
+- **Railway.app**: Deploy with 1-click using [railway.json](file:///c:/PROJECTS/ResearchIntern_Pro/railway.json).
+- **Fly.io**: Deploy using `fly deploy` using [fly.toml](file:///c:/PROJECTS/ResearchIntern_Pro/fly.toml).
+
+### Option B: Multi-Tier Docker Compose (Full Stack + Microservices)
+Run the isolated multi-tier cluster (Nginx + Express Gateway + FastAPI + Redis + PostgreSQL + MongoDB + SQLite):
 
 ```bash
 docker compose -f docker-compose.prod.yml up -d --build
 ```
 
-### Services Started:
-- **Web & Gateway**: `http://localhost:5000`
-- **FastAPI AI Service**: `http://localhost:8000/docs`
-- **Health Check**: `http://localhost:5000/api/health`
+### Option C: Automated Production Verification
+Run the autonomous deployment health verification suite to validate all 11 production contracts:
+
+```bash
+node scripts/verify_production_deployment.mjs
+```
 
 ---
 
