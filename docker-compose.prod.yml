@@ -31,8 +31,8 @@ services:
       - DATABASE_URL=postgres://anusandhan_user:anusandhan_secure_password_2026@postgres-db:5432/anusandhan_db
       - MONGODB_URI=mongodb://mongo-db:27017/anusandhan_db
       - JWT_SECRET=${JWT_SECRET:-anusandhan_production_jwt_secret_key_2026}
-      - RAZORPAY_KEY_ID=${RAZORPAY_KEY_ID:-rzp_live_anusandhan_2026}
-      - RAZORPAY_KEY_SECRET=${RAZORPAY_KEY_SECRET:-rzp_secret_anusandhan_2026}
+      - RAZORPAY_KEY_ID=${RAZORPAY_KEY_ID:-rzp_test_placeholder}
+      - RAZORPAY_KEY_SECRET=${RAZORPAY_KEY_SECRET:-rzp_test_secret_placeholder}
     ports:
       - "5000:5000"
     depends_on:

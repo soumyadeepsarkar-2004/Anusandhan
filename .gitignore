@@ -32,6 +32,10 @@ venv/
 htmlcov/
 
 # Databases & local stores
+*.sqlite
+*.sqlite3
+*.db
+server/db/*.sqlite
 server/db/*.sqlite-shm
 server/db/*.sqlite-wal
 *.log
