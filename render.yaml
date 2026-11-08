@@ -1,0 +1,56 @@
+# ==============================================================================
+# Anusandhan PRO - Render.com Blueprint Infrastructure as Code (IaC)
+# ==============================================================================
+services:
+  # 1. Main Unified Web Service (React SPA + Express Gateway + SQLite)
+  - type: web
+    name: anusandhan-web-gateway
+    env: docker
+    dockerfilePath: Dockerfile.unified
+    plan: starter
+    region: frankfurt
+    numInstances: 1
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: JWT_SECRET
+        generateValue: true
+      - key: FASTAPI_BACKEND_URL
+        fromService:
+          type: web
+          name: anusandhan-ai-microservice
+          property: host
+      - key: RAZORPAY_KEY_ID
+        sync: false
+      - key: RAZORPAY_KEY_SECRET
+        sync: false
+    healthCheckPath: /api/health
+
+  # 2. Python FastAPI AI Microservice (LangChain + Gemini + Voice)
+  - type: web
+    name: anusandhan-ai-microservice
+    env: docker
+    dockerContext: backend
+    dockerfilePath: backend/Dockerfile
+    plan: starter
+    region: frankfurt
+    numInstances: 1
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: PORT
+        value: 8000
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: SARVAM_API_KEY
+        sync: false
+    healthCheckPath: /health
+
+  # 3. High-Speed Redis Memory Cache
+  - type: redis
+    name: anusandhan-redis-cache
+    plan: starter
+    region: frankfurt
+    ipAllowList: [] # internal access only

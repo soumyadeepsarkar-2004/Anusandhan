@@ -303,13 +303,25 @@ export const sqliteDao = {
   },
 
   async saveDraft(draft) {
-    const existing = await dbGet('SELECT id FROM outreach_drafts WHERE id = ?', [draft.id]);
+    const existing = await dbGet('SELECT * FROM outreach_drafts WHERE id = ?', [draft.id]);
     if (existing) {
       await dbRun(`
         UPDATE outreach_drafts SET
-          status = ?, days_since_sent = ?, sent_at = ?, body = ?, subject_line = ?, updated_at = datetime('now')
+          status = COALESCE(?, status),
+          days_since_sent = COALESCE(?, days_since_sent),
+          sent_at = COALESCE(?, sent_at),
+          body = COALESCE(?, body),
+          subject_line = COALESCE(?, subject_line),
+          updated_at = datetime('now')
         WHERE id = ?
-      `, [draft.status, draft.daysSinceSent || 0, draft.sentAt || null, draft.body, draft.subjectLine, draft.id]);
+      `, [
+        draft.status || null,
+        draft.daysSinceSent !== undefined ? draft.daysSinceSent : null,
+        draft.sentAt || null,
+        draft.body || draft.body_text || null,
+        draft.subjectLine || draft.subject_line || null,
+        draft.id
+      ]);
     } else {
       await dbRun(`
         INSERT INTO outreach_drafts (
@@ -317,8 +329,17 @@ export const sqliteDao = {
           paper_title, subject_line, body, status, days_since_sent, sent_at
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `, [
-        draft.id, draft.studentId, draft.professorId, draft.professorName, draft.professorUniversity,
-        draft.paperTitle, draft.subjectLine, draft.body, draft.status || 'Drafted', draft.daysSinceSent || 0, draft.sentAt || null
+        draft.id,
+        draft.studentId || draft.student_id || 'student_active',
+        draft.professorId || draft.professor_id || 'prof_unknown',
+        draft.professorName || draft.professor_name || 'Professor',
+        draft.professorUniversity || draft.professor_university || 'University',
+        draft.paperTitle || draft.paper_title || 'Research Publication',
+        draft.subjectLine || draft.subject_line || 'Research Inquiry',
+        draft.body || draft.body_text || '',
+        draft.status || 'Drafted',
+        draft.daysSinceSent || 0,
+        draft.sentAt || null
       ]);
     }
   }
