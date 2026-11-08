@@ -1,4 +1,5 @@
 import React, { useRef, useState, MouseEvent } from 'react';
+import { useTheme } from '../../context/ThemeContext';
 
 export interface AppleGlassCardProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
@@ -11,15 +12,19 @@ export interface AppleGlassCardProps extends React.HTMLAttributes<HTMLDivElement
 export const AppleGlassCard: React.FC<AppleGlassCardProps> = ({
   children,
   className = '',
-  spotlightColor = 'rgba(245, 158, 11, 0.12)', // Subtle amber specular spotlight
+  spotlightColor,
   enableTilt = false,
   glowOnHover = true,
   ...props
 }) => {
   const cardRef = useRef<HTMLDivElement>(null);
+  const { isDark } = useTheme();
   const [position, setPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [opacity, setOpacity] = useState<number>(0);
   const [tilt, setTilt] = useState<{ rx: number; ry: number }>({ rx: 0, ry: 0 });
+
+  // Theme-calibrated refractive spotlight color
+  const effectiveSpotlight = spotlightColor || (isDark ? 'rgba(245, 158, 11, 0.12)' : 'rgba(217, 119, 6, 0.16)');
 
   const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
     if (!cardRef.current || !glowOnHover) return;
@@ -67,13 +72,13 @@ export const AppleGlassCard: React.FC<AppleGlassCardProps> = ({
           className="pointer-events-none absolute -inset-px transition-opacity duration-300"
           style={{
             opacity,
-            background: `radial-gradient(400px circle at ${position.x}px ${position.y}px, ${spotlightColor}, transparent 75%)`
+            background: `radial-gradient(400px circle at ${position.x}px ${position.y}px, ${effectiveSpotlight}, transparent 75%)`
           }}
         />
       )}
 
       {/* Subtle Specular Top Sheen Highlight */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+      <div className={`pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent ${isDark ? 'via-white/20' : 'via-white/95'} to-transparent`} />
 
       {/* Card Body */}
       <div className="relative z-10 h-full">{children}</div>

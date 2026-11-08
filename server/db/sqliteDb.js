@@ -59,10 +59,16 @@ export function getSqliteDb() {
         oauth_provider TEXT DEFAULT NULL,
         is_pro INTEGER DEFAULT 0,
         is_verified INTEGER DEFAULT 1,
+        is_institutional_verified INTEGER DEFAULT 0,
+        institutional_email TEXT DEFAULT NULL,
         created_at TEXT DEFAULT (datetime('now')),
         updated_at TEXT DEFAULT (datetime('now'))
       );
     `);
+
+    // Non-destructive schema evolution migrations
+    db.run(`ALTER TABLE users ADD COLUMN is_institutional_verified INTEGER DEFAULT 0;`, () => {});
+    db.run(`ALTER TABLE users ADD COLUMN institutional_email TEXT DEFAULT NULL;`, () => {});
 
     db.run(`
       CREATE TABLE IF NOT EXISTS outreach_drafts (
@@ -179,6 +185,8 @@ export const sqliteDao = {
       oauthProvider: row.oauth_provider,
       isPro: Boolean(row.is_pro),
       isVerified: Boolean(row.is_verified),
+      isInstitutionalVerified: Boolean(row.is_institutional_verified),
+      institutionalEmail: row.institutional_email || null,
       createdAt: row.created_at,
       updatedAt: row.updated_at
     };
@@ -210,6 +218,8 @@ export const sqliteDao = {
       oauthProvider: row.oauth_provider,
       isPro: Boolean(row.is_pro),
       isVerified: Boolean(row.is_verified),
+      isInstitutionalVerified: Boolean(row.is_institutional_verified),
+      institutionalEmail: row.institutional_email || null,
       createdAt: row.created_at,
       updatedAt: row.updated_at
     };
@@ -237,6 +247,9 @@ export const sqliteDao = {
     const dailyRewardClaimedToday = user.dailyRewardClaimedToday !== undefined ? (user.dailyRewardClaimedToday ? 1 : 0) : (existing ? (existing.dailyRewardClaimedToday ? 1 : 0) : 0);
     const oauthProvider = user.oauthProvider !== undefined ? user.oauthProvider : (existing ? existing.oauthProvider : null);
     const isPro = user.isPro !== undefined ? (user.isPro ? 1 : 0) : (existing ? (existing.isPro ? 1 : 0) : 0);
+    const isVerified = user.isVerified !== undefined ? (user.isVerified ? 1 : 0) : (existing ? (existing.isVerified ? 1 : 0) : 1);
+    const isInstitutionalVerified = user.isInstitutionalVerified !== undefined ? (user.isInstitutionalVerified ? 1 : 0) : (existing ? (existing.isInstitutionalVerified ? 1 : 0) : 0);
+    const institutionalEmail = user.institutionalEmail !== undefined ? user.institutionalEmail : (existing ? existing.institutionalEmail : null);
 
     if (existing) {
       await dbRun(`
@@ -245,13 +258,15 @@ export const sqliteDao = {
           current_year = ?, cgpa = ?, target_domains = ?, skills = ?, rrs_score = ?,
           rrs_tier = ?, role = ?, credits_remaining = ?, tokens_balance = ?, login_streak = ?,
           xp_points = ?, daily_reward_claimed_today = ?, oauth_provider = ?, is_pro = ?,
+          is_verified = ?, is_institutional_verified = ?, institutional_email = ?,
           updated_at = datetime('now')
         WHERE id = ?
       `, [
         email, passwordHash, fullName, university, degreeLevel,
         currentYear, cgpa, targetDomains, skills, rrsScore,
         rrsTier, role, creditsRemaining, tokensBalance, loginStreak,
-        xpPoints, dailyRewardClaimedToday, oauthProvider, isPro, id
+        xpPoints, dailyRewardClaimedToday, oauthProvider, isPro,
+        isVerified, isInstitutionalVerified, institutionalEmail, id
       ]);
     } else {
       await dbRun(`
@@ -259,13 +274,15 @@ export const sqliteDao = {
           id, email, password_hash, full_name, university, degree_level,
           current_year, cgpa, target_domains, skills, rrs_score,
           rrs_tier, role, credits_remaining, tokens_balance, login_streak,
-          xp_points, daily_reward_claimed_today, oauth_provider, is_pro
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          xp_points, daily_reward_claimed_today, oauth_provider, is_pro,
+          is_verified, is_institutional_verified, institutional_email
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `, [
         id, email, passwordHash, fullName, university, degreeLevel,
         currentYear, cgpa, targetDomains, skills, rrsScore,
         rrsTier, role, creditsRemaining, tokensBalance, loginStreak,
-        xpPoints, dailyRewardClaimedToday, oauthProvider, isPro
+        xpPoints, dailyRewardClaimedToday, oauthProvider, isPro,
+        isVerified, isInstitutionalVerified, institutionalEmail
       ]);
     }
 

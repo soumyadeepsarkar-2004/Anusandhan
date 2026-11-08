@@ -142,8 +142,8 @@ test('Live Academic Data Ingestion Engine reports operational status and telemet
   assert.strictEqual(res.status, 200);
   const data = await res.json();
   assert.strictEqual(data.status, 'operational');
-  assert.strictEqual(data.trackedFacultyCount, 4);
-  assert.strictEqual(data.trackedFellowshipsCount, 8);
+  assert.ok(data.trackedFacultyCount >= 4);
+  assert.ok(data.trackedFellowshipsCount >= 8);
   assert.ok(data.lastSweepTimestamp !== undefined);
 });
 

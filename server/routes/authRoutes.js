@@ -323,21 +323,12 @@ router.post('/verify-institutional-email', authenticateToken, async (req, res) =
     }
 
     // 1. Pre-check: Reject if account has already been verified
-    let currentUser = null;
-    if (isDbConnected()) {
-      try {
-        currentUser = await User.findOne({ email: normalizedEmail });
-      } catch {
-        currentUser = memoryUsers.get(normalizedEmail);
-      }
-    } else {
-      currentUser = memoryUsers.get(normalizedEmail);
-    }
+    let currentUser = await findUserByEmail(normalizedEmail);
     if (!currentUser) {
-      currentUser = memoryUsers.get(normalizedEmail);
+      return res.status(404).json({ error: 'User profile not found.' });
     }
 
-    if (currentUser?.isInstitutionalVerified === true) {
+    if (currentUser.isInstitutionalVerified === true) {
       return res.status(400).json({
         verified: true,
         error: 'Institutional affiliation has already been verified for this account.'
@@ -366,55 +357,13 @@ router.post('/verify-institutional-email', authenticateToken, async (req, res) =
     // Award verified badge and bonus credits in memory / database
     const normalizedInstEmail = institutionalEmail.toLowerCase().trim();
 
-    let updatedUserDoc = null;
-    if (isDbConnected()) {
-      try {
-        updatedUserDoc = await User.findOneAndUpdate(
-          { email: normalizedEmail, isInstitutionalVerified: { $ne: true } },
-          {
-            $set: {
-              isVerified: true,
-              isInstitutionalVerified: true,
-              institutionalEmail: normalizedInstEmail,
-              updatedAt: new Date()
-            },
-            $inc: { creditsRemaining: 10 }
-          },
-          { new: true }
-        );
-      } catch (dbErr) {
-        console.error('[Auth Verify Institutional Error - DB]:', dbErr);
-        throw dbErr;
-      }
+    currentUser.isVerified = true;
+    currentUser.isInstitutionalVerified = true;
+    currentUser.institutionalEmail = normalizedInstEmail;
+    currentUser.creditsRemaining = (currentUser.creditsRemaining || 10) + 10;
+    currentUser.updatedAt = new Date();
 
-      if (!updatedUserDoc) {
-        return res.status(400).json({
-          verified: true,
-          error: 'Institutional affiliation has already been verified for this account.'
-        });
-      }
-
-      memoryUsers.set(normalizedEmail, updatedUserDoc.toObject ? updatedUserDoc.toObject() : updatedUserDoc);
-    } else {
-      // In-Memory store synchronization with atomic idempotency enforcement
-      const user = memoryUsers.get(normalizedEmail);
-      if (!user) {
-        return res.status(404).json({ error: 'User profile not found.' });
-      }
-
-      if (user.isInstitutionalVerified === true) {
-        return res.status(400).json({
-          verified: true,
-          error: 'Institutional affiliation has already been verified for this account.'
-        });
-      }
-
-      user.isVerified = true;
-      user.isInstitutionalVerified = true;
-      user.institutionalEmail = normalizedInstEmail;
-      user.creditsRemaining = (user.creditsRemaining || 10) + 10;
-      user.updatedAt = new Date();
-    }
+    await saveUser(currentUser);
 
     res.json({
       verified: true,
