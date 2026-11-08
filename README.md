@@ -81,8 +81,8 @@ graph TD
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/your-username/ResearchIntern_Pro.git
-cd ResearchIntern_Pro
+git clone https://github.com/soumyadeepsarkar-2004/Anusandhan.git
+cd Anusandhan
 ```
 
 ### 2. Install Dependencies
