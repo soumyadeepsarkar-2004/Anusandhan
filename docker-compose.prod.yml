@@ -1,0 +1,138 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      gateway:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:80/ || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+    networks:
+      - anusandhan-net
+
+  gateway:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    environment:
+      - PORT=5000
+      - NODE_ENV=production
+      - PYTHON_SERVICE_URL=http://ai-microservice:8000/api/v1
+      - REDIS_URL=redis://redis-cache:6379
+      - DATABASE_URL=postgres://anusandhan_user:anusandhan_secure_password_2026@postgres-db:5432/anusandhan_db
+      - MONGODB_URI=mongodb://mongo-db:27017/anusandhan_db
+      - JWT_SECRET=${JWT_SECRET:-anusandhan_production_jwt_secret_key_2026}
+      - RAZORPAY_KEY_ID=${RAZORPAY_KEY_ID:-rzp_live_anusandhan_2026}
+      - RAZORPAY_KEY_SECRET=${RAZORPAY_KEY_SECRET:-rzp_secret_anusandhan_2026}
+    ports:
+      - "5000:5000"
+    depends_on:
+      ai-microservice:
+        condition: service_healthy
+      redis-cache:
+        condition: service_healthy
+      postgres-db:
+        condition: service_healthy
+      mongo-db:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5000/api/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - anusandhan-net
+
+  ai-microservice:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      - PORT=8000
+      - ENVIRONMENT=production
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - SARVAM_API_KEY=${SARVAM_API_KEY:-}
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      - anusandhan-net
+
+  redis-cache:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    networks:
+      - anusandhan-net
+
+  postgres-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: anusandhan_user
+      POSTGRES_PASSWORD: anusandhan_secure_password_2026
+      POSTGRES_DB: anusandhan_db
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./server/db/schema.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U anusandhan_user -d anusandhan_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - anusandhan-net
+
+  mongo-db:
+    image: mongo:7-jammy
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodata:/data/db
+    healthcheck:
+      test: ["CMD-SHELL", "echo 'db.runCommand({ping:1}).ok' | mongosh localhost:27017/test --quiet"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - anusandhan-net
+
+volumes:
+  pgdata:
+  mongodata:
+  redisdata:
+
+networks:
+  anusandhan-net:
+    driver: bridge

@@ -1,0 +1,100 @@
+--- a/server/routes/authRoutes.js
++++ b/server/routes/authRoutes.js
+@@ -247,6 +247,33 @@
+ router.post('/verify-institutional-email', authenticateToken, async (req, res) => {
+   try {
+     const { institutionalEmail } = req.body;
+     if (!institutionalEmail) {
+       return res.status(400).json({ error: 'Institutional email is required' });
+     }
+ 
++    const normalizedEmail = (req.user?.email || '').toLowerCase().trim();
++    if (!normalizedEmail) {
++      return res.status(401).json({ error: 'Access token required.' });
++    }
++
++    // 1. Pre-check: Reject if account has already been verified
++    let currentUser = null;
++    if (isDbConnected()) {
++      try {
++        currentUser = await User.findOne({ email: normalizedEmail });
++      } catch {
++        currentUser = memoryUsers.get(normalizedEmail);
++      }
++    } else {
++      currentUser = memoryUsers.get(normalizedEmail);
++    }
++    if (!currentUser) {
++      currentUser = memoryUsers.get(normalizedEmail);
++    }
++
++    if (currentUser?.isInstitutionalVerified === true) {
++      return res.status(400).json({
++        verified: true,
++        error: 'Institutional affiliation has already been verified for this account.'
++      });
++    }
++
+-    const domain = institutionalEmail.split('@')[1]?.toLowerCase();
++    const domain = institutionalEmail.split('@')[1]?.toLowerCase()?.trim();
+     const isAccredited = domain && (
+       domain.endsWith('.ac.in') ||
+       domain.endsWith('.edu') ||
+@@ -274,38 +301,57 @@
+     // Award verified badge and bonus credits in memory / database
+-    const normalizedEmail = (req.user?.email || '').toLowerCase().trim();
+     const normalizedInstEmail = institutionalEmail.toLowerCase().trim();
+ 
+     let updatedUserDoc = null;
+     if (isDbConnected()) {
+       try {
+         updatedUserDoc = await User.findOneAndUpdate(
+-          { email: normalizedEmail },
++          { email: normalizedEmail, isInstitutionalVerified: { $ne: true } },
+           {
+             $set: {
+               isVerified: true,
+               isInstitutionalVerified: true,
+               institutionalEmail: normalizedInstEmail,
+               updatedAt: new Date()
+             },
+             $inc: { creditsRemaining: 10 }
+           },
+           { new: true }
+         );
+       } catch (dbErr) {
+         console.error('[Auth Verify Institutional Error - DB]:', dbErr);
++        throw dbErr;
+       }
+-    }
+-
+-    if (updatedUserDoc) {
++
++      if (!updatedUserDoc) {
++        return res.status(400).json({
++          verified: true,
++          error: 'Institutional affiliation has already been verified for this account.'
++        });
++      }
++
+       memoryUsers.set(normalizedEmail, updatedUserDoc.toObject ? updatedUserDoc.toObject() : updatedUserDoc);
+     } else {
++      // In-Memory store synchronization with atomic idempotency enforcement
+       const user = memoryUsers.get(normalizedEmail);
+       if (!user) {
++        return res.status(404).json({ error: 'User profile not found.' });
++      }
++
++      if (user.isInstitutionalVerified === true) {
++        return res.status(400).json({
++          verified: true,
++          error: 'Institutional affiliation has already been verified for this account.'
++        });
++      }
++
+       user.isVerified = true;
+       user.isInstitutionalVerified = true;
+       user.institutionalEmail = normalizedInstEmail;
+       user.creditsRemaining = (user.creditsRemaining || 10) + 10;
+       user.updatedAt = new Date();
+     }
