@@ -8,8 +8,6 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 jobs:
   frontend-build:
@@ -37,16 +35,6 @@ jobs:
           name: anusandhan-frontend-dist
           path: dist/
           retention-days: 7
-
-      - name: Setup Pages
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        uses: actions/configure-pages@v5
-
-      - name: Upload Pages Artifact
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: dist/
 
   gateway-test:
     name: Node.js Express Gateway Integration Test
@@ -110,18 +98,3 @@ jobs:
           GEMINI_API_KEY: test_dummy_gemini_key_for_ci
           JWT_SECRET: test_jwt_secret_for_ci_cd_32chars_long_entropy
 
-  deploy-github-pages:
-    name: Automated Deployment to GitHub Pages
-    needs: [frontend-build, gateway-test, python-microservice-test]
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    runs-on: ubuntu-latest
-    permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4

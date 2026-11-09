@@ -18,9 +18,11 @@ import { WORKSPACE_TABS } from '../../data/navigationConfig';
 import { AudioWaveformVisualizer } from '../ui/AppleGlass';
 import { PullChainBulb } from '../ui/PullChainBulb';
 import { useAuth } from '../../context/AuthContext';
-import { ScholarStreakModal } from '../gamification/ScholarStreakModal';
-import { TokenRewardsModal } from '../gamification/TokenRewardsModal';
 import { AnusandhanLogo } from '../common/AnusandhanLogo';
+
+// Dynamic lazy imports for gamification modals
+const ScholarStreakModal = React.lazy(() => import('../gamification/ScholarStreakModal').then(m => ({ default: m.ScholarStreakModal })));
+const TokenRewardsModal = React.lazy(() => import('../gamification/TokenRewardsModal').then(m => ({ default: m.TokenRewardsModal })));
 
 interface AppLayoutProps {
   currentTab: AppTab;
@@ -239,18 +241,20 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
       />
 
       {/* Scholar Streak, Daily Login Rewards & Token Exchange Modal */}
-      <ScholarStreakModal
-        isOpen={isStreakModalOpen}
-        onClose={() => setIsStreakModalOpen(false)}
-        onOpenPricingModal={onOpenPricingModal}
-      />
+      <React.Suspense fallback={null}>
+        <ScholarStreakModal
+          isOpen={isStreakModalOpen}
+          onClose={() => setIsStreakModalOpen(false)}
+          onOpenPricingModal={onOpenPricingModal}
+        />
 
-      {/* Shodh Token Wallet & Rewards Claim Modal */}
-      <TokenRewardsModal
-        isOpen={isTokenModalOpen}
-        onClose={() => setIsTokenModalOpen(false)}
-        onOpenPricingModal={onOpenPricingModal}
-      />
+        {/* Shodh Token Wallet & Rewards Claim Modal */}
+        <TokenRewardsModal
+          isOpen={isTokenModalOpen}
+          onClose={() => setIsTokenModalOpen(false)}
+          onOpenPricingModal={onOpenPricingModal}
+        />
+      </React.Suspense>
 
     </div>
   );

@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import { AuthModal } from './components/auth/AuthModal';
 import { StudentProfile, Professor, FellowshipProgram, OutreachDraft, ActivityFeedItem } from './types';
 import { INITIAL_STUDENT_STATE } from './services/resumeParser';
 import { FELLOWSHIP_PROGRAMS } from './data/fellowships';
@@ -19,36 +18,42 @@ import { FellowshipsMarquee } from './components/landing/FellowshipsMarquee';
 import { PricingSection } from './components/landing/PricingSection';
 import { Footer } from './components/landing/Footer';
 
-// Stepped Student Intake & Failure Diagnostics
-import { IntakeDiagnosticFlow } from './components/intake/IntakeDiagnosticFlow';
-
 // UI & Ambient Components
 import { ConstellationBackground } from './components/ui/ConstellationBackground';
 import { OfflineBanner } from './components/ui/OfflineBanner';
 import { PullChainBulb } from './components/ui/PullChainBulb';
 import { AnusandhanLogo } from './components/common/AnusandhanLogo';
-import { TokenRewardsModal } from './components/gamification/TokenRewardsModal';
 
-// Platform App Components
+// Platform Core App Layout & Lightweight Nav
 import { AppLayout } from './components/app/AppLayout';
 import { AppTab, MobileBottomNav } from './components/app/MobileBottomNav';
-import { OnboardingModal } from './components/app/OnboardingModal';
-import { StudentProfileHub } from './components/app/StudentProfileHub';
 import { OpportunityExplorer } from './components/app/OpportunityExplorer';
 import { OutreachComposer } from './components/app/OutreachComposer';
 import { FollowUpManager } from './components/app/FollowUpManager';
 import { ApplicationCRM } from './components/app/ApplicationCRM';
 import { LiveActivityFeed } from './components/app/LiveActivityFeed';
-import { PricingModal } from './components/app/PricingModal';
-
-// Dedicated Interactive Studios inside App Workspace
-import { InteractiveRRSStudio } from './components/landing/InteractiveRRSStudio';
-import { PaperPitchVisualizer } from './components/landing/PaperPitchVisualizer';
-
-// Voice Agent & Autonomous Screening Components
 import { AutonomousAssistantWidget } from './components/voice/AutonomousAssistantWidget';
-import { MockInterviewModal } from './components/agents/MockInterviewModal';
-import { CommandPalette } from './components/common/CommandPalette';
+
+// Code-Split Dynamic Heavy Modules (Instant First Paint & Zero Bundle Lag)
+const AuthModal = lazy(() => import('./components/auth/AuthModal').then(m => ({ default: m.AuthModal })));
+const IntakeDiagnosticFlow = lazy(() => import('./components/intake/IntakeDiagnosticFlow').then(m => ({ default: m.IntakeDiagnosticFlow })));
+const TokenRewardsModal = lazy(() => import('./components/gamification/TokenRewardsModal').then(m => ({ default: m.TokenRewardsModal })));
+const OnboardingModal = lazy(() => import('./components/app/OnboardingModal').then(m => ({ default: m.OnboardingModal })));
+const StudentProfileHub = lazy(() => import('./components/app/StudentProfileHub').then(m => ({ default: m.StudentProfileHub })));
+const PricingModal = lazy(() => import('./components/app/PricingModal').then(m => ({ default: m.PricingModal })));
+const InteractiveRRSStudio = lazy(() => import('./components/landing/InteractiveRRSStudio').then(m => ({ default: m.InteractiveRRSStudio })));
+const PaperPitchVisualizer = lazy(() => import('./components/landing/PaperPitchVisualizer').then(m => ({ default: m.PaperPitchVisualizer })));
+const MockInterviewModal = lazy(() => import('./components/agents/MockInterviewModal').then(m => ({ default: m.MockInterviewModal })));
+const CommandPalette = lazy(() => import('./components/common/CommandPalette').then(m => ({ default: m.CommandPalette })));
+
+const SuspenseSkeleton: React.FC = () => (
+  <div className="w-full min-h-[300px] flex items-center justify-center p-8">
+    <div className="flex flex-col items-center gap-3">
+      <div className="w-8 h-8 rounded-full border-2 border-amber-500/25 border-t-amber-500 animate-spin" />
+      <span className="text-xs font-mono text-stone-400 dark:text-zinc-500">Loading module...</span>
+    </div>
+  </div>
+);
 
 const AppContent: React.FC = () => {
   const { user, isAuthenticated } = useAuth();
@@ -346,6 +351,16 @@ const AppContent: React.FC = () => {
     }));
   };
 
+  // Authenticated Gateway Handler (Blocks anonymous free plan & token consumption)
+  const handleLaunchPlatform = (targetTab: AppTab = 'discover') => {
+    if (!isAuthenticated) {
+      setAuthInitialMode('signin');
+      setIsAuthModalOpen(true);
+      return;
+    }
+    navigateToView('app', targetTab);
+  };
+
   const handleVoiceActionTrigger = (action: string) => {
     const act = action.toUpperCase();
     if (act.includes('CRM') || act === 'OPEN_CRM') {
@@ -379,11 +394,25 @@ const AppContent: React.FC = () => {
         /* SIMPLE, INFORMATIVE, CLEAN MARKETING LANDING PAGE */
         <div className="relative z-10">
           <Navbar
-            onLaunchApp={() => navigateToView('intake')}
+            onLaunchApp={() => handleLaunchPlatform('discover')}
             onOpenVoiceModal={() => setIsVoiceModalOpen(true)}
             onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
-            onOpenPricingModal={() => setIsPricingModalOpen(true)}
-            onOpenRewardsModal={() => setIsRewardsModalOpen(true)}
+            onOpenPricingModal={() => {
+              if (!isAuthenticated) {
+                setAuthInitialMode('signin');
+                setIsAuthModalOpen(true);
+                return;
+              }
+              setIsPricingModalOpen(true);
+            }}
+            onOpenRewardsModal={() => {
+              if (!isAuthenticated) {
+                setAuthInitialMode('signin');
+                setIsAuthModalOpen(true);
+                return;
+              }
+              setIsRewardsModalOpen(true);
+            }}
             onOpenAuth={() => {
               setAuthInitialMode('signin');
               setIsAuthModalOpen(true);
@@ -393,7 +422,7 @@ const AppContent: React.FC = () => {
 
           <main>
             <SimpleHeroSection
-              onLaunchPlatform={() => navigateToView('intake')}
+              onLaunchPlatform={() => handleLaunchPlatform('discover')}
               onExploreLabs={() => {
                 const el = document.getElementById('opportunities');
                 if (el) {
@@ -413,22 +442,32 @@ const AppContent: React.FC = () => {
               professors={liveFaculty}
               student={student}
               onSelectProfessor={(prof) => {
+                if (!isAuthenticated) {
+                  setAuthInitialMode('signin');
+                  setIsAuthModalOpen(true);
+                  return;
+                }
                 handleDraftOutreach(prof);
               }}
-              onLaunchPlatform={() => navigateToView('intake')}
+              onLaunchPlatform={() => handleLaunchPlatform('discover')}
             />
 
             <HowItWorksSection
-              onLaunchPlatform={() => navigateToView('intake')}
+              onLaunchPlatform={() => handleLaunchPlatform('discover')}
             />
 
             <FellowshipsMarquee
               fellowships={fellowships}
-              onLaunchApp={() => navigateToView('intake')}
+              onLaunchApp={() => handleLaunchPlatform('discover')}
             />
 
             <PricingSection
               onSelectPlan={(planId) => {
+                if (!isAuthenticated) {
+                  setAuthInitialMode('register');
+                  setIsAuthModalOpen(true);
+                  return;
+                }
                 setIsPricingModalOpen(true);
               }}
             />
@@ -461,20 +500,22 @@ const AppContent: React.FC = () => {
           </header>
 
           <div className="py-8 px-4 max-w-5xl mx-auto">
-            <IntakeDiagnosticFlow
-              currentStudent={student}
-              onCompleteIntake={(updatedStudent) => {
-                setStudent(updatedStudent);
-                const matched = matchProfessorsForStudent(updatedStudent);
-                if (matched.length > 0) {
-                  const newDrafts = matched.slice(0, 3).map(p => generateColdEmail(p, updatedStudent));
-                  setDrafts(newDrafts);
-                  setActiveDraft(newDrafts[0]);
-                }
-                navigateToView('app', 'discover');
-              }}
-              onCancel={() => navigateToView('landing')}
-            />
+            <Suspense fallback={<SuspenseSkeleton />}>
+              <IntakeDiagnosticFlow
+                currentStudent={student}
+                onCompleteIntake={(updatedStudent) => {
+                  setStudent(updatedStudent);
+                  const matched = matchProfessorsForStudent(updatedStudent);
+                  if (matched.length > 0) {
+                    const newDrafts = matched.slice(0, 3).map(p => generateColdEmail(p, updatedStudent));
+                    setDrafts(newDrafts);
+                    setActiveDraft(newDrafts[0]);
+                  }
+                  navigateToView('app', 'discover');
+                }}
+                onCancel={() => navigateToView('landing')}
+              />
+            </Suspense>
           </div>
         </div>
       )}
@@ -545,7 +586,9 @@ const AppContent: React.FC = () => {
                     Run Automated Gap Diagnostic
                   </button>
                 </div>
-                <InteractiveRRSStudio onLaunchApp={() => setCurrentTab('discover')} />
+                <Suspense fallback={<SuspenseSkeleton />}>
+                  <InteractiveRRSStudio onLaunchApp={() => setCurrentTab('discover')} />
+                </Suspense>
               </div>
             )}
 
@@ -556,35 +599,39 @@ const AppContent: React.FC = () => {
                   <h2 className="text-lg font-semibold text-zinc-100">Paper-to-Pitch Deconstruction Canvas</h2>
                   <p className="text-xs text-zinc-400">See how raw 2025-2026 ArXiv literature is deconstructed into academic problem framing, student angle, and a 146-word inquiry.</p>
                 </div>
-                <PaperPitchVisualizer
-                  initialPaperTitle={selectedDeconstructTitle}
-                  onDraftOutreach={(title, body, subject) => {
-                    const newDraft: OutreachDraft = {
-                      id: `draft-paper-${Date.now()}`,
-                      professorId: 'prof_scraped_deconstruct',
-                      professorName: 'Lead PI',
-                      professorEmail: 'lab-admissions@academic-frontier.edu',
-                      university: 'Target Research Institution',
-                      paperTitle: title,
-                      subjectLine: subject,
-                      body: body,
-                      status: 'Drafted'
-                    };
-                    setDrafts(prev => [newDraft, ...prev]);
-                    setActiveDraft(newDraft);
-                    navigateToView('app', 'outreach');
-                  }}
-                />
+                <Suspense fallback={<SuspenseSkeleton />}>
+                  <PaperPitchVisualizer
+                    initialPaperTitle={selectedDeconstructTitle}
+                    onDraftOutreach={(title, body, subject) => {
+                      const newDraft: OutreachDraft = {
+                        id: `draft-paper-${Date.now()}`,
+                        professorId: 'prof_scraped_deconstruct',
+                        professorName: 'Lead PI',
+                        professorEmail: 'lab-admissions@academic-frontier.edu',
+                        university: 'Target Research Institution',
+                        paperTitle: title,
+                        subjectLine: subject,
+                        body: body,
+                        status: 'Drafted'
+                      };
+                      setDrafts(prev => [newDraft, ...prev]);
+                      setActiveDraft(newDraft);
+                      navigateToView('app', 'outreach');
+                    }}
+                  />
+                </Suspense>
               </div>
             )}
 
             {/* Tab 4: Student Profile & Credentials Hub */}
             {currentTab === 'profile' && (
-              <StudentProfileHub
-                student={student}
-                onUpdateProfile={setStudent}
-                onOpenVoiceModal={() => setIsVoiceModalOpen(true)}
-              />
+              <Suspense fallback={<SuspenseSkeleton />}>
+                <StudentProfileHub
+                  student={student}
+                  onUpdateProfile={setStudent}
+                  onOpenVoiceModal={() => setIsVoiceModalOpen(true)}
+                />
+              </Suspense>
             )}
 
             {/* Tab 5: 146-Word Precision Pitch Composer */}
@@ -653,68 +700,80 @@ const AppContent: React.FC = () => {
         onClose={() => setIsVoiceModalOpen(false)}
       />
 
-      {/* Global Modals */}
-      <CommandPalette
-        isOpen={isCommandPaletteOpen}
-        onClose={() => setIsCommandPaletteOpen(false)}
-        onNavigateView={navigateToView}
-        onOpenVoiceModal={() => setIsVoiceModalOpen(true)}
-        onOpenMockInterview={() => setIsMockInterviewOpen(true)}
-        onOpenPricingModal={() => setIsPricingModalOpen(true)}
-        professors={liveFaculty}
-        fellowships={fellowships}
-        scrapedPostings={scrapedPostings}
-        student={student}
-      />
+      {/* Global Modals Wrapped in Lazy Suspense Boundaries */}
+      <Suspense fallback={null}>
+        <CommandPalette
+          isOpen={isCommandPaletteOpen}
+          onClose={() => setIsCommandPaletteOpen(false)}
+          onNavigateView={navigateToView}
+          onOpenVoiceModal={() => setIsVoiceModalOpen(true)}
+          onOpenMockInterview={() => setIsMockInterviewOpen(true)}
+          onOpenPricingModal={() => setIsPricingModalOpen(true)}
+          professors={liveFaculty}
+          fellowships={fellowships}
+          scrapedPostings={scrapedPostings}
+          student={student}
+        />
+      </Suspense>
 
-      <AuthModal
-        isOpen={isAuthModalOpen}
-        onClose={() => setIsAuthModalOpen(false)}
-        initialMode={authInitialMode}
-        onSuccess={() => {
-          setIsAuthModalOpen(false);
-          navigateToView('app', 'discover');
-        }}
-      />
+      <Suspense fallback={null}>
+        <AuthModal
+          isOpen={isAuthModalOpen}
+          onClose={() => setIsAuthModalOpen(false)}
+          initialMode={authInitialMode}
+          onSuccess={() => {
+            setIsAuthModalOpen(false);
+            navigateToView('app', 'discover');
+          }}
+        />
+      </Suspense>
 
-      <MockInterviewModal
-        isOpen={isMockInterviewOpen}
-        onClose={() => {
-          setIsMockInterviewOpen(false);
-          setSelectedInterviewProf(null);
-        }}
-        student={student}
-        targetProfessor={selectedInterviewProf}
-        onUpdateRrs={(newScore) => {
-          setStudent(prev => ({
-            ...prev,
-            rrsScore: Math.max(prev.rrsScore, newScore)
-          }));
-        }}
-      />
+      <Suspense fallback={null}>
+        <MockInterviewModal
+          isOpen={isMockInterviewOpen}
+          onClose={() => {
+            setIsMockInterviewOpen(false);
+            setSelectedInterviewProf(null);
+          }}
+          student={student}
+          targetProfessor={selectedInterviewProf}
+          onUpdateRrs={(newScore) => {
+            setStudent(prev => ({
+              ...prev,
+              rrsScore: Math.max(prev.rrsScore, newScore)
+            }));
+          }}
+        />
+      </Suspense>
 
-      <PricingModal
-        isOpen={isPricingModalOpen}
-        onClose={() => setIsPricingModalOpen(false)}
-        creditsRemaining={student.creditsRemaining}
-        onAddCredits={handleAddCredits}
-      />
+      <Suspense fallback={null}>
+        <PricingModal
+          isOpen={isPricingModalOpen}
+          onClose={() => setIsPricingModalOpen(false)}
+          creditsRemaining={student.creditsRemaining}
+          onAddCredits={handleAddCredits}
+        />
+      </Suspense>
 
-      <TokenRewardsModal
-        isOpen={isRewardsModalOpen}
-        onClose={() => setIsRewardsModalOpen(false)}
-        onOpenPricingModal={() => {
-          setIsRewardsModalOpen(false);
-          setIsPricingModalOpen(true);
-        }}
-      />
+      <Suspense fallback={null}>
+        <TokenRewardsModal
+          isOpen={isRewardsModalOpen}
+          onClose={() => setIsRewardsModalOpen(false)}
+          onOpenPricingModal={() => {
+            setIsRewardsModalOpen(false);
+            setIsPricingModalOpen(true);
+          }}
+        />
+      </Suspense>
 
-      <OnboardingModal
-        isOpen={isOnboardingOpen}
-        onClose={() => setIsOnboardingOpen(false)}
-        student={student}
-        onSaveProfile={setStudent}
-      />
+      <Suspense fallback={null}>
+        <OnboardingModal
+          isOpen={isOnboardingOpen}
+          onClose={() => setIsOnboardingOpen(false)}
+          student={student}
+          onSaveProfile={setStudent}
+        />
+      </Suspense>
 
     </div>
   );

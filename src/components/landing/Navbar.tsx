@@ -73,7 +73,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <div className="fixed top-3 sm:top-5 inset-x-0 mx-auto max-w-5xl z-50 px-2 sm:px-6 pointer-events-none">
-      <header className="pointer-events-auto apple-glass-pill rounded-full px-3 sm:px-4 py-2 flex items-center justify-between transition-all duration-300 gap-2 overflow-hidden shadow-2xl">
+      <header className="pointer-events-auto apple-glass-pill rounded-full px-3 sm:px-4 py-2 flex items-center justify-between transition-all duration-300 gap-2 shadow-2xl">
         
         {/* Dynamic Theme-Aware Brand Logo */}
         <div 
@@ -185,7 +185,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <div className="flex items-center space-x-1.5 shrink-0">
               <button
                 onClick={onLaunchApp}
-                className="min-h-[36px] flex items-center space-x-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-zinc-950 font-semibold text-xs shadow-md shadow-amber-500/20 transition-all cursor-pointer active:scale-95 shrink-0 whitespace-nowrap"
+                className="min-h-[38px] flex items-center space-x-1.5 px-4 py-1.5 rounded-full bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-slate-950 font-bold text-xs shadow-md shadow-amber-500/20 hover:shadow-amber-500/35 transition-all cursor-pointer transform active:scale-95 shrink-0 whitespace-nowrap border border-amber-300/40"
               >
                 <span>Workspace</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -193,7 +193,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
               <button
                 onClick={logout}
-                className="min-h-[36px] min-w-[36px] p-2 rounded-full text-zinc-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer shrink-0 flex items-center justify-center"
+                className="min-h-[38px] min-w-[38px] p-2 rounded-full text-zinc-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer shrink-0 flex items-center justify-center"
                 title="Sign Out"
                 aria-label="Sign Out"
               >
@@ -204,17 +204,17 @@ export const Navbar: React.FC<NavbarProps> = ({
             <div className="flex items-center space-x-1.5 shrink-0">
               <button
                 onClick={onOpenAuth}
-                className="min-h-[36px] px-3 py-1 rounded-full text-xs font-medium text-zinc-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer shrink-0 whitespace-nowrap"
+                className="min-h-[38px] px-3.5 py-1.5 rounded-full text-xs font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-bg)] transition-colors cursor-pointer shrink-0 whitespace-nowrap border border-transparent hover:border-[var(--border-subtle)]"
               >
                 Sign In
               </button>
 
               <button
                 onClick={onLaunchApp}
-                className="min-h-[36px] relative group overflow-hidden flex items-center space-x-1 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-zinc-950 font-semibold text-xs shadow-lg shadow-amber-500/25 transition-all cursor-pointer transform active:scale-95 shrink-0 whitespace-nowrap"
+                className="min-h-[38px] group flex items-center space-x-1.5 px-4 py-1.5 rounded-full bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-slate-950 font-bold text-xs shadow-md shadow-amber-500/20 hover:shadow-amber-500/35 transition-all cursor-pointer transform active:scale-95 shrink-0 whitespace-nowrap border border-amber-300/40"
               >
-                <span className="relative z-10">Launch Platform</span>
-                <ArrowRight className="relative z-10 w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                <span>Launch Platform</span>
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
               </button>
             </div>
           )}

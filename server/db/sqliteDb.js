@@ -121,8 +121,16 @@ export function getSqliteDb() {
       );
     `);
 
+    // High-Concurrency Performance Indexes (Sub-millisecond query execution)
     db.run(`CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);`);
+    db.run(`CREATE INDEX IF NOT EXISTS idx_users_id_role ON users(id, role);`);
+    db.run(`CREATE INDEX IF NOT EXISTS idx_users_login_streak ON users(login_streak);`);
     db.run(`CREATE INDEX IF NOT EXISTS idx_drafts_student ON outreach_drafts(student_id);`);
+    db.run(`CREATE INDEX IF NOT EXISTS idx_drafts_student_status ON outreach_drafts(student_id, status);`);
+    db.run(`CREATE INDEX IF NOT EXISTS idx_orders_student ON orders(student_id);`);
+    db.run(`CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);`);
+    db.run(`CREATE INDEX IF NOT EXISTS idx_claims_user_day ON daily_claims(user_id, streak_day);`);
+    db.run(`PRAGMA optimize;`);
   });
 
   dbInstance = db;

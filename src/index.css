@@ -95,6 +95,26 @@ html.light-theme ::-webkit-scrollbar-thumb:hover,
    Apple Liquid Glass & Refractive Specular Design System
    ========================================================================= */
 
+/* GPU-Accelerated Hardware Compositing (Zero-Scroll Tearing & 120fps Smoothness) */
+.apple-glass,
+.apple-glass-pill,
+.apple-glass-card,
+.apple-liquid-glass {
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Off-screen Section Layout Containment (Zero Layout Thrashing on Scroll) */
+#opportunities,
+#how-it-works,
+#fellowships,
+#pricing {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 600px;
+}
+
 /* Apple Frosted Glass Container */
 .apple-glass {
   background: rgba(18, 20, 29, 0.65);

@@ -33,3 +33,20 @@ export function authenticateToken(req, res, next) {
     next();
   });
 }
+
+/**
+ * Role-Based Access Control (RBAC) middleware.
+ * Verifies that the authenticated user possesses an authorized role.
+ */
+export function authorizeRole(...allowedRoles) {
+  return (req, res, next) => {
+    if (!req.user) {
+      return res.status(401).json({ error: 'Authentication required.' });
+    }
+    const role = req.user.role || 'student';
+    if (!allowedRoles.includes(role) && !allowedRoles.includes('*')) {
+      return res.status(403).json({ error: `Forbidden: role '${role}' lacks required permission.` });
+    }
+    next();
+  };
+}
