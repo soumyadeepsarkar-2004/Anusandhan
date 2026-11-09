@@ -20,7 +20,8 @@ import {
   BookOpen, 
   CheckCircle2,
   CornerDownLeft,
-  RefreshCw
+  RefreshCw,
+  Scale
 } from 'lucide-react';
 import { Professor, FellowshipProgram, StudentProfile } from '../../types';
 import { useTheme } from '../../context/ThemeContext';
@@ -42,6 +43,8 @@ export interface CommandPaletteProps {
   onOpenVoiceModal?: () => void;
   onOpenMockInterview?: () => void;
   onOpenPricingModal?: () => void;
+  onOpenPrivacyModal?: () => void;
+  onOpenTermsModal?: () => void;
   professors?: Professor[];
   fellowships?: FellowshipProgram[];
   scrapedPostings?: any[];
@@ -50,7 +53,7 @@ export interface CommandPaletteProps {
 
 interface PaletteItem {
   id: string;
-  category: 'Navigation' | '24/7 Bot' | 'Faculty' | 'Fellowships' | 'Actions' | 'Documentation';
+  category: 'Navigation' | '24/7 Bot' | 'Faculty' | 'Fellowships' | 'Actions' | 'Documentation' | 'Legal & Compliance';
   title: string;
   subtitle: string;
   icon: React.ComponentType<{ className?: string }>;
@@ -66,6 +69,8 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
   onOpenVoiceModal,
   onOpenMockInterview,
   onOpenPricingModal,
+  onOpenPrivacyModal,
+  onOpenTermsModal,
   professors = [],
   fellowships = [],
   scrapedPostings = [],
@@ -244,6 +249,45 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
           await ApiClient.triggerIngestionSweep();
         } catch {}
         onNavigateView('app', 'discover', { subTab: 'scraped' });
+        onClose();
+      }
+    },
+    {
+      id: 'act-privacy-policy',
+      category: 'Legal & Compliance',
+      title: 'View DPDP Act 2023 Privacy Policy',
+      subtitle: 'Data fiduciary safeguards, consent controls, grievance redressal and zero-data-sale mandate',
+      icon: ShieldCheck,
+      badge: 'DPDP 2023',
+      badgeColor: 'text-emerald-500 bg-emerald-500/15 border-emerald-500/30',
+      action: () => {
+        if (onOpenPrivacyModal) onOpenPrivacyModal();
+        onClose();
+      }
+    },
+    {
+      id: 'act-terms-service',
+      category: 'Legal & Compliance',
+      title: 'View Terms of Service & Research Ethics Code',
+      subtitle: 'Mandatory human verification, anti-spam cold outreach limits, and academic honor code',
+      icon: Scale,
+      badge: 'Ethics Code',
+      badgeColor: 'text-amber-500 bg-amber-500/15 border-amber-500/30',
+      action: () => {
+        if (onOpenTermsModal) onOpenTermsModal();
+        onClose();
+      }
+    },
+    {
+      id: 'act-contact-support',
+      category: 'Legal & Compliance',
+      title: 'Contact Scholar Support & Grievance Desk',
+      subtitle: 'Reach our Data Protection Officer and technical support team at support@anusandhan.ai',
+      icon: Mail,
+      badge: 'Support',
+      badgeColor: 'text-blue-400 bg-blue-400/10 border-blue-400/20',
+      action: () => {
+        window.location.href = 'mailto:support@anusandhan.ai';
         onClose();
       }
     }

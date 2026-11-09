@@ -4,6 +4,8 @@ import { useAuth } from '../../context/AuthContext';
 import { AnusandhanLogo } from '../common/AnusandhanLogo';
 import { parseResumeText } from '../../services/resumeParser';
 import confetti from 'canvas-confetti';
+import { PrivacyPolicyModal } from '../legal/PrivacyPolicyModal';
+import { TermsOfServiceModal } from '../legal/TermsOfServiceModal';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -25,6 +27,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [showPrivacyModal, setShowPrivacyModal] = useState<boolean>(false);
+  const [showTermsModal, setShowTermsModal] = useState<boolean>(false);
 
   // Form State
   const [email, setEmail] = useState('');
@@ -621,6 +625,28 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             </p>
           </div>
 
+          {/* Statutory Legal & Consent Disclaimer */}
+          <div className="pt-2 text-center">
+            <p className="text-[11px] text-zinc-400 leading-relaxed">
+              By continuing, you agree to Anusandhan's{' '}
+              <button
+                type="button"
+                onClick={() => setShowTermsModal(true)}
+                className="text-amber-400 hover:text-amber-300 underline font-medium cursor-pointer inline"
+              >
+                Terms of Service
+              </button>{' '}
+              &amp;{' '}
+              <button
+                type="button"
+                onClick={() => setShowPrivacyModal(true)}
+                className="text-amber-400 hover:text-amber-300 underline font-medium cursor-pointer inline"
+              >
+                Privacy Policy (DPDP 2023)
+              </button>.
+            </p>
+          </div>
+
           {/* Institutional Compliance Seal */}
           <div className="pt-2 flex items-center justify-center space-x-2 text-[11px] text-zinc-500">
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
@@ -630,6 +656,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         </div>
 
       </div>
+
+      {/* Direct In-Modal Legal Overlays */}
+      <PrivacyPolicyModal isOpen={showPrivacyModal} onClose={() => setShowPrivacyModal(false)} />
+      <TermsOfServiceModal isOpen={showTermsModal} onClose={() => setShowTermsModal(false)} />
     </div>
   );
 };

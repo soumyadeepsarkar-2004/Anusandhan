@@ -10,7 +10,9 @@ import {
   LogOut, 
   Search, 
   Flame, 
-  Coins 
+  Coins,
+  ShieldCheck,
+  Scale
 } from 'lucide-react';
 import { StudentProfile } from '../../types';
 import { MacOSDock } from '../ui/MacOSDock';
@@ -34,6 +36,8 @@ interface AppLayoutProps {
   onBackToLanding: () => void;
   onOpenCommandPalette?: () => void;
   onOpenAuth?: () => void;
+  onOpenPrivacyModal?: () => void;
+  onOpenTermsModal?: () => void;
   student: StudentProfile;
   followUpDueCount: number;
   children: React.ReactNode;
@@ -49,6 +53,8 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
   onBackToLanding,
   onOpenCommandPalette,
   onOpenAuth,
+  onOpenPrivacyModal,
+  onOpenTermsModal,
   student,
   followUpDueCount,
   children
@@ -163,6 +169,30 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
               <PullChainBulb size="sm" />
             </div>
 
+            {/* Legal & Compliance Quick Access Buttons */}
+            {(onOpenPrivacyModal || onOpenTermsModal) && (
+              <div className="hidden xl:flex items-center space-x-1 pl-1 border-l border-[var(--border-subtle)]">
+                {onOpenPrivacyModal && (
+                  <button
+                    onClick={onOpenPrivacyModal}
+                    className="p-1.5 rounded-full bg-[var(--surface-card)] hover:bg-amber-500/10 border border-[var(--border-subtle)] hover:border-amber-500/40 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all cursor-pointer shadow-sm"
+                    title="DPDP Act 2023 Privacy Policy"
+                  >
+                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+                  </button>
+                )}
+                {onOpenTermsModal && (
+                  <button
+                    onClick={onOpenTermsModal}
+                    className="p-1.5 rounded-full bg-[var(--surface-card)] hover:bg-amber-500/10 border border-[var(--border-subtle)] hover:border-amber-500/40 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all cursor-pointer shadow-sm"
+                    title="Terms of Service & Research Ethics"
+                  >
+                    <Scale className="w-3.5 h-3.5 text-amber-500" />
+                  </button>
+                )}
+              </div>
+            )}
+
             {/* Scholar Profile / Sign In Action */}
             <div className="flex items-center space-x-1.5 pl-2 border-l border-[var(--border-subtle)]">
               {isAuthenticated && user ? (
@@ -244,6 +274,40 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-6">
         {children}
       </main>
+
+      {/* Workspace Footer Strip with High-Contrast Legal & Policy Links */}
+      <footer className="mt-auto max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 border-t border-[var(--border-subtle)] flex flex-col sm:flex-row items-center justify-between text-xs text-[var(--text-secondary)] gap-3 font-mono">
+        <div className="flex items-center space-x-2 text-[11px]">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          <span>Anusandhan Autonomous Workspace · DPDP Act 2023 Compliant</span>
+        </div>
+        <div className="flex items-center space-x-4 text-[11px]">
+          {onOpenPrivacyModal && (
+            <button
+              onClick={onOpenPrivacyModal}
+              className="hover:text-amber-500 transition-colors cursor-pointer flex items-center gap-1"
+            >
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+              <span>Privacy Policy</span>
+            </button>
+          )}
+          {onOpenTermsModal && (
+            <button
+              onClick={onOpenTermsModal}
+              className="hover:text-amber-500 transition-colors cursor-pointer flex items-center gap-1"
+            >
+              <Scale className="w-3.5 h-3.5 text-amber-500" />
+              <span>Terms & Ethics</span>
+            </button>
+          )}
+          <a
+            href="mailto:support@anusandhan.ai"
+            className="hover:text-amber-500 transition-colors"
+          >
+            Support
+          </a>
+        </div>
+      </footer>
 
       {/* Mobile Bottom Navigation Taskbar (Synchronized across all 8 tabs) */}
       <MobileBottomNav

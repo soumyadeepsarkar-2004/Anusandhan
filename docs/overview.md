@@ -14,7 +14,7 @@ Historically, this has resulted in:
 ---
 
 <p align="center">
-  <img src="/anusandhan-preview.svg" alt="Anusandhan Platform Architecture & Interface Preview" width="100%" />
+  <img src="/anusandhan-live-preview.png" alt="Anusandhan Platform Architecture & Interface Preview" width="100%" />
 </p>
 
 ---

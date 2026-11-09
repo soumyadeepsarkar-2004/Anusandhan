@@ -6,10 +6,31 @@ import { TermsOfServiceModal } from '../legal/TermsOfServiceModal';
 import { AnusandhanLogo } from '../common/AnusandhanLogo';
 import { useTheme } from '../../context/ThemeContext';
 
-export const Footer: React.FC = () => {
-  const [showPrivacy, setShowPrivacy] = useState(false);
-  const [showTerms, setShowTerms] = useState(false);
+interface FooterProps {
+  onOpenPrivacy?: () => void;
+  onOpenTerms?: () => void;
+}
+
+export const Footer: React.FC<FooterProps> = ({ onOpenPrivacy, onOpenTerms }) => {
+  const [showPrivacyLocal, setShowPrivacyLocal] = useState(false);
+  const [showTermsLocal, setShowTermsLocal] = useState(false);
   const { isDark } = useTheme();
+
+  const handleOpenPrivacy = () => {
+    if (onOpenPrivacy) {
+      onOpenPrivacy();
+    } else {
+      setShowPrivacyLocal(true);
+    }
+  };
+
+  const handleOpenTerms = () => {
+    if (onOpenTerms) {
+      onOpenTerms();
+    } else {
+      setShowTermsLocal(true);
+    }
+  };
 
   return (
     <footer className="relative mt-24 border-t border-[var(--border-subtle)] bg-[var(--surface-bg)]/90 backdrop-blur-3xl py-16 text-xs transition-colors duration-300">
@@ -123,43 +144,43 @@ export const Footer: React.FC = () => {
               Anusandhan enforces mandatory human confirmation, 7-day anti-burnout pacing, and strict DPDP Act 2023 data fiduciary compliance.
             </p>
 
-            <div className="space-y-2 pt-1">
+            <div className="space-y-2.5 pt-1">
               <button
-                onClick={() => setShowPrivacy(true)}
-                className="w-full p-2.5 rounded-xl bg-white/[0.04] hover:bg-amber-500/10 border border-white/12 hover:border-amber-500/40 text-left transition-all group cursor-pointer backdrop-blur-md shadow-sm"
+                onClick={handleOpenPrivacy}
+                className="w-full p-3 rounded-xl bg-[var(--surface-card)] hover:bg-amber-500/10 border border-[var(--border-subtle)] hover:border-amber-500/50 text-left transition-all group cursor-pointer shadow-sm"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 group-hover:text-amber-400 transition-colors" />
-                    <span className="text-xs font-semibold text-zinc-100 group-hover:text-amber-300 transition-colors">
+                    <ShieldCheck className="w-4 h-4 text-emerald-500 group-hover:text-amber-500 transition-colors" />
+                    <span className="text-xs font-semibold text-[var(--text-primary)] group-hover:text-amber-500 transition-colors">
                       Privacy Policy
                     </span>
                   </div>
-                  <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 font-medium">
                     DPDP 2023
                   </span>
                 </div>
-                <p className="text-[10px] text-zinc-400 mt-1 font-sans">
+                <p className="text-[11px] text-[var(--text-secondary)] mt-1 font-sans">
                   Data fiduciary safeguards, consent controls & grievance redressal
                 </p>
               </button>
 
               <button
-                onClick={() => setShowTerms(true)}
-                className="w-full p-2.5 rounded-xl bg-white/[0.04] hover:bg-amber-500/10 border border-white/12 hover:border-amber-500/40 text-left transition-all group cursor-pointer backdrop-blur-md shadow-sm"
+                onClick={handleOpenTerms}
+                className="w-full p-3 rounded-xl bg-[var(--surface-card)] hover:bg-amber-500/10 border border-[var(--border-subtle)] hover:border-amber-500/50 text-left transition-all group cursor-pointer shadow-sm"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
-                    <Scale className="w-3.5 h-3.5 text-amber-400" />
-                    <span className="text-xs font-semibold text-zinc-100 group-hover:text-amber-300 transition-colors">
+                    <Scale className="w-4 h-4 text-amber-500" />
+                    <span className="text-xs font-semibold text-[var(--text-primary)] group-hover:text-amber-500 transition-colors">
                       Terms & Research Ethics
                     </span>
                   </div>
-                  <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-medium">
                     Ethics Code
                   </span>
                 </div>
-                <p className="text-[10px] text-zinc-400 mt-1 font-sans">
+                <p className="text-[11px] text-[var(--text-secondary)] mt-1 font-sans">
                   Anti-spam quotas, human-in-the-loop verification & scholar code
                 </p>
               </button>
@@ -168,7 +189,7 @@ export const Footer: React.FC = () => {
 
         </div>
 
-        {/* Bottom Bar Strip - High Contrast, Prominent Interactive Action Badges */}
+        {/* Bottom Bar Strip - High Contrast, Theme-Adaptive Interactive Action Badges */}
         <div className="pt-6 border-t border-[var(--border-subtle)] flex flex-col md:flex-row items-center justify-between text-xs font-mono gap-4">
           <div className="text-[var(--text-secondary)] text-center md:text-left text-[11px]">
             © 2026–2027 Anusandhan Technologies Pvt. Ltd. · All research rights reserved.
@@ -179,31 +200,31 @@ export const Footer: React.FC = () => {
               href="https://soumyadeepsarkar-2004.github.io/Anusandhan/" 
               target="_blank" 
               rel="noreferrer" 
-              className="px-3 py-1.5 rounded-full bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 hover:text-amber-200 font-semibold transition-all inline-flex items-center gap-1.5 shadow-sm text-[11px]"
+              className="px-3.5 py-1.5 rounded-full bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-600 dark:text-amber-400 font-semibold transition-all inline-flex items-center gap-1.5 shadow-sm text-xs"
             >
               <span>VitePress Docs</span>
-              <ExternalLink className="w-3 h-3" />
+              <ExternalLink className="w-3.5 h-3.5" />
             </a>
 
             <button 
-              onClick={() => setShowPrivacy(true)} 
-              className="px-3 py-1.5 rounded-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/15 text-zinc-200 hover:text-white font-medium transition-all inline-flex items-center gap-1.5 cursor-pointer shadow-sm text-[11px]"
+              onClick={handleOpenPrivacy} 
+              className="px-3.5 py-1.5 rounded-full bg-[var(--surface-card)] hover:bg-amber-500/10 border border-[var(--border-subtle)] hover:border-amber-500/40 text-[var(--text-primary)] font-medium transition-all inline-flex items-center gap-1.5 cursor-pointer shadow-sm text-xs"
             >
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
               <span>Privacy Policy</span>
             </button>
 
             <button 
-              onClick={() => setShowTerms(true)} 
-              className="px-3 py-1.5 rounded-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/15 text-zinc-200 hover:text-white font-medium transition-all inline-flex items-center gap-1.5 cursor-pointer shadow-sm text-[11px]"
+              onClick={handleOpenTerms} 
+              className="px-3.5 py-1.5 rounded-full bg-[var(--surface-card)] hover:bg-amber-500/10 border border-[var(--border-subtle)] hover:border-amber-500/40 text-[var(--text-primary)] font-medium transition-all inline-flex items-center gap-1.5 cursor-pointer shadow-sm text-xs"
             >
-              <Scale className="w-3.5 h-3.5 text-amber-400" />
+              <Scale className="w-3.5 h-3.5 text-amber-500" />
               <span>Terms of Service</span>
             </button>
 
             <a 
               href="mailto:support@anusandhan.ai" 
-              className="px-3 py-1.5 rounded-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/15 text-zinc-200 hover:text-white font-medium transition-all inline-flex items-center gap-1.5 shadow-sm text-[11px]"
+              className="px-3.5 py-1.5 rounded-full bg-[var(--surface-card)] hover:bg-amber-500/10 border border-[var(--border-subtle)] hover:border-amber-500/40 text-[var(--text-secondary)] hover:text-[var(--text-primary)] font-medium transition-all inline-flex items-center gap-1.5 shadow-sm text-xs"
             >
               <span>Support & Inquiries</span>
             </a>
@@ -212,9 +233,9 @@ export const Footer: React.FC = () => {
 
       </div>
 
-      {/* Legal Modals */}
-      <PrivacyPolicyModal isOpen={showPrivacy} onClose={() => setShowPrivacy(false)} />
-      <TermsOfServiceModal isOpen={showTerms} onClose={() => setShowTerms(false)} />
+      {/* Legal Modals Fallback */}
+      <PrivacyPolicyModal isOpen={showPrivacyLocal} onClose={() => setShowPrivacyLocal(false)} />
+      <TermsOfServiceModal isOpen={showTermsLocal} onClose={() => setShowTermsLocal(false)} />
     </footer>
   );
 };

@@ -45,6 +45,8 @@ const InteractiveRRSStudio = lazy(() => import('./components/landing/Interactive
 const PaperPitchVisualizer = lazy(() => import('./components/landing/PaperPitchVisualizer').then(m => ({ default: m.PaperPitchVisualizer })));
 const MockInterviewModal = lazy(() => import('./components/agents/MockInterviewModal').then(m => ({ default: m.MockInterviewModal })));
 const CommandPalette = lazy(() => import('./components/common/CommandPalette').then(m => ({ default: m.CommandPalette })));
+import { PrivacyPolicyModal } from './components/legal/PrivacyPolicyModal';
+import { TermsOfServiceModal } from './components/legal/TermsOfServiceModal';
 
 const SuspenseSkeleton: React.FC = () => (
   <div className="w-full min-h-[300px] flex items-center justify-center p-8">
@@ -147,6 +149,8 @@ const AppContent: React.FC = () => {
   const [selectedInterviewProf, setSelectedInterviewProf] = useState<{ name: string; institution?: string; domain?: string; firstQuestion?: string } | null>(null);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState<boolean>(false);
   const [isRewardsModalOpen, setIsRewardsModalOpen] = useState<boolean>(false);
+  const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState<boolean>(false);
+  const [isTermsModalOpen, setIsTermsModalOpen] = useState<boolean>(false);
 
   // Global Keyboard Shortcuts (⌘K / Ctrl+K for Command Palette)
   useEffect(() => {
@@ -413,6 +417,8 @@ const AppContent: React.FC = () => {
               setAuthInitialMode('signin');
               setIsAuthModalOpen(true);
             }}
+            onOpenPrivacyModal={() => setIsPrivacyModalOpen(true)}
+            onOpenTermsModal={() => setIsTermsModalOpen(true)}
             creditsRemaining={student.creditsRemaining}
           />
 
@@ -469,7 +475,10 @@ const AppContent: React.FC = () => {
             />
           </main>
 
-          <Footer />
+          <Footer
+            onOpenPrivacy={() => setIsPrivacyModalOpen(true)}
+            onOpenTerms={() => setIsTermsModalOpen(true)}
+          />
         </div>
       )}
 
@@ -531,6 +540,8 @@ const AppContent: React.FC = () => {
               setAuthInitialMode('signin');
               setIsAuthModalOpen(true);
             }}
+            onOpenPrivacyModal={() => setIsPrivacyModalOpen(true)}
+            onOpenTermsModal={() => setIsTermsModalOpen(true)}
             onBackToLanding={() => navigateToView('landing')}
             student={student}
             followUpDueCount={followUpDueCount}
@@ -709,6 +720,8 @@ const AppContent: React.FC = () => {
           onOpenVoiceModal={() => setIsVoiceModalOpen(true)}
           onOpenMockInterview={() => setIsMockInterviewOpen(true)}
           onOpenPricingModal={() => setIsPricingModalOpen(true)}
+          onOpenPrivacyModal={() => setIsPrivacyModalOpen(true)}
+          onOpenTermsModal={() => setIsTermsModalOpen(true)}
           professors={liveFaculty}
           fellowships={fellowships}
           scrapedPostings={scrapedPostings}
@@ -779,6 +792,16 @@ const AppContent: React.FC = () => {
           onSaveProfile={setStudent}
         />
       </Suspense>
+
+      <PrivacyPolicyModal
+        isOpen={isPrivacyModalOpen}
+        onClose={() => setIsPrivacyModalOpen(false)}
+      />
+
+      <TermsOfServiceModal
+        isOpen={isTermsModalOpen}
+        onClose={() => setIsTermsModalOpen(false)}
+      />
 
     </div>
   );

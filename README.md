@@ -24,11 +24,11 @@
 ---
 
 <p align="center">
-  <img src="public/anusandhan-preview.svg" alt="Anusandhan Platform Architecture & Interface Preview" width="100%" />
+  <img src="public/anusandhan-live-preview.png" alt="Anusandhan Live Platform Interface & Discovery Studio" width="100%" style="border-radius: 14px; box-shadow: 0 24px 50px rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.12);" />
 </p>
 
 ### 🌐 Live Production Deployments & Access
-- 🚀 **Live Production Platform**: [https://anusandhan.trycloudflare.com](https://anusandhan.trycloudflare.com)
+- 🚀 **Live Production Platform**: [https://anusandhan.pages.dev](https://anusandhan.pages.dev) · [https://anusandhan.trycloudflare.com](https://anusandhan.trycloudflare.com)
 - 📚 **VitePress Documentation (GitHub Pages)**: [https://soumyadeepsarkar-2004.github.io/Anusandhan/](https://soumyadeepsarkar-2004.github.io/Anusandhan/)
 - 📦 **GitHub Repository**: [https://github.com/soumyadeepsarkar-2004/Anusandhan](https://github.com/soumyadeepsarkar-2004/Anusandhan)
 

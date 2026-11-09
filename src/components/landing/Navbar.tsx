@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mic, ArrowRight, Menu, X, Sparkles, User, LogOut, ShieldCheck, Search, CreditCard } from 'lucide-react';
+import { Mic, ArrowRight, Menu, X, Sparkles, User, LogOut, ShieldCheck, Search, CreditCard, Scale, ChevronDown } from 'lucide-react';
 import { AudioWaveformVisualizer, LiveRadarDot } from '../ui/AppleGlass';
 import { PullChainBulb } from '../ui/PullChainBulb';
 import { AnusandhanLogo } from '../common/AnusandhanLogo';
@@ -14,6 +14,8 @@ interface NavbarProps {
   onOpenCommandPalette?: () => void;
   onOpenPricingModal?: () => void;
   onOpenRewardsModal?: () => void;
+  onOpenPrivacyModal?: () => void;
+  onOpenTermsModal?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ 
@@ -23,13 +25,30 @@ export const Navbar: React.FC<NavbarProps> = ({
   creditsRemaining,
   onOpenCommandPalette,
   onOpenPricingModal,
-  onOpenRewardsModal
+  onOpenRewardsModal,
+  onOpenPrivacyModal,
+  onOpenTermsModal
 }) => {
   const { user, isAuthenticated, logout } = useAuth();
   const [hoveredNav, setHoveredNav] = useState<string | null>(null);
   const [activeSection, setActiveSection] = useState<string>('hero');
   const [isVoiceHovered, setIsVoiceHovered] = useState<boolean>(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
+  const [legalDropdownOpen, setLegalDropdownOpen] = useState<boolean>(false);
+  const legalDropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close legal dropdown on outside click
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      if (legalDropdownRef.current && !legalDropdownRef.current.contains(e.target as Node)) {
+        setLegalDropdownOpen(false);
+      }
+    };
+    if (legalDropdownOpen) {
+      document.addEventListener('mousedown', handleOutsideClick);
+    }
+    return () => document.removeEventListener('mousedown', handleOutsideClick);
+  }, [legalDropdownOpen]);
 
   const navLinks = [
     { name: 'Opportunities', href: '#opportunities', id: 'opportunities' },
@@ -128,6 +147,73 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Action Controls - Guaranteed Containment Inside Floating Glass Pill */}
         <div className="flex items-center space-x-1.5 sm:space-x-2 shrink-0">
           
+          {/* Institutional Compliance & Ethics Dropdown (DPDP Act 2023 & Terms) */}
+          {(onOpenPrivacyModal || onOpenTermsModal) && (
+            <div className="relative hidden xl:block shrink-0" ref={legalDropdownRef}>
+              <button
+                onClick={() => setLegalDropdownOpen(!legalDropdownOpen)}
+                className="flex items-center space-x-1.5 px-2.5 h-8 rounded-full bg-[var(--surface-card)] hover:bg-amber-500/10 border border-[var(--border-subtle)] hover:border-amber-500/40 text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-xs font-sans transition-all cursor-pointer shadow-sm group backdrop-blur-md shrink-0"
+                title="Statutory DPDP 2023 Privacy & Research Ethics Policies"
+              >
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-500 group-hover:scale-110 transition-transform" />
+                <span className="text-[11px] font-medium">Compliance</span>
+                <ChevronDown className={`w-3 h-3 text-[var(--text-muted)] transition-transform ${legalDropdownOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              <AnimatePresence>
+                {legalDropdownOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 6, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 4, scale: 0.95 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute right-0 top-10 w-64 p-2 rounded-2xl bg-[var(--surface-bg)] border border-[var(--border-subtle)] shadow-2xl backdrop-blur-2xl z-50 space-y-1"
+                  >
+                    <div className="px-3 py-1.5 text-[10px] font-mono uppercase tracking-wider text-[var(--text-muted)] border-b border-[var(--border-subtle)]">
+                      Statutory Disclosures
+                    </div>
+                    {onOpenPrivacyModal && (
+                      <button
+                        onClick={() => {
+                          setLegalDropdownOpen(false);
+                          onOpenPrivacyModal();
+                        }}
+                        className="w-full flex items-center justify-between p-2 rounded-xl hover:bg-amber-500/10 text-left transition-colors cursor-pointer group"
+                      >
+                        <div className="flex items-center space-x-2">
+                          <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+                          <span className="text-xs font-medium text-[var(--text-primary)] group-hover:text-amber-500">Privacy Policy</span>
+                        </div>
+                        <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">DPDP 2023</span>
+                      </button>
+                    )}
+                    {onOpenTermsModal && (
+                      <button
+                        onClick={() => {
+                          setLegalDropdownOpen(false);
+                          onOpenTermsModal();
+                        }}
+                        className="w-full flex items-center justify-between p-2 rounded-xl hover:bg-amber-500/10 text-left transition-colors cursor-pointer group"
+                      >
+                        <div className="flex items-center space-x-2">
+                          <Scale className="w-3.5 h-3.5 text-amber-500" />
+                          <span className="text-xs font-medium text-[var(--text-primary)] group-hover:text-amber-500">Terms & Ethics</span>
+                        </div>
+                        <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30">Ethics Code</span>
+                      </button>
+                    )}
+                    <a
+                      href="mailto:support@anusandhan.ai"
+                      className="w-full flex items-center p-2 rounded-xl hover:bg-amber-500/10 text-left transition-colors text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                    >
+                      <span className="text-[11px] ml-5">Support: support@anusandhan.ai</span>
+                    </a>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          )}
+
           {/* Quick Search / Command Palette Pill */}
           {onOpenCommandPalette && (
             <button
@@ -253,6 +339,30 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </a>
               ))}
             </div>
+
+            {/* Mobile Compliance Actions */}
+            {(onOpenPrivacyModal || onOpenTermsModal) && (
+              <div className="pt-2 border-t border-[var(--border-subtle)] grid grid-cols-2 gap-2 text-[11px]">
+                {onOpenPrivacyModal && (
+                  <button
+                    onClick={() => { setMobileMenuOpen(false); onOpenPrivacyModal(); }}
+                    className="flex items-center justify-center space-x-1.5 py-2 px-2.5 rounded-xl bg-[var(--surface-card)] hover:bg-amber-500/10 border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer font-medium"
+                  >
+                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+                    <span>Privacy Policy</span>
+                  </button>
+                )}
+                {onOpenTermsModal && (
+                  <button
+                    onClick={() => { setMobileMenuOpen(false); onOpenTermsModal(); }}
+                    className="flex items-center justify-center space-x-1.5 py-2 px-2.5 rounded-xl bg-[var(--surface-card)] hover:bg-amber-500/10 border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer font-medium"
+                  >
+                    <Scale className="w-3.5 h-3.5 text-amber-500" />
+                    <span>Terms & Ethics</span>
+                  </button>
+                )}
+              </div>
+            )}
 
             <div className="pt-2 border-t border-[var(--border-subtle)] flex items-center justify-between text-xs">
               <button
