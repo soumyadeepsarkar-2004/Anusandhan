@@ -104,7 +104,6 @@ TARGET_URL=http://your-server-ip:5000 CONCURRENT_USERS=1000 DURATION=15 node tes
 Anusandhan is fully configured for zero-configuration, production deployment on **Vercel** (`vercel.app`):
 
 - **Live Production Endpoint**: `https://anusandhan.vercel.app`
-- **1-Click Deploy**: [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/soumyadeepsarkar-2004/Anusandhan)
 - **VitePress Documentation**: `https://soumyadeepsarkar-2004.github.io/Anusandhan/`
 - **GitHub Repository**: `https://github.com/soumyadeepsarkar-2004/Anusandhan`
 

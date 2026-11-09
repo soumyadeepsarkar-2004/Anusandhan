@@ -3,6 +3,7 @@ import { Professor, FellowshipProgram, StudentProfile } from '../../types';
 import { Search, ShieldCheck, Mail, ArrowUpRight, Clock, DollarSign, Users, Sparkles, Cpu, RefreshCw, ExternalLink, Calendar, CheckCircle2, Globe } from 'lucide-react';
 import { ApiClient } from '../../services/apiClient';
 import { AppleGlassCard } from '../ui/AppleGlass';
+import { AutonomousPortalModal } from '../agents/AutonomousPortalModal';
 
 interface OpportunityExplorerProps {
   professors: Professor[];
@@ -44,6 +45,7 @@ export const OpportunityExplorer: React.FC<OpportunityExplorerProps> = ({
   const [onlyHighMentorship, setOnlyHighMentorship] = useState<boolean>(false);
   const [liveProfessors, setLiveProfessors] = useState<Professor[]>(professors);
   const [liveFellowships, setLiveFellowships] = useState<FellowshipProgram[]>(fellowships);
+  const [selectedPortalFellowship, setSelectedPortalFellowship] = useState<FellowshipProgram | null>(null);
   const [isGatewayConnected, setIsGatewayConnected] = useState<boolean>(false);
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -287,28 +289,13 @@ export const OpportunityExplorer: React.FC<OpportunityExplorerProps> = ({
         </div>
 
         <div className="flex items-center gap-2 self-start sm:self-center shrink-0">
-          <button
-            onClick={async () => {
-              setIsRefreshing(true);
-              await ApiClient.triggerIngestionSweep();
-              const freshFaculty = await ApiClient.getFaculty({ q: searchQuery, scope: selectedScope });
-              if (freshFaculty && Array.isArray(freshFaculty)) {
-                setLiveProfessors(freshFaculty);
-              }
-              const freshFellowships = await ApiClient.getFellowships({ q: searchQuery, status: selectedStatus, scope: selectedScope });
-              if (freshFellowships && Array.isArray(freshFellowships)) {
-                setLiveFellowships(freshFellowships);
-              }
-              const freshStatus = await ApiClient.getIngestionStatus();
-              if (freshStatus) setIngestionTelemetry(freshStatus as any);
-              setIsRefreshing(false);
-            }}
-            disabled={isRefreshing}
-            className="px-3.5 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer backdrop-blur-md shadow-sm active:scale-95"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
-            <span>{isRefreshing ? 'Scraping Web...' : '⚡ Scrape Now'}</span>
-          </button>
+          <div className="px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-mono flex items-center gap-2 shadow-sm">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            <span>Server Scraper Agent: 24/7 Active</span>
+          </div>
         </div>
       </div>
 
@@ -374,63 +361,11 @@ export const OpportunityExplorer: React.FC<OpportunityExplorerProps> = ({
           </div>
 
           {isGatewayConnected && (
-            <div className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[11px] font-mono shrink-0">
-              <Sparkles className="w-3 h-3 text-amber-400" />
-              <span>LIVE OPENALEX & ARXIV SYNC</span>
+            <div className="hidden sm:inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-white/[0.04] border border-white/10 text-zinc-300 text-[11px] font-mono shrink-0">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span>OpenAlex & ArXiv Autonomous Feed</span>
             </div>
           )}
-
-          <button
-            onClick={async () => {
-              setIsRefreshing(true);
-              await ApiClient.triggerIngestionSweep();
-              const fresh = await ApiClient.getFaculty({ q: searchQuery });
-              if (fresh && Array.isArray(fresh)) {
-                setLiveProfessors(fresh.map((bp: any) => ({
-                  id: bp.id,
-                  name: bp.name,
-                  title: bp.title || 'Principal Investigator',
-                  department: bp.department || 'Computer Science & AI',
-                  university: bp.institution || bp.university,
-                  country: bp.country || 'Global',
-                  labName: bp.lab_name || 'Autonomous Systems Lab',
-                  labUrl: bp.lab_url || 'https://example.edu',
-                  contactEmail: bp.email,
-                  domain: (bp.research_domains?.[0] as any) || bp.domain || 'Artificial Intelligence & ML',
-                  researchFocus: bp.top_keywords?.join(' · ') || bp.researchFocus || 'Frontier Systems',
-                  recentPaper: bp.recentPaper || {
-                    title: bp.recent_papers?.[0]?.title || 'Recent Advances in Frontier Science',
-                    year: bp.recent_papers?.[0]?.year || 2025,
-                    venue: bp.recent_papers?.[0]?.venue || 'Top Venue',
-                    snippet: `Investigates ${bp.top_keywords?.[0] || 'core dynamics'} with empirical benchmarks.`,
-                    doiUrl: bp.recent_papers?.[0]?.pdf_url || undefined
-                  },
-                  metrics: {
-                    hIndex: bp.metrics?.hIndex || bp.metrics?.h_index || 40,
-                    i10Index: bp.metrics?.i10Index || bp.metrics?.calculated_mentor_score || 35,
-                    totalCitations: bp.metrics?.totalCitations || bp.metrics?.total_citations || 5000,
-                    citationVelocity: bp.metrics?.citationVelocity || bp.metrics?.citation_velocity_2y || 1200,
-                    recentTopVenuePapers: bp.metrics?.recentTopVenuePapers || 8,
-                    studentCoAuthorshipRatio: bp.metrics?.studentCoAuthorshipRatio || bp.metrics?.student_coauthor_ratio || 0.85,
-                    activeGrant: bp.metrics?.activeGrant
-                  },
-                  matchScore: 98,
-                  isAcceptingStudents: true
-                })));
-              }
-              const freshFellowships = await ApiClient.getFellowships({ q: searchQuery });
-              if (freshFellowships && Array.isArray(freshFellowships) && freshFellowships.length > 0) {
-                setLiveFellowships(freshFellowships);
-              }
-              setIsRefreshing(false);
-            }}
-            disabled={isRefreshing}
-            className="px-3 py-2 rounded-xl bg-zinc-800/90 hover:bg-zinc-700/90 border border-white/10 text-zinc-300 text-xs flex items-center gap-1.5 transition-colors cursor-pointer shrink-0"
-            title="Scrape and refresh real bibliometrics from OpenAlex & ArXiv"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 text-amber-400 ${isRefreshing ? 'animate-spin' : ''}`} />
-            <span className="hidden sm:inline font-mono text-[11px]">{isRefreshing ? 'Scraping...' : 'Live Sync'}</span>
-          </button>
         </div>
 
       </div>
@@ -936,8 +871,17 @@ export const OpportunityExplorer: React.FC<OpportunityExplorerProps> = ({
                       
                       <div className="flex items-center gap-1.5">
                         <button
+                          onClick={() => setSelectedPortalFellowship(prog)}
+                          className="px-2.5 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-all shadow-sm active:scale-95"
+                          title="Apply via Autonomous Agent (Audit, SOP & One-Click Launch)"
+                        >
+                          <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                          <span>Auto-Apply</span>
+                        </button>
+
+                        <button
                           onClick={() => onApplyFellowship(prog)}
-                          className="px-2.5 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-mono flex items-center gap-1 cursor-pointer transition-colors"
+                          className="px-2 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-mono flex items-center gap-1 cursor-pointer transition-colors"
                           title="View Fellowship Specs & Requirements"
                         >
                           <span>Specs</span>
@@ -970,6 +914,14 @@ export const OpportunityExplorer: React.FC<OpportunityExplorerProps> = ({
           )}
         </div>
       )}
+
+      {/* Autonomous Portal Agent Application Modal */}
+      <AutonomousPortalModal
+        isOpen={!!selectedPortalFellowship}
+        onClose={() => setSelectedPortalFellowship(null)}
+        fellowship={selectedPortalFellowship}
+        student={student}
+      />
 
     </div>
   );

@@ -5,22 +5,45 @@
  * with automatic, resilient local fallback.
  */
 
-const GATEWAY_BASE_URL = 'http://localhost:5000/api';
-const PYTHON_BASE_URL = 'http://localhost:8000/api/v1';
+const isBrowser = typeof window !== 'undefined';
+const getGatewayBaseUrl = () => {
+  if (isBrowser) {
+    const host = window.location.hostname;
+    if (host === 'localhost' || host === '127.0.0.1') {
+      return 'http://localhost:5000/api';
+    }
+    return '/api';
+  }
+  return '/api';
+};
+
+const GATEWAY_BASE_URL = getGatewayBaseUrl();
+const PYTHON_BASE_URL = isBrowser && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1'
+  ? '/api'
+  : 'http://localhost:8000/api/v1';
 
 export class ApiClient {
   private static async request<T>(baseUrl: string, endpoint: string, options: RequestInit = {}): Promise<T> {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 3500);
+    const timeoutId = setTimeout(() => controller.abort(), 8000);
+
+    const headers: Record<string, string> = {
+      'Accept': 'application/json',
+      ...(options.headers as Record<string, string> || {})
+    };
+
+    if (typeof window !== 'undefined' && !headers['Authorization'] && !headers['authorization']) {
+      const token = localStorage.getItem('rip_auth_token');
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+    }
 
     try {
       const response = await fetch(`${baseUrl}${endpoint}`, {
         ...options,
         signal: controller.signal,
-        headers: {
-          'Accept': 'application/json',
-          ...(options.headers || {})
-        }
+        headers
       });
       clearTimeout(timeoutId);
 
@@ -117,6 +140,22 @@ export class ApiClient {
       });
     } catch (e) {
       console.warn('Voice gateway unavailable, utilizing client speech synthesis:', e);
+      return null;
+    }
+  }
+
+  /**
+   * Generates tailored portal application dossier and statement of purpose via Autonomous Portal Agent.
+   */
+  static async applyViaAgent(payload: { fellowship: any; student: any }) {
+    try {
+      return await this.request<any>(GATEWAY_BASE_URL, '/agents/portal-application', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+    } catch (e) {
+      console.warn('Autonomous portal application agent unavailable:', e);
       return null;
     }
   }

@@ -28,10 +28,9 @@
 </p>
 
 ### 🌐 Live Production Deployments & Access
-- 🚀 **Live Production Platform (Vercel)**: [https://anusandhan.vercel.app](https://anusandhan.vercel.app)
+- 🚀 **Live Production Platform**: [https://anusandhan.vercel.app](https://anusandhan.vercel.app)
 - 📚 **VitePress Documentation (GitHub Pages)**: [https://soumyadeepsarkar-2004.github.io/Anusandhan/](https://soumyadeepsarkar-2004.github.io/Anusandhan/)
 - 📦 **GitHub Repository**: [https://github.com/soumyadeepsarkar-2004/Anusandhan](https://github.com/soumyadeepsarkar-2004/Anusandhan)
-- ⚡ **1-Click Vercel Deploy**: [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/soumyadeepsarkar-2004/Anusandhan)
 
 ---
 

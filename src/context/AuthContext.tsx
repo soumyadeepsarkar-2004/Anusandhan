@@ -72,10 +72,13 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const getAuthBaseUrl = () => {
   if (typeof window !== 'undefined') {
-    const host = window.location.hostname || 'localhost';
-    return `http://${host}:5000/api/auth`;
+    const host = window.location.hostname;
+    if (host === 'localhost' || host === '127.0.0.1') {
+      return 'http://localhost:5000/api/auth';
+    }
+    return '/api/auth';
   }
-  return 'http://localhost:5000/api/auth';
+  return '/api/auth';
 };
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
