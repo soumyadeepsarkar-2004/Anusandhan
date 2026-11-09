@@ -26,6 +26,8 @@ import { IntakeDiagnosticFlow } from './components/intake/IntakeDiagnosticFlow';
 import { ConstellationBackground } from './components/ui/ConstellationBackground';
 import { OfflineBanner } from './components/ui/OfflineBanner';
 import { PullChainBulb } from './components/ui/PullChainBulb';
+import { AnusandhanLogo } from './components/common/AnusandhanLogo';
+import { TokenRewardsModal } from './components/gamification/TokenRewardsModal';
 
 // Platform App Components
 import { AppLayout } from './components/app/AppLayout';
@@ -139,6 +141,7 @@ const AppContent: React.FC = () => {
   const [isMockInterviewOpen, setIsMockInterviewOpen] = useState<boolean>(false);
   const [selectedInterviewProf, setSelectedInterviewProf] = useState<{ name: string; institution?: string; domain?: string; firstQuestion?: string } | null>(null);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState<boolean>(false);
+  const [isRewardsModalOpen, setIsRewardsModalOpen] = useState<boolean>(false);
 
   // Global Keyboard Shortcuts (⌘K / Ctrl+K for Command Palette)
   useEffect(() => {
@@ -379,6 +382,8 @@ const AppContent: React.FC = () => {
             onLaunchApp={() => navigateToView('intake')}
             onOpenVoiceModal={() => setIsVoiceModalOpen(true)}
             onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
+            onOpenPricingModal={() => setIsPricingModalOpen(true)}
+            onOpenRewardsModal={() => setIsRewardsModalOpen(true)}
             onOpenAuth={() => {
               setAuthInitialMode('signin');
               setIsAuthModalOpen(true);
@@ -438,14 +443,10 @@ const AppContent: React.FC = () => {
         <div className="relative z-10 min-h-screen pb-16">
           <header className="sticky top-0 z-30 w-full border-b border-[var(--border-subtle)] bg-[var(--surface-bg)]/80 backdrop-blur-3xl shadow-sm px-4 sm:px-6 h-14 flex items-center justify-between">
             <div 
-              className="flex items-center space-x-2.5 cursor-pointer select-none"
+              className="flex items-center cursor-pointer select-none"
               onClick={() => navigateToView('landing')}
             >
-              <div className="w-7 h-7 rounded-lg bg-zinc-900 border border-zinc-700 p-0.5 overflow-hidden flex items-center justify-center shadow-sm">
-                <img src="/brand-emblem.png" alt="Anusandhan" className="w-full h-full object-cover rounded-md" onError={(e) => { (e.target as HTMLImageElement).src = '/brand-emblem.svg'; }} />
-              </div>
-              <span className="font-bold text-sm tracking-tight text-[var(--text-primary)]">Anusandhan</span>
-              <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-full bg-amber-500/15 text-amber-500 border border-amber-500/30 font-bold">PRO</span>
+              <AnusandhanLogo size="sm" badge="PRO" />
             </div>
 
             <div className="flex items-center space-x-3">
@@ -696,6 +697,15 @@ const AppContent: React.FC = () => {
         onClose={() => setIsPricingModalOpen(false)}
         creditsRemaining={student.creditsRemaining}
         onAddCredits={handleAddCredits}
+      />
+
+      <TokenRewardsModal
+        isOpen={isRewardsModalOpen}
+        onClose={() => setIsRewardsModalOpen(false)}
+        onOpenPricingModal={() => {
+          setIsRewardsModalOpen(false);
+          setIsPricingModalOpen(true);
+        }}
       />
 
       <OnboardingModal

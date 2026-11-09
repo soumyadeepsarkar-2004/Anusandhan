@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ShieldCheck, Scale, ExternalLink, Sparkles, Heart } from 'lucide-react';
 import { PrivacyPolicyModal } from '../legal/PrivacyPolicyModal';
 import { TermsOfServiceModal } from '../legal/TermsOfServiceModal';
+import { AnusandhanLogo } from '../common/AnusandhanLogo';
 import { useTheme } from '../../context/ThemeContext';
 
 export const Footer: React.FC = () => {
@@ -24,23 +25,8 @@ export const Footer: React.FC = () => {
           
           {/* Column 1: Brand & Purpose */}
           <div className="space-y-3.5">
-            <div className="flex items-center space-x-2.5">
-              <div className="w-8 h-8 rounded-xl bg-zinc-900 border border-zinc-700/80 p-0.5 overflow-hidden flex items-center justify-center shadow-md">
-                <img 
-                  src="/brand-emblem.png" 
-                  alt="Anusandhan" 
-                  className="w-full h-full object-cover rounded-lg" 
-                  onError={(e) => { (e.target as HTMLImageElement).src = '/brand-emblem.svg'; }} 
-                />
-              </div>
-              <div>
-                <span className="font-bold text-sm tracking-tight text-[var(--text-primary)]">
-                  Anusandhan
-                </span>
-                <span className="ml-1.5 text-[10px] font-mono px-1.5 py-0.2 rounded-full bg-amber-500/15 text-amber-500 border border-amber-500/30 font-semibold">
-                  PRO
-                </span>
-              </div>
+            <div className="flex items-center">
+              <AnusandhanLogo size="sm" badge="PRO" />
             </div>
 
             <p className="text-[var(--text-secondary)] text-xs leading-relaxed font-sans">

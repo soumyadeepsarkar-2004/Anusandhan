@@ -6,6 +6,7 @@
 import express from 'express';
 import crypto from 'crypto';
 import { authenticateToken } from '../middleware/authMiddleware.js';
+import { findUserByEmail, saveUser } from './authRoutes.js';
 
 const router = express.Router();
 
@@ -120,6 +121,70 @@ router.post('/create-order', authenticateToken, async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({ error: 'Order creation failed: ' + err.message });
+  }
+});
+
+// POST /api/billing/verify-payment - Verifies checkout & allots credits/tokens
+router.post('/verify-payment', authenticateToken, async (req, res) => {
+  try {
+    const { orderId, paymentId, signature, planId } = req.body;
+    let order = orderId ? orderHistory.get(orderId) : null;
+    const targetPlanId = planId || (order ? order.planId : 'pro_researcher');
+    const plan = PRICING_PLANS.find(p => p.id === targetPlanId);
+
+    if (!plan) {
+      return res.status(400).json({ error: 'Invalid subscription plan selected' });
+    }
+
+    // Cryptographic signature check if signature provided
+    if (signature && RAZORPAY_KEY_SECRET) {
+      const generatedSig = crypto
+        .createHmac('sha256', RAZORPAY_KEY_SECRET)
+        .update(`${orderId}|${paymentId}`)
+        .digest('hex');
+      const sigBuf = Buffer.from(signature, 'utf8');
+      const expBuf = Buffer.from(generatedSig, 'utf8');
+      if (sigBuf.length !== expBuf.length || !crypto.timingSafeEqual(sigBuf, expBuf)) {
+        return res.status(400).json({ error: 'Invalid Razorpay payment signature' });
+      }
+    }
+
+    const confirmedPaymentId = paymentId || `pay_${Date.now()}_${crypto.randomBytes(3).toString('hex')}`;
+    const confirmedOrderId = orderId || `order_${Date.now()}`;
+
+    if (order) {
+      order.status = 'paid';
+      order.paymentId = confirmedPaymentId;
+      order.paidAt = new Date().toISOString();
+      orderHistory.set(confirmedOrderId, order);
+    }
+
+    // Allocate credits and tokens to the user
+    let user = await findUserByEmail(req.user.email);
+    const creditsAwarded = plan.id === 'institutional_lab' ? 500 : (plan.id === 'pro_researcher' ? 50 : 10);
+    const tokensAwarded = plan.id === 'institutional_lab' ? 250 : (plan.id === 'pro_researcher' ? 50 : 10);
+
+    if (user) {
+      user.creditsRemaining = (user.creditsRemaining || 0) + creditsAwarded;
+      user.tokensBalance = (user.tokensBalance || 0) + tokensAwarded;
+      user.rrsTier = plan.id === 'institutional_lab' ? 'Investigator' : (plan.id === 'pro_researcher' ? 'Fellow' : user.rrsTier);
+      await saveUser(user);
+    }
+
+    res.json({
+      success: true,
+      orderId: confirmedOrderId,
+      paymentId: confirmedPaymentId,
+      planName: plan.name,
+      creditsAwarded,
+      tokensAwarded,
+      totalCredits: user ? user.creditsRemaining : creditsAwarded,
+      totalTokens: user ? user.tokensBalance : tokensAwarded,
+      invoiceNumber: `INV-${confirmedOrderId.replace(/^order_/, '').toUpperCase()}`,
+      message: `Successfully activated ${plan.name}! Awarded ${creditsAwarded} verified credits and ${tokensAwarded} Shodh tokens.`
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Payment verification failed: ' + err.message });
   }
 });
 

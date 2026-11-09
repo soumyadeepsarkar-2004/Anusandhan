@@ -33,6 +33,8 @@ import {
   ActivityFeedItem, 
   OutreachDraft 
 } from '../../types';
+import { useTheme } from '../../context/ThemeContext';
+import { AnusandhanLogo } from '../common/AnusandhanLogo';
 import { processVoiceQuery, speakText, OpportunityLinkItem } from '../../services/voiceAgentService';
 import { ApiClient } from '../../services/apiClient';
 import { AppleGlassCard, AudioWaveformVisualizer, LiveRadarDot } from '../ui/AppleGlass';
@@ -85,6 +87,7 @@ export const AutonomousAssistantWidget: React.FC<AutonomousAssistantWidgetProps>
   // 'orb': Minimal circular floating icon (DEFAULT on initial load / reload)
   // 'capsule': Horizontal bar with voice mic & audio visualizer (opens on orb click)
   // 'chat': Full conversational window with foundation models (opens on expand)
+  const { isDark } = useTheme();
   const [mode, setMode] = useState<AssistantWidgetMode>('orb');
   const [selectedModel, setSelectedModel] = useState<AgentModelId>('gemini-flash');
   const [voiceEngine, setVoiceEngine] = useState<VoiceEngineType>('sarvam');
@@ -631,7 +634,7 @@ export const AutonomousAssistantWidget: React.FC<AutonomousAssistantWidgetProps>
             aria-label="Open AnusandhanAI Assistant"
           >
             <div className="relative w-full h-full flex items-center justify-center">
-              <img src="/brand-emblem.svg" alt="Emblem" className="w-5 h-5 object-contain" />
+              <img src={isDark ? '/brand-emblem-dark.svg' : '/brand-emblem-light.svg'} alt="Emblem" className="w-5 h-5 object-contain" />
             </div>
           </button>
         </div>
@@ -758,7 +761,7 @@ export const AutonomousAssistantWidget: React.FC<AutonomousAssistantWidgetProps>
 
               {/* Emblem Icon / Neural Core */}
               <div className="relative w-7 h-7 rounded-full bg-zinc-900 border border-zinc-700/80 p-1 flex items-center justify-center shadow-inner shrink-0 mr-1">
-                <img src="/brand-emblem.svg" alt="Emblem" className="w-full h-full object-contain" />
+                <img src={isDark ? '/brand-emblem-dark.svg' : '/brand-emblem-light.svg'} alt="Emblem" className="w-full h-full object-contain" />
               </div>
 
               {/* 1. Voice Interaction Button with Sleek Audio Visualizer Animation */}
@@ -921,7 +924,7 @@ export const AutonomousAssistantWidget: React.FC<AutonomousAssistantWidgetProps>
               </div>
 
               <div className="relative w-8 h-8 rounded-xl bg-zinc-900 border border-zinc-700 p-1 flex items-center justify-center shadow-md shrink-0">
-                <img src="/brand-emblem.svg" alt="Emblem" className="w-full h-full object-contain" />
+                <img src={isDark ? '/brand-emblem-dark.svg' : '/brand-emblem-light.svg'} alt="Emblem" className="w-full h-full object-contain" />
               </div>
 
               <div>

@@ -5,6 +5,7 @@ import { StudentProfile, VoiceEngineType, VoiceMessage } from '../../types';
 import { processVoiceQuery, speakText } from '../../services/voiceAgentService';
 import { ApiClient } from '../../services/apiClient';
 import { AudioWaveformVisualizer, LiveRadarDot, AppleGlassCard } from '../ui/AppleGlass';
+import { useTheme } from '../../context/ThemeContext';
 
 interface VoiceAgentModalProps {
   isOpen: boolean;
@@ -21,6 +22,7 @@ export const VoiceAgentModal: React.FC<VoiceAgentModalProps> = ({
 }) => {
   if (!isOpen) return null;
 
+  const { isDark } = useTheme();
   const [engine, setEngine] = useState<VoiceEngineType>('sarvam');
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
@@ -228,7 +230,7 @@ export const VoiceAgentModal: React.FC<VoiceAgentModalProps> = ({
           
           <div className="flex items-center space-x-3">
             <div className="relative flex items-center justify-center w-9 h-9 rounded-2xl bg-white/[0.06] border border-white/15 shadow-md">
-              <img src="/brand-emblem.svg" alt="Emblem" className="w-5 h-5 object-contain" />
+              <img src={isDark ? '/brand-emblem-dark.svg' : '/brand-emblem-light.svg'} alt="Emblem" className="w-5 h-5 object-contain" />
             </div>
 
             <div>

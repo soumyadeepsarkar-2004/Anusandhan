@@ -19,6 +19,8 @@ import { AudioWaveformVisualizer } from '../ui/AppleGlass';
 import { PullChainBulb } from '../ui/PullChainBulb';
 import { useAuth } from '../../context/AuthContext';
 import { ScholarStreakModal } from '../gamification/ScholarStreakModal';
+import { TokenRewardsModal } from '../gamification/TokenRewardsModal';
+import { AnusandhanLogo } from '../common/AnusandhanLogo';
 
 interface AppLayoutProps {
   currentTab: AppTab;
@@ -49,6 +51,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
 }) => {
   const { user, isAuthenticated, logout } = useAuth();
   const [isStreakModalOpen, setIsStreakModalOpen] = useState(false);
+  const [isTokenModalOpen, setIsTokenModalOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-[var(--canvas-bg)] text-[var(--text-primary)] flex flex-col pb-32 relative transition-colors duration-300">
@@ -70,23 +73,8 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
               <ArrowLeft className="w-4 h-4" />
             </button>
 
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 rounded-xl bg-zinc-900 border border-zinc-700/80 p-0.5 overflow-hidden flex items-center justify-center shadow-md">
-                <img 
-                  src="/brand-emblem.png" 
-                  alt="Anusandhan" 
-                  className="w-full h-full object-cover rounded-lg" 
-                  onError={(e) => { (e.target as HTMLImageElement).src = '/brand-emblem.svg'; }} 
-                />
-              </div>
-              <div className="flex items-center space-x-1.5">
-                <span className="font-bold text-sm tracking-tight text-[var(--text-primary)]">
-                  Anusandhan
-                </span>
-                <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-full bg-amber-500/15 text-amber-500 border border-amber-500/30 font-bold">
-                  PRO
-                </span>
-              </div>
+            <div className="flex items-center cursor-pointer select-none" onClick={onBackToLanding}>
+              <AnusandhanLogo size="sm" badge="PRO" />
             </div>
           </div>
 
@@ -122,9 +110,9 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
 
             {/* Shodh Tokens Balance */}
             <button
-              onClick={() => setIsStreakModalOpen(true)}
+              onClick={() => setIsTokenModalOpen(true)}
               className="hidden sm:flex items-center space-x-1 px-2.5 py-1 rounded-full bg-white/[0.04] hover:bg-white/[0.08] border border-[var(--border-subtle)] hover:border-amber-400/40 text-amber-500 font-mono text-xs transition-all cursor-pointer shadow-sm active:scale-95"
-              title="Your Shodh Token Balance"
+              title="Your Shodh Token Balance & Reward Claims"
             >
               <span className="text-xs">🪙</span>
               <span className="font-bold text-[var(--text-primary)]">{user?.tokensBalance || 14}</span>
@@ -254,6 +242,13 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
       <ScholarStreakModal
         isOpen={isStreakModalOpen}
         onClose={() => setIsStreakModalOpen(false)}
+        onOpenPricingModal={onOpenPricingModal}
+      />
+
+      {/* Shodh Token Wallet & Rewards Claim Modal */}
+      <TokenRewardsModal
+        isOpen={isTokenModalOpen}
+        onClose={() => setIsTokenModalOpen(false)}
         onOpenPricingModal={onOpenPricingModal}
       />
 

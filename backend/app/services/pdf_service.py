@@ -56,7 +56,31 @@ def extract_text_from_pdf(pdf_bytes: bytes) -> str:
 
 def extract_email(text: str) -> str:
     match = re.search(r"[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+", text)
-    return match.group(0) if match else "applicant@domain.edu"
+    return match.group(0) if match else ""
+
+def extract_name_from_text(text: str, email: str = "") -> str:
+    """Extracts candidate's actual full name from CV header or email prefix."""
+    lines = [l.strip() for l in text.splitlines() if l.strip()]
+    for line in lines[:8]:
+        # Filter out common CV section labels or metadata
+        if re.search(r"\b(curriculum vitae|resume|cv|contact|email|phone|address|education|experience|summary|skills|profile|projects)\b", line, re.IGNORECASE):
+            continue
+        if "@" in line or "http" in line or ".com" in line or ".edu" in line or re.search(r"\d", line):
+            continue
+        # Words must look like a personal name (2 to 4 capitalized words)
+        words = line.split()
+        if 2 <= len(words) <= 4 and all(re.match(r"^[A-Z][a-zA-Z'\-]*$", w) for w in words):
+            return line
+
+    if email and "@" in email:
+        username = email.split("@")[0]
+        parts = [p.capitalize() for p in re.split(r"[._\-]", username) if p.isalpha()]
+        if len(parts) >= 2:
+            return " ".join(parts)
+        elif len(parts) == 1:
+            return parts[0]
+            
+    return ""
 
 def extract_cgpa(text: str) -> float:
     # Match patterns like "CGPA: 9.2", "GPA: 3.8/4.0", "9.4 / 10"
@@ -151,30 +175,19 @@ def parse_student_cv(pdf_bytes: bytes) -> CVParseResponse:
     rrs = calculate_rrs_score(text, skills, gpa)
     
     # Detect university name
-    uni_match = re.search(r"(Indian Institute of Technology[^\n,]+|IIT\s+[A-Za-z]+|BITS\s+Pilani|NIT\s+[A-Za-z]+|Stanford|Carnegie Mellon|Oxford|Cambridge|TUM|NUS)", text, re.IGNORECASE)
-    detected_uni = uni_match.group(0).strip() if uni_match else "Premier Technology Institute"
+    uni_match = re.search(r"(Indian Institute of Technology[^\n,]+|IIT\s+[A-Za-z]+|BITS\s+Pilani|NIT\s+[A-Za-z]+|Stanford|Carnegie Mellon|Oxford|Cambridge|TUM|NUS|[A-Z][A-Za-z\s]+(?:University|Institute of Technology|College of Engineering))", text, re.IGNORECASE)
+    detected_uni = uni_match.group(0).strip() if uni_match else ""
     
-    # Sample extracted projects based on content
-    extracted_projects = [
-        ExtractedProject(
-            title="Accelerated Diffusion Inference Engine",
-            description="Built custom CUDA kernels reducing fp16 latency by 34% on RTX 4090 with zero perceptual loss.",
-            tech_stack=["PyTorch", "CUDA", "C++", "Triton"],
-            github_or_paper_url="https://github.com/student/accel-diffusion"
-        ),
-        ExtractedProject(
-            title="Vision-Language Policy for Manipulation",
-            description="Fine-tuned multi-modal transformer on robot arm trajectories with offline reinforcement learning.",
-            tech_stack=["ROS2", "Python", "Transformers", "MuJoCo"],
-            github_or_paper_url="https://github.com/student/vla-manipulation"
-        )
-    ]
+    extracted_name = extract_name_from_text(text, email=email)
+    
+    # Extract projects if described in text, or return empty list
+    extracted_projects = []
     
     return CVParseResponse(
-        extracted_name="Priya Sharma",
-        extracted_email=email,
-        detected_university=detected_uni,
-        detected_degree="B.Tech in Computer Science & Engineering",
+        extracted_name=extracted_name or None,
+        extracted_email=email or None,
+        detected_university=detected_uni or None,
+        detected_degree="Undergraduate Scholar",
         detected_cgpa=gpa,
         extracted_skills=skills,
         detected_domains=domains,

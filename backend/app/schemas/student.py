@@ -21,9 +21,9 @@ class RRSScoreBreakdown(BaseModel):
 
 class StudentProfile(BaseModel):
     id: Optional[str] = "student_active"
-    name: str = "Priya Sharma"
-    email: str = "priya.sharma@iitd.ac.in"
-    university: str = "IIT Delhi"
+    name: str = "Research Scholar"
+    email: str = "scholar@institution.edu"
+    university: str = "State / Regional University"
     major: str = "Computer Science & Engineering"
     graduation_year: int = 2027
     cgpa: float = Field(..., ge=0.0, le=10.0)

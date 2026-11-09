@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, Check, Zap, Sparkles, CreditCard, ShieldCheck, Coins, Lock } from 'lucide-react';
 import { PRICING_PLANS } from '../../data/pricingPlans';
 import { useAuth } from '../../context/AuthContext';
+import { RazorpayPaymentModal } from '../payment/RazorpayPaymentModal';
 import confetti from 'canvas-confetti';
 
 interface PricingModalProps {
@@ -24,6 +25,10 @@ export const PricingModal: React.FC<PricingModalProps> = ({
   const [currency, setCurrency] = useState<'INR' | 'USD'>('INR');
   const [payWithTokens, setPayWithTokens] = useState(false);
   const [tokenFeedback, setTokenFeedback] = useState<string | null>(null);
+
+  // Razorpay Checkout State
+  const [checkoutPlanId, setCheckoutPlanId] = useState<string>('pro-season');
+  const [isRazorpayModalOpen, setIsRazorpayModalOpen] = useState(false);
 
   const tokens = user?.tokensBalance || 0;
 
@@ -48,12 +53,19 @@ export const PricingModal: React.FC<PricingModalProps> = ({
       return;
     }
 
-    setTimeout(() => {
-      onAddCredits(credits);
+    if (planId === 'free-scholar') {
+      onAddCredits(10);
       setIsProcessing(false);
-      confetti({ particleCount: 70, spread: 80, origin: { y: 0.6 } });
+      confetti({ particleCount: 50, spread: 60 });
       onClose();
-    }, 800);
+      return;
+    }
+
+    // Map to backend billing plan ID and open Razorpay Payment Modal
+    const mappedPlanId = planId === 'institutional-lab' ? 'institutional_lab' : 'pro_researcher';
+    setCheckoutPlanId(mappedPlanId);
+    setIsRazorpayModalOpen(true);
+    setIsProcessing(false);
   };
 
   return (
@@ -259,6 +271,21 @@ export const PricingModal: React.FC<PricingModalProps> = ({
         </div>
 
       </div>
+
+      {/* Embedded Razorpay Secure Checkout Gateway */}
+      <RazorpayPaymentModal
+        isOpen={isRazorpayModalOpen}
+        initialPlanId={checkoutPlanId}
+        onClose={() => {
+          setIsRazorpayModalOpen(false);
+          onClose();
+        }}
+        onSuccessCredits={(added) => {
+          onAddCredits(added);
+          setIsRazorpayModalOpen(false);
+          onClose();
+        }}
+      />
     </div>
   );
 };

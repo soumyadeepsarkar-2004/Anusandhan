@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Lock, Mail, User, School, ArrowRight, Eye, EyeOff, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { AnusandhanLogo } from '../common/AnusandhanLogo';
 import confetti from 'canvas-confetti';
 
 interface AuthModalProps {
@@ -77,21 +78,19 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-2xl animate-fadeIn">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/75 backdrop-blur-2xl animate-fadeIn">
       {/* Specular Ambient Glow */}
       <div className="absolute w-[450px] h-[450px] bg-gradient-to-tr from-amber-500/15 via-amber-400/5 to-transparent rounded-full blur-[140px] pointer-events-none -z-10" />
 
-      {/* Glassmorphism Dialog Card */}
-      <div className="w-full max-w-md apple-glass rounded-3xl border border-white/20 shadow-[0_30px_90px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col relative">
+      {/* Glassmorphism Dialog Card - Contained Viewport */}
+      <div className="w-full max-w-lg apple-glass rounded-3xl border border-white/20 shadow-[0_30px_90px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col relative max-h-[88vh]">
         {/* Specular Top Sheen Line */}
         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
         
         {/* Header Strip */}
-        <div className="p-5 sm:p-6 border-b border-white/10 flex items-center justify-between bg-white/[0.03] backdrop-blur-md">
+        <div className="p-4 sm:p-5 border-b border-white/10 flex items-center justify-between bg-white/[0.03] backdrop-blur-md shrink-0">
           <div className="flex items-center space-x-3">
-            <div className="w-9 h-9 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-400 flex items-center justify-center shadow-inner">
-              <ShieldCheck className="w-5 h-5 text-amber-400" />
-            </div>
+            <AnusandhanLogo size="sm" showText={false} />
             <div>
               <h3 className="text-base sm:text-lg font-serif font-medium text-zinc-100">
                 {mode === 'signin' ? 'Sign In to Anusandhan' : 'Create Scholar Account'}
@@ -112,7 +111,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         </div>
 
         {/* Tab Toggle - Liquid Glass Pill */}
-        <div className="mx-5 mt-4 p-1 apple-glass-pill rounded-2xl grid grid-cols-2 text-xs font-mono">
+        <div className="mx-5 mt-4 p-1 apple-glass-pill rounded-2xl grid grid-cols-2 text-xs font-mono shrink-0">
           <button
             onClick={() => { setMode('signin'); setErrorMessage(null); }}
             className={`min-h-[38px] py-2 rounded-xl transition-colors cursor-pointer font-medium ${
@@ -135,8 +134,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           </button>
         </div>
 
-        {/* Form Body */}
-        <div className="p-5 sm:p-6 space-y-4">
+        {/* Form Body - Scrollable Container */}
+        <div className="p-4 sm:p-6 space-y-4 overflow-y-auto custom-scrollbar flex-1">
           
           {/* Social OAuth Buttons - Google, LinkedIn, GitHub */}
           <div className="grid grid-cols-3 gap-2">
@@ -202,36 +201,38 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             
             {mode === 'register' && (
               <>
-                <div>
-                  <label className="block text-xs font-medium text-zinc-300 mb-1">Full Name</label>
-                  <div className="relative">
-                    <User className="w-4 h-4 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
-                    <input
-                      type="text"
-                      required
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      placeholder="e.g. Aditya Varma"
-                      className="min-h-[44px] w-full pl-9 pr-3 py-2 rounded-xl bg-white/[0.04] backdrop-blur-md border border-white/12 focus:border-amber-400/70 focus:bg-white/[0.07] text-xs text-zinc-100 placeholder-zinc-500 transition-colors"
-                    />
-                  </div>
-                </div>
-
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-medium text-zinc-300 mb-1">University / Institute</label>
+                    <label className="block text-xs font-medium text-zinc-300 mb-1">Full Name</label>
+                    <div className="relative">
+                      <User className="w-4 h-4 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                      <input
+                        type="text"
+                        required
+                        value={fullName}
+                        onChange={(e) => setFullName(e.target.value)}
+                        placeholder="e.g. Rahul Verma"
+                        className="min-h-[42px] w-full pl-9 pr-3 py-1.5 rounded-xl bg-white/[0.04] backdrop-blur-md border border-white/12 focus:border-amber-400/70 focus:bg-white/[0.07] text-xs text-zinc-100 placeholder-zinc-500 transition-colors"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium text-zinc-300 mb-1">University / College</label>
                     <div className="relative">
                       <School className="w-4 h-4 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
                       <input
                         type="text"
                         value={university}
                         onChange={(e) => setUniversity(e.target.value)}
-                        placeholder="e.g. IIT Bombay / Stanford"
-                        className="min-h-[44px] w-full pl-9 pr-3 py-2 rounded-xl bg-white/[0.04] backdrop-blur-md border border-white/12 focus:border-amber-400/70 focus:bg-white/[0.07] text-xs text-zinc-100 placeholder-zinc-500 transition-colors"
+                        placeholder="e.g. IIT Bombay / NIT Trichy"
+                        className="min-h-[42px] w-full pl-9 pr-3 py-1.5 rounded-xl bg-white/[0.04] backdrop-blur-md border border-white/12 focus:border-amber-400/70 focus:bg-white/[0.07] text-xs text-zinc-100 placeholder-zinc-500 transition-colors"
                       />
                     </div>
                   </div>
+                </div>
 
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-medium text-zinc-300 mb-1">Academic CGPA (out of 10)</label>
                     <input
@@ -241,27 +242,27 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                       max="10"
                       value={cgpa}
                       onChange={(e) => setCgpa(e.target.value)}
-                      placeholder="e.g. 8.8"
-                      className="min-h-[44px] w-full px-3 py-2 rounded-xl bg-white/[0.04] backdrop-blur-md border border-white/12 focus:border-amber-400/70 focus:bg-white/[0.07] text-xs text-zinc-100 placeholder-zinc-500 font-mono transition-colors"
+                      placeholder="e.g. 8.85"
+                      className="min-h-[42px] w-full px-3 py-1.5 rounded-xl bg-white/[0.04] backdrop-blur-md border border-white/12 focus:border-amber-400/70 focus:bg-white/[0.07] text-xs text-zinc-100 placeholder-zinc-500 font-mono transition-colors"
                     />
                   </div>
-                </div>
 
-                <div>
-                  <label className="block text-xs font-medium text-zinc-300 mb-1">Target Research Domain</label>
-                  <select
-                    value={fieldOfStudy}
-                    onChange={(e) => setFieldOfStudy(e.target.value)}
-                    className="min-h-[44px] w-full px-3 py-2 rounded-xl bg-zinc-900 border border-white/12 focus:border-amber-400/70 text-xs text-zinc-100 cursor-pointer transition-colors"
-                  >
-                    <option value="Artificial Intelligence & ML">Artificial Intelligence & ML</option>
-                    <option value="Robotics & Autonomous Systems">Robotics & Autonomous Systems</option>
-                    <option value="Computational Biology & Genomics">Computational Biology & Genomics</option>
-                    <option value="Quantum Computing & Information">Quantum Computing & Information</option>
-                    <option value="High Energy & Theoretical Physics">High Energy & Theoretical Physics</option>
-                    <option value="Cybersecurity & Distributed Systems">Cybersecurity & Distributed Systems</option>
-                    <option value="Clean Energy & Materials Science">Clean Energy & Materials Science</option>
-                  </select>
+                  <div>
+                    <label className="block text-xs font-medium text-zinc-300 mb-1">Target Research Domain</label>
+                    <select
+                      value={fieldOfStudy}
+                      onChange={(e) => setFieldOfStudy(e.target.value)}
+                      className="min-h-[42px] w-full px-3 py-1.5 rounded-xl bg-zinc-900 border border-white/12 focus:border-amber-400/70 text-xs text-zinc-100 cursor-pointer transition-colors"
+                    >
+                      <option value="Artificial Intelligence & ML">AI & Machine Learning</option>
+                      <option value="Robotics & Autonomous Systems">Robotics & Autonomous Systems</option>
+                      <option value="Computational Biology & Genomics">Computational Biology & Genomics</option>
+                      <option value="Quantum Computing & Information">Quantum Computing</option>
+                      <option value="High Energy & Theoretical Physics">Physics & HPC</option>
+                      <option value="Cybersecurity & Distributed Systems">Distributed Systems</option>
+                      <option value="Clean Energy & Materials Science">Clean Energy & Materials</option>
+                    </select>
+                  </div>
                 </div>
               </>
             )}

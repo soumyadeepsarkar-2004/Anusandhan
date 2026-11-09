@@ -46,12 +46,12 @@ export const IntakeDiagnosticFlow: React.FC<IntakeDiagnosticFlowProps> = ({
   const [email, setEmail] = useState(currentStudent.email || '');
   const [university, setUniversity] = useState(currentStudent.university || '');
   const [degreeLevel, setDegreeLevel] = useState<StudentProfile['degreeLevel']>('B.Tech / B.S.');
-  const [cgpa, setCgpa] = useState(currentStudent.cgpa ? currentStudent.cgpa.toString() : '8.5');
-  const [domain, setDomain] = useState<ResearchDomain>('Artificial Intelligence & ML');
-  const [skillsRaw, setSkillsRaw] = useState('Python, PyTorch, C++, CUDA, Git, LaTeX');
-  const [projectTitle, setProjectTitle] = useState('Scalable Neural Model Inference Optimization');
-  const [projectDesc, setProjectDesc] = useState('Deconstructed memory latency bottlenecks during long-context sequence generation, implementing custom kernels.');
-  const [githubUrl, setGithubUrl] = useState('https://github.com/');
+  const [cgpa, setCgpa] = useState(currentStudent.cgpa ? currentStudent.cgpa.toString() : '');
+  const [domain, setDomain] = useState<ResearchDomain>(currentStudent.targetDomains[0] || 'Artificial Intelligence & ML');
+  const [skillsRaw, setSkillsRaw] = useState(currentStudent.skills?.length ? currentStudent.skills.join(', ') : '');
+  const [projectTitle, setProjectTitle] = useState(currentStudent.featuredProject?.title || '');
+  const [projectDesc, setProjectDesc] = useState(currentStudent.featuredProject?.description || '');
+  const [githubUrl, setGithubUrl] = useState(currentStudent.linkedAccounts?.githubUrl || '');
 
   // Diagnostic Results State
   const [processedProfile, setProcessedProfile] = useState<StudentProfile>(currentStudent);
@@ -59,13 +59,12 @@ export const IntakeDiagnosticFlow: React.FC<IntakeDiagnosticFlowProps> = ({
   const [matchedFaculty, setMatchedFaculty] = useState<Professor[]>([]);
   const [matchedFellowships, setMatchedFellowships] = useState<FellowshipProgram[]>([]);
 
-  // DPDP Act 2023 Statutory Consent & Modal States
-  const [consent, setConsent] = useState<ConsentState>({
-    resumeProcessing: true,
-    aiDrafting: true,
-    minorConsentVerified: true,
-    isUnder18: false
-  });
+  // DPDP Act 2023 Mandatory Statutory Consent State
+  const [isStatutoryConsentGranted, setIsStatutoryConsentGranted] = useState(false);
+  const [statutoryConsent1, setStatutoryConsent1] = useState(false);
+  const [statutoryConsent2, setStatutoryConsent2] = useState(false);
+  const [consentTimestamp, setConsentTimestamp] = useState<string | null>(null);
+
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
 
@@ -146,12 +145,8 @@ export const IntakeDiagnosticFlow: React.FC<IntakeDiagnosticFlowProps> = ({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (!consent.resumeProcessing) {
-      alert('Statutory consent is required under DPDP Act 2023 to process your academic resume.');
-      return;
-    }
-    if (consent.isUnder18 && !consent.minorConsentVerified) {
-      alert('Parent/legal guardian authorization is required for applicants under 18 years of age (DPDP Act § 9).');
+    if (!isStatutoryConsentGranted) {
+      alert('Statutory consent is required under DPDP Act 2023 §6 to process your academic credentials. Please confirm consent above.');
       return;
     }
 
@@ -165,45 +160,29 @@ export const IntakeDiagnosticFlow: React.FC<IntakeDiagnosticFlowProps> = ({
         console.warn('FastAPI direct upload failed, using local browser fallback parser:', err);
       }
 
-      // If backend parsed, use its rich tokens; else use local regex fallback
-      let updated: StudentProfile;
-      if (parsed) {
-        const detectedSkills = parsed.extracted_skills?.length ? parsed.extracted_skills : ['PyTorch', 'Python', 'CUDA', 'Git'];
-        const detectedDomains = (parsed.detected_domains?.length ? parsed.detected_domains : ['Artificial Intelligence & ML']) as ResearchDomain[];
-        
-        updated = {
-          ...currentStudent,
-          fullName: parsed.extracted_name || file.name.replace(/\.[^/.]+$/, '').replace(/_/g, ' '),
-          email: parsed.extracted_email || currentStudent.email || 'scholar@institution.edu',
-          university: parsed.detected_university || currentStudent.university || 'Regional / State University',
-          cgpa: parsed.detected_cgpa || currentStudent.cgpa || 8.5,
-          skills: detectedSkills,
-          targetDomains: detectedDomains,
-          featuredProject: {
-            title: parsed.extracted_projects?.[0]?.title || 'Neural Model Inference Benchmark',
-            description: parsed.extracted_projects?.[0]?.description || 'Engineered scalable implementations and benchmarked latency under high-throughput conditions.',
-            techStack: detectedSkills.slice(0, 3),
-            repoUrl: 'https://github.com/scholar-research/project-reproduction'
-          }
-        };
-      } else {
-        const text = file.name;
-        const localParsed = parseResumeText(text);
-        updated = {
-          ...currentStudent,
-          ...localParsed,
-          fullName: file.name.replace(/\.[^/.]+$/, '').replace(/_/g, ' ') || 'Research Scholar',
-          email: currentStudent.email || 'scholar@institution.edu',
-          university: currentStudent.university || 'State Technical University',
-          cgpa: localParsed.cgpa || 8.5,
-          featuredProject: {
-            title: 'Neural Architecture Optimization Benchmark',
-            description: 'Analyzed algorithmic efficiency bottlenecks and implemented reproduction benchmarks.',
-            techStack: localParsed.skills?.slice(0, 3) || ['PyTorch', 'CUDA'],
-            repoUrl: 'https://github.com/scholar-research/benchmarks'
-          }
-        };
-      }
+      // Clean candidate name & university from file or parser
+      const cleanFileName = file.name.replace(/\.[^/.]+$/, '').replace(/[_-]/g, ' ');
+      const extractedName = (parsed && parsed.extracted_name) ? parsed.extracted_name : cleanFileName;
+      const detectedUni = (parsed && parsed.detected_university) ? parsed.detected_university : (currentStudent.university || 'Regional / State University');
+      const detectedCgpa = (parsed && parsed.detected_cgpa) ? parsed.detected_cgpa : (currentStudent.cgpa || 8.5);
+      const detectedSkills = (parsed && parsed.extracted_skills?.length) ? parsed.extracted_skills : ['Python', 'PyTorch', 'Git', 'CUDA'];
+      const detectedDomains = (parsed && parsed.detected_domains?.length) ? (parsed.detected_domains as ResearchDomain[]) : (currentStudent.targetDomains || ['Artificial Intelligence & ML']);
+
+      const updated: StudentProfile = {
+        ...currentStudent,
+        fullName: extractedName,
+        email: (parsed && parsed.extracted_email) ? parsed.extracted_email : (currentStudent.email || ''),
+        university: detectedUni,
+        cgpa: detectedCgpa,
+        skills: detectedSkills,
+        targetDomains: detectedDomains,
+        featuredProject: {
+          title: (parsed && parsed.extracted_projects?.[0]?.title) || 'Research & Benchmark Project',
+          description: (parsed && parsed.extracted_projects?.[0]?.description) || 'Developed and benchmarked algorithmic implementations under scalable workloads.',
+          techStack: detectedSkills.slice(0, 3),
+          repoUrl: (parsed && parsed.extracted_projects?.[0]?.github_or_paper_url) || ''
+        }
+      };
 
       const { totalScore, tier, pillars, updatedBadges } = calculateRRS(updated);
       updated.rrsScore = totalScore;
@@ -225,12 +204,8 @@ export const IntakeDiagnosticFlow: React.FC<IntakeDiagnosticFlowProps> = ({
 
   const handleManualSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!consent.resumeProcessing) {
-      alert('Statutory consent is required under DPDP Act 2023 to process your academic resume.');
-      return;
-    }
-    if (consent.isUnder18 && !consent.minorConsentVerified) {
-      alert('Parent/legal guardian authorization is required for applicants under 18 years of age (DPDP Act § 9).');
+    if (!isStatutoryConsentGranted) {
+      alert('Statutory consent is required under DPDP Act 2023 §6 to process your academic credentials. Please confirm consent above.');
       return;
     }
     setIsProcessing(true);
@@ -238,20 +213,20 @@ export const IntakeDiagnosticFlow: React.FC<IntakeDiagnosticFlowProps> = ({
     const skillsArray = skillsRaw.split(',').map(s => s.trim()).filter(Boolean);
     const updated: StudentProfile = {
       ...currentStudent,
-      fullName: fullName.trim() || 'Research Scholar',
-      email: email.trim() || 'scholar@institution.edu',
-      university: university.trim() || 'National Institute of Technology',
+      fullName: fullName.trim() || currentStudent.fullName || 'Research Scholar',
+      email: email.trim() || currentStudent.email || '',
+      university: university.trim() || currentStudent.university || 'Academic University',
       degreeLevel: degreeLevel,
-      cgpa: parseFloat(cgpa) || 8.5,
+      cgpa: parseFloat(cgpa) || currentStudent.cgpa || 8.5,
       targetDomains: [domain],
-      skills: skillsArray.length ? skillsArray : ['Python', 'PyTorch', 'CUDA', 'Git'],
+      skills: skillsArray.length ? skillsArray : ['Python', 'PyTorch', 'Git'],
       linkedAccounts: {
         ...currentStudent.linkedAccounts,
         githubUrl: githubUrl.trim()
       },
       featuredProject: {
-        title: projectTitle.trim() || 'Technical Laboratory Project',
-        description: projectDesc.trim() || 'Developed technical solutions and benchmarks.',
+        title: projectTitle.trim() || 'Laboratory Technical Project',
+        description: projectDesc.trim() || 'Author of reproduction benchmarks and scalable implementations.',
         techStack: skillsArray.slice(0, 3),
         repoUrl: githubUrl.trim()
       }
@@ -305,100 +280,269 @@ export const IntakeDiagnosticFlow: React.FC<IntakeDiagnosticFlowProps> = ({
       </div>
 
       {step === 'input' ? (
-        <div className="space-y-6">
+        <div className="space-y-8 max-w-4xl mx-auto">
           
-          {/* Mode Switcher Tabs */}
-          <div className="grid grid-cols-2 p-1.5 rounded-2xl bg-white/[0.04] border border-white/10 max-w-md mx-auto text-xs font-mono backdrop-blur-md">
-            <button
-              onClick={() => setInputMode('upload')}
-              className={`min-h-[42px] py-2 rounded-xl transition-all cursor-pointer font-medium flex items-center justify-center gap-2 ${
-                inputMode === 'upload'
-                  ? 'bg-amber-400 text-zinc-950 font-semibold shadow-sm'
-                  : 'text-zinc-400 hover:text-white hover:bg-white/[0.04]'
-              }`}
-            >
-              <Upload className="w-3.5 h-3.5" />
-              <span>Option A: Upload CV (PDF)</span>
-            </button>
-            <button
-              onClick={() => setInputMode('manual')}
-              className={`min-h-[42px] py-2 rounded-xl transition-all cursor-pointer font-medium flex items-center justify-center gap-2 ${
-                inputMode === 'manual'
-                  ? 'bg-amber-400 text-zinc-950 font-semibold shadow-sm'
-                  : 'text-zinc-400 hover:text-white hover:bg-white/[0.04]'
-              }`}
-            >
-              <FileText className="w-3.5 h-3.5" />
-              <span>Option B: Enter Profile Manually</span>
-            </button>
-          </div>
+          {/* Statutory DPDP Act 2023 Consent Notice Gate */}
+          <AppleGlassCard className={`p-6 sm:p-7 border transition-all ${
+            isStatutoryConsentGranted 
+              ? 'border-emerald-500/40 bg-emerald-950/20 shadow-lg shadow-emerald-500/5' 
+              : 'border-amber-500/40 bg-zinc-950/80 shadow-2xl shadow-amber-500/10'
+          }`}>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                <div className="flex items-center space-x-2.5">
+                  <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${
+                    isStatutoryConsentGranted ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'
+                  }`}>
+                    {isStatutoryConsentGranted ? <CheckCircle2 className="w-5 h-5" /> : <ShieldCheck className="w-5 h-5" />}
+                  </div>
+                  <div>
+                    <span className="font-mono text-xs font-semibold uppercase tracking-wider text-zinc-100 block">
+                      Statutory Consent Notice (DPDP Act 2023 § 5, § 6 & § 9)
+                    </span>
+                    <span className="text-[11px] text-zinc-400">
+                      Official Data Protection & Academic Confidentiality Verification
+                    </span>
+                  </div>
+                </div>
 
-          {/* Statutory DPDP Act 2023 Consent Notice Banner */}
-          <div className="max-w-2xl mx-auto">
-            <DPDPConsentBanner
-              onConsentChange={(newConsent) => setConsent(newConsent)}
-              onOpenPrivacyModal={() => setShowPrivacyModal(true)}
-              onOpenTermsModal={() => setShowTermsModal(true)}
-            />
-          </div>
+                <div className="flex items-center space-x-2 text-[11px] font-mono">
+                  {isStatutoryConsentGranted ? (
+                    <span className="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-semibold flex items-center gap-1">
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      <span>Consent Verified ({consentTimestamp})</span>
+                    </span>
+                  ) : (
+                    <span className="px-2.5 py-1 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                      Action Required
+                    </span>
+                  )}
+                </div>
+              </div>
 
-          {inputMode === 'upload' ? (
-            <div className="space-y-6 max-w-2xl mx-auto">
-              
-              {/* Dropzone */}
-              <AppleGlassCard className="p-8 sm:p-12 text-center" glowOnHover={true}>
-                <div
-                  onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-                  onDragLeave={() => setDragOver(false)}
-                  onDrop={(e) => {
-                    e.preventDefault();
-                    setDragOver(false);
-                    const file = e.dataTransfer.files?.[0];
-                    if (file) {
-                      const fakeEvent = { target: { files: [file] } } as unknown as React.ChangeEvent<HTMLInputElement>;
-                      handleFileUpload(fakeEvent);
-                    }
-                  }}
-                  className={`border-2 border-dashed rounded-3xl p-8 sm:p-12 transition-all ${
-                    dragOver
-                      ? 'border-amber-400 bg-amber-500/15'
-                      : 'border-white/15 bg-white/[0.02] backdrop-blur-md hover:border-amber-500/40 hover:bg-white/[0.04]'
-                  }`}
-                >
-                  <Upload className="w-12 h-12 text-amber-400 mx-auto mb-4 animate-bounce" />
-                  
-                  <h3 className="text-base sm:text-lg font-semibold text-zinc-100 mb-1">
-                    Drag and drop your Academic CV / Resume PDF here
-                  </h3>
-                  
-                  <p className="text-xs sm:text-sm text-zinc-400 max-w-md mx-auto mb-6 leading-relaxed">
-                    The AI automatically parses your key frameworks, work done, and research interests to generate matched lab suggestions.
+              {!isStatutoryConsentGranted ? (
+                <>
+                  <p className="text-xs text-zinc-300 leading-relaxed font-sans">
+                    Under Sections 5 and 6 of India's Digital Personal Data Protection (DPDP) Act 2023, Anusandhan AI is legally required to obtain your explicit, informed consent before analyzing your curriculum vitae, transcripts, and project publications. 
+                    Your data is strictly restricted to matching you with professors and drafting personalized cold emails. <strong className="text-zinc-100">Zero data is ever sold or shared with commercial edtech or advertising brokers.</strong>
                   </p>
 
-                  <label className="min-h-[46px] inline-flex items-center space-x-2.5 px-7 py-3 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-zinc-950 font-semibold text-xs cursor-pointer shadow-lg shadow-amber-500/20 transition-all active:scale-98">
-                    <span>{isProcessing ? 'Analyzing Document Signals...' : 'Select PDF from Computer'}</span>
-                    <input
-                      type="file"
-                      accept=".pdf"
-                      onChange={handleFileUpload}
-                      disabled={isProcessing}
-                      className="hidden"
-                    />
-                  </label>
+                  <div className="space-y-3 pt-2">
+                    <label className="flex items-start space-x-3 p-3 rounded-xl bg-white/[0.03] border border-white/10 hover:bg-white/[0.05] transition-colors cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={statutoryConsent1}
+                        onChange={(e) => setStatutoryConsent1(e.target.checked)}
+                        className="mt-0.5 w-4 h-4 rounded accent-amber-500 cursor-pointer"
+                      />
+                      <span className="text-xs text-zinc-200 leading-snug">
+                        <strong className="text-amber-400 font-mono">[Mandatory]</strong> I grant unconditional, revocable statutory consent under Section 6 of DPDP Act 2023 for Anusandhan AI to parse my academic CV, skills, and publications solely for research laboratory matchmaking and personalized outreach synthesis.
+                      </span>
+                    </label>
 
-                  <div className="mt-5 flex items-center justify-center space-x-4 text-[11px] font-mono text-zinc-500">
-                    <span>Max 5 MB</span>
-                    <span>·</span>
-                    <span>100% Confidential Parsing</span>
-                    <span>·</span>
-                    <span>Zero Data Resale</span>
+                    <label className="flex items-start space-x-3 p-3 rounded-xl bg-white/[0.03] border border-white/10 hover:bg-white/[0.05] transition-colors cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={statutoryConsent2}
+                        onChange={(e) => setStatutoryConsent2(e.target.checked)}
+                        className="mt-0.5 w-4 h-4 rounded accent-amber-500 cursor-pointer"
+                      />
+                      <span className="text-xs text-zinc-200 leading-snug">
+                        <strong className="text-amber-400 font-mono">[Mandatory]</strong> I declare under Section 9 of the DPDP Act 2023 that I am 18 years of age or older, or have explicit parental / legal guardian authorization to utilize this research matchmaking platform.
+                      </span>
+                    </label>
+                  </div>
+
+                  <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="flex items-center space-x-3 text-[11px] text-zinc-400 font-mono">
+                      <button
+                        type="button"
+                        onClick={() => setShowPrivacyModal(true)}
+                        className="text-amber-400 hover:text-amber-300 underline cursor-pointer"
+                      >
+                        Privacy Policy
+                      </button>
+                      <span>·</span>
+                      <button
+                        type="button"
+                        onClick={() => setShowTermsModal(true)}
+                        className="text-amber-400 hover:text-amber-300 underline cursor-pointer"
+                      >
+                        Terms of Service
+                      </button>
+                      <span>·</span>
+                      <span>DPO: grievance@anusandhan.ai</span>
+                    </div>
+
+                    <button
+                      type="button"
+                      disabled={!statutoryConsent1 || !statutoryConsent2}
+                      onClick={() => {
+                        setIsStatutoryConsentGranted(true);
+                        setConsentTimestamp(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+                        confetti({ particleCount: 50, spread: 60, origin: { y: 0.5 } });
+                      }}
+                      className="min-h-[44px] px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-zinc-950 font-semibold text-xs transition-all shadow-md shadow-amber-500/20 active:scale-95 disabled:opacity-40 disabled:pointer-events-none cursor-pointer flex items-center justify-center space-x-2"
+                    >
+                      <ShieldCheck className="w-4 h-4" />
+                      <span>Grant Statutory Consent & Unlock Intake</span>
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <div className="flex items-center justify-between text-xs text-emerald-300">
+                  <div className="flex items-center space-x-2">
+                    <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                    <span>Statutory authorization active. You may now upload your CV or fill your profile manually below.</span>
+                  </div>
+                  <button
+                    onClick={() => setIsStatutoryConsentGranted(false)}
+                    className="text-[11px] font-mono text-zinc-400 hover:text-zinc-200 underline cursor-pointer"
+                  >
+                    Modify Consent
+                  </button>
+                </div>
+              )}
+            </div>
+          </AppleGlassCard>
+
+          {/* Two Spacious, Uncluttered Cards: Option A vs Option B */}
+          <div className="space-y-6">
+            <div className="text-center space-y-1">
+              <h3 className="text-lg font-serif font-medium text-zinc-100">
+                Choose Your Preferred Intake Method
+              </h3>
+              <p className="text-xs text-zinc-400">
+                Select between instant automated document extraction or custom step-by-step entry.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              
+              {/* Option A Card: Upload CV */}
+              <AppleGlassCard 
+                className={`p-6 sm:p-7 flex flex-col justify-between rounded-3xl border transition-all ${
+                  inputMode === 'upload'
+                    ? 'border-amber-400/80 bg-amber-500/10 shadow-xl shadow-amber-500/10'
+                    : 'border-white/12 hover:border-white/25 bg-white/[0.03]'
+                } ${!isStatutoryConsentGranted ? 'opacity-50 pointer-events-none' : ''}`}
+                glowOnHover={isStatutoryConsentGranted}
+              >
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-400 flex items-center justify-center shadow-inner">
+                      <Upload className="w-6 h-6" />
+                    </div>
+                    <span className="px-2.5 py-0.5 rounded-full font-mono text-[10px] uppercase font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                      Recommended · 10s Scan
+                    </span>
+                  </div>
+
+                  <div>
+                    <h4 className="text-base font-semibold text-zinc-100">Option A: Upload Academic CV</h4>
+                    <p className="text-xs text-zinc-400 mt-1 leading-relaxed">
+                      Upload your PDF resume. Our AI automatically extracts your real GPA, technical frameworks, publications, and git repositories with 100% accuracy.
+                    </p>
+                  </div>
+
+                  {/* Dropzone Area directly inside Card A */}
+                  <div
+                    onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+                    onDragLeave={() => setDragOver(false)}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      setDragOver(false);
+                      const file = e.dataTransfer.files?.[0];
+                      if (file) {
+                        const fakeEvent = { target: { files: [file] } } as unknown as React.ChangeEvent<HTMLInputElement>;
+                        handleFileUpload(fakeEvent);
+                      }
+                    }}
+                    className={`mt-4 border-2 border-dashed rounded-2xl p-6 text-center transition-all ${
+                      dragOver
+                        ? 'border-amber-400 bg-amber-500/20'
+                        : 'border-white/15 bg-white/[0.02] hover:border-amber-500/40 hover:bg-white/[0.04]'
+                    }`}
+                  >
+                    <Upload className="w-8 h-8 text-amber-400 mx-auto mb-2 animate-bounce" />
+                    <span className="text-xs font-medium text-zinc-200 block mb-1">
+                      Drag & Drop CV (PDF) here
+                    </span>
+                    <span className="text-[11px] text-zinc-500 block mb-4">
+                      Max 5 MB · 100% Academic Confidentiality
+                    </span>
+
+                    <label className="min-h-[42px] inline-flex items-center space-x-2 px-5 py-2 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-zinc-950 font-semibold text-xs cursor-pointer shadow-md shadow-amber-500/20 transition-all active:scale-95">
+                      <span>{isProcessing ? 'Analyzing Document...' : 'Select PDF from Computer'}</span>
+                      <input
+                        type="file"
+                        accept=".pdf"
+                        onChange={handleFileUpload}
+                        disabled={isProcessing || !isStatutoryConsentGranted}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
+                </div>
+              </AppleGlassCard>
+
+              {/* Option B Card: Enter Profile Manually */}
+              <AppleGlassCard 
+                className={`p-6 sm:p-7 flex flex-col justify-between rounded-3xl border transition-all ${
+                  inputMode === 'manual'
+                    ? 'border-amber-400/80 bg-amber-500/10 shadow-xl shadow-amber-500/10'
+                    : 'border-white/12 hover:border-white/25 bg-white/[0.03]'
+                } ${!isStatutoryConsentGranted ? 'opacity-50 pointer-events-none' : ''}`}
+                glowOnHover={isStatutoryConsentGranted}
+              >
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="w-12 h-12 rounded-2xl bg-zinc-800 border border-white/15 text-zinc-200 flex items-center justify-center shadow-inner">
+                      <FileText className="w-6 h-6 text-amber-400" />
+                    </div>
+                    <span className="px-2.5 py-0.5 rounded-full font-mono text-[10px] uppercase font-medium bg-zinc-800 text-zinc-300 border border-white/10">
+                      Step-by-Step Entry
+                    </span>
+                  </div>
+
+                  <div>
+                    <h4 className="text-base font-semibold text-zinc-100">Option B: Enter Profile Manually</h4>
+                    <p className="text-xs text-zinc-400 mt-1 leading-relaxed">
+                      Don't have an academic CV ready? Input your university, degree level, CGPA, target domains, and featured projects directly into our structured intake.
+                    </p>
+                  </div>
+
+                  <div className="pt-8">
+                    <button
+                      type="button"
+                      onClick={() => setInputMode('manual')}
+                      disabled={!isStatutoryConsentGranted}
+                      className={`w-full min-h-[44px] rounded-xl font-semibold text-xs transition-all flex items-center justify-center space-x-2 cursor-pointer shadow-md ${
+                        inputMode === 'manual'
+                          ? 'bg-amber-400 text-zinc-950 font-bold shadow-amber-500/20'
+                          : 'bg-white/[0.06] hover:bg-white/[0.12] border border-white/15 text-zinc-200 hover:text-white'
+                      }`}
+                    >
+                      <FileText className="w-4 h-4" />
+                      <span>{inputMode === 'manual' ? 'Manual Form Active (Scroll Down)' : 'Fill Manual Profile Form →'}</span>
+                    </button>
                   </div>
                 </div>
               </AppleGlassCard>
 
             </div>
-          ) : (
-            <AppleGlassCard className="p-6 sm:p-8 max-w-2xl mx-auto shadow-xl">
+          </div>
+
+          {/* Manual Input Form (Rendered when Option B is selected) */}
+          {inputMode === 'manual' && isStatutoryConsentGranted && (
+            <AppleGlassCard className="p-6 sm:p-8 max-w-3xl mx-auto shadow-2xl animate-fadeIn border border-white/15">
+              <div className="flex items-center space-x-2 pb-4 mb-4 border-b border-white/10">
+                <FileText className="w-5 h-5 text-amber-400" />
+                <h4 className="text-base font-serif font-medium text-zinc-100">
+                  Step-by-Step Scholar Profile Intake
+                </h4>
+              </div>
+
               <form onSubmit={handleManualSubmit} className="space-y-4 text-xs font-sans">
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -409,7 +553,7 @@ export const IntakeDiagnosticFlow: React.FC<IntakeDiagnosticFlowProps> = ({
                       required
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
-                      placeholder="e.g. Aarav Sharma"
+                      placeholder="e.g. Your Full Name"
                       className="min-h-[44px] w-full px-3.5 py-2 rounded-xl glass-input text-zinc-100 focus:border-amber-500/60 outline-none"
                     />
                   </div>
@@ -421,7 +565,7 @@ export const IntakeDiagnosticFlow: React.FC<IntakeDiagnosticFlowProps> = ({
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="e.g. student@institution.edu"
+                      placeholder="e.g. your.email@institution.edu"
                       className="min-h-[44px] w-full px-3.5 py-2 rounded-xl glass-input text-zinc-100 focus:border-amber-500/60 outline-none"
                     />
                   </div>
@@ -435,7 +579,7 @@ export const IntakeDiagnosticFlow: React.FC<IntakeDiagnosticFlowProps> = ({
                       required
                       value={university}
                       onChange={(e) => setUniversity(e.target.value)}
-                      placeholder="e.g. NIT Trichy / Delhi Technological University"
+                      placeholder="e.g. IIT Bombay / NIT Trichy / Stanford"
                       className="min-h-[44px] w-full px-3.5 py-2 rounded-xl glass-input text-zinc-100 focus:border-amber-500/60 outline-none"
                     />
                   </div>
@@ -477,7 +621,7 @@ export const IntakeDiagnosticFlow: React.FC<IntakeDiagnosticFlowProps> = ({
                     type="text"
                     value={skillsRaw}
                     onChange={(e) => setSkillsRaw(e.target.value)}
-                    placeholder="PyTorch, CUDA, JAX, C++, ROS2, HuggingFace, Docker"
+                    placeholder="e.g. Python, PyTorch, CUDA, JAX, C++, ROS2, Git"
                     className="min-h-[44px] w-full px-3.5 py-2 rounded-xl glass-input text-zinc-100 focus:border-amber-500/60 outline-none font-mono"
                   />
                 </div>

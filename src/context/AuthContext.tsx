@@ -61,6 +61,7 @@ interface AuthContextType {
   register: (data: RegisterData) => Promise<void>;
   oauthLogin: (provider: 'google' | 'linkedin' | 'github') => Promise<void>;
   claimDailyReward: () => Promise<DailyClaimResult>;
+  claimDailyStreak: () => Promise<DailyClaimResult>;
   redeemTokensForPlan: (planId: string, tokenCost: number, creditsToAdd: number) => Promise<{ success: boolean; message: string }>;
   logout: () => void;
   updateUser: (updated: Partial<UserProfile>) => void;
@@ -417,6 +418,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       register,
       oauthLogin,
       claimDailyReward,
+      claimDailyStreak: claimDailyReward,
       redeemTokensForPlan,
       logout,
       updateUser

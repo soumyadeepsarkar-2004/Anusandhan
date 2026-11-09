@@ -138,6 +138,7 @@ class OutreachService:
         follow_up_date = datetime.now() + timedelta(days=req.bump_after_days)
         follow_up_id = f"bump_{uuid.uuid4().hex[:8]}"
 
+        student_name = getattr(req, 'student_name', None) or "Research Scholar"
         subject = "Following up: Research Internship Inquiry / Summer 2026"
         bump_body = (
             "Dear Professor,\n\n"
@@ -146,8 +147,7 @@ class OutreachService:
             "I understand you receive many messages and are very busy. If your group is considering summer researchers, "
             "I would be glad to share any additional details or benchmark results.\n\n"
             "Thank you again for your time and consideration.\n\n"
-            "Sincerely,\n"
-            "Priya Sharma"
+            f"Sincerely,\n{student_name}"
         )
 
         return FollowUpResponse(
