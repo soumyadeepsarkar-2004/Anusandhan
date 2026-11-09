@@ -74,7 +74,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <div className="fixed top-3 sm:top-5 inset-x-0 mx-auto max-w-7xl w-[96%] z-50 px-2 sm:px-4 pointer-events-none">
-      <header className="pointer-events-auto apple-glass-pill rounded-full px-3 sm:px-5 py-2 flex items-center justify-between transition-all duration-300 gap-2 sm:gap-3 shadow-2xl">
+      <header className="pointer-events-auto apple-glass-pill rounded-full min-h-[56px] h-[56px] px-3.5 sm:px-5 lg:px-6 flex items-center justify-between transition-all duration-300 gap-2 sm:gap-4 shadow-2xl relative">
         
         {/* Dynamic Theme-Aware Brand Logo */}
         <div 
@@ -125,14 +125,14 @@ export const Navbar: React.FC<NavbarProps> = ({
           })}
         </nav>
 
-        {/* Action Controls - Fully Contained Inside Extended Header Taskbar */}
-        <div className="flex items-center space-x-1 sm:space-x-2 shrink-0">
+        {/* Action Controls - Guaranteed Containment Inside Floating Glass Pill */}
+        <div className="flex items-center space-x-1.5 sm:space-x-2 shrink-0">
           
           {/* Quick Search / Command Palette Pill */}
           {onOpenCommandPalette && (
             <button
               onClick={onOpenCommandPalette}
-              className="hidden xl:flex items-center space-x-1.5 px-2.5 py-1.5 rounded-full bg-white/[0.04] hover:bg-white/[0.08] border border-white/12 hover:border-amber-500/40 text-zinc-300 hover:text-white text-xs font-mono transition-all cursor-pointer shadow-sm group backdrop-blur-md shrink-0"
+              className="hidden xl:flex items-center space-x-1.5 px-2.5 h-8 rounded-full bg-white/[0.04] hover:bg-white/[0.08] border border-white/12 hover:border-amber-500/40 text-zinc-300 hover:text-white text-xs font-mono transition-all cursor-pointer shadow-sm group backdrop-blur-md shrink-0"
               title="Global Command Palette (⌘K / Ctrl+K)"
             >
               <Search className="w-3.5 h-3.5 text-zinc-400 group-hover:text-amber-400 transition-colors" />
@@ -148,7 +148,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={onOpenVoiceModal}
             onMouseEnter={() => setIsVoiceHovered(true)}
             onMouseLeave={() => setIsVoiceHovered(false)}
-            className="hidden md:flex items-center space-x-1.5 px-2.5 py-1.5 rounded-full bg-white/[0.04] hover:bg-white/[0.08] border border-white/12 hover:border-amber-500/40 text-zinc-200 text-xs font-medium transition-all cursor-pointer shadow-sm group backdrop-blur-md shrink-0"
+            className="hidden md:flex items-center space-x-1.5 px-2.5 h-8 rounded-full bg-white/[0.04] hover:bg-white/[0.08] border border-white/12 hover:border-amber-500/40 text-zinc-200 text-xs font-medium transition-all cursor-pointer shadow-sm group backdrop-blur-md shrink-0"
             title="Open Multilingual Academic Voice Mentor"
           >
             <AudioWaveformVisualizer active={true} variant="micro" />
@@ -157,23 +157,11 @@ export const Navbar: React.FC<NavbarProps> = ({
             </span>
           </button>
 
-          {/* Pricing & Checkout Gateway Trigger */}
-          {onOpenPricingModal && (
-            <button
-              onClick={onOpenPricingModal}
-              className="hidden sm:flex items-center space-x-1 px-2.5 py-1.5 rounded-full bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 text-xs font-mono transition-all cursor-pointer shadow-sm shrink-0"
-              title="Open Subscription Plans & Payment Gateway"
-            >
-              <CreditCard className="w-3.5 h-3.5" />
-              <span className="text-[11px]">Plans</span>
-            </button>
-          )}
-
           {/* Shodh Token Rewards Trigger */}
           {isAuthenticated && onOpenRewardsModal && (
             <button
               onClick={onOpenRewardsModal}
-              className="hidden sm:flex items-center space-x-1 px-2.5 py-1.5 rounded-full bg-white/[0.04] hover:bg-white/[0.08] border border-amber-500/30 text-amber-300 text-xs font-mono transition-all cursor-pointer shadow-sm shrink-0"
+              className="hidden sm:flex items-center space-x-1 px-2.5 h-8 rounded-full bg-white/[0.04] hover:bg-white/[0.08] border border-amber-500/30 text-amber-300 text-xs font-mono transition-all cursor-pointer shadow-sm shrink-0"
               title="Shodh Token Wallet & Daily Rewards"
             >
               <span>🪙</span>
@@ -186,12 +174,12 @@ export const Navbar: React.FC<NavbarProps> = ({
             <PullChainBulb size="sm" />
           </div>
 
-          {/* User Status & Launch Platform Integrated Inside Taskbar */}
+          {/* Seamless Authentication & Launch Platform Capsule Placeholder */}
           {isAuthenticated && user ? (
-            <div className="flex items-center space-x-1.5 shrink-0">
+            <div className="flex items-center p-1 rounded-full bg-white/[0.04] border border-white/10 backdrop-blur-md shrink-0 gap-1 shadow-inner">
               <button
                 onClick={onLaunchApp}
-                className="min-h-[38px] flex items-center space-x-1.5 px-4 py-1.5 rounded-full bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-slate-950 font-bold text-xs shadow-md shadow-amber-500/20 hover:shadow-amber-500/35 transition-all cursor-pointer transform active:scale-95 shrink-0 whitespace-nowrap border border-amber-300/40"
+                className="h-8 group flex items-center space-x-1.5 px-3.5 sm:px-4 rounded-full bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-slate-950 font-bold text-xs shadow-md shadow-amber-500/20 hover:shadow-amber-500/35 transition-all cursor-pointer transform active:scale-95 shrink-0 whitespace-nowrap border border-amber-300/40"
               >
                 <span>Workspace</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -199,7 +187,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
               <button
                 onClick={logout}
-                className="min-h-[38px] min-w-[38px] p-2 rounded-full text-zinc-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer shrink-0 flex items-center justify-center"
+                className="h-8 w-8 rounded-full text-zinc-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer shrink-0 flex items-center justify-center"
                 title="Sign Out"
                 aria-label="Sign Out"
               >
@@ -207,17 +195,17 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
             </div>
           ) : (
-            <div className="flex items-center p-0.5 rounded-full bg-white/[0.04] border border-white/10 backdrop-blur-md shrink-0 gap-1 shadow-inner">
+            <div className="flex items-center p-1 rounded-full bg-white/[0.04] border border-white/10 backdrop-blur-md shrink-0 gap-1 shadow-inner">
               <button
                 onClick={onOpenAuth}
-                className="min-h-[36px] px-3.5 py-1.5 rounded-full text-xs font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/[0.08] transition-colors cursor-pointer shrink-0 whitespace-nowrap"
+                className="h-8 px-3.5 rounded-full text-xs font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/[0.08] transition-colors cursor-pointer shrink-0 whitespace-nowrap"
               >
                 Sign In
               </button>
 
               <button
                 onClick={onLaunchApp}
-                className="min-h-[36px] group flex items-center space-x-1.5 px-4 py-1.5 rounded-full bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-slate-950 font-bold text-xs shadow-md shadow-amber-500/20 hover:shadow-amber-500/35 transition-all cursor-pointer transform active:scale-95 shrink-0 whitespace-nowrap border border-amber-300/40"
+                className="h-8 group flex items-center space-x-1.5 px-3.5 sm:px-4 rounded-full bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-slate-950 font-bold text-xs shadow-md shadow-amber-500/20 hover:shadow-amber-500/35 transition-all cursor-pointer transform active:scale-95 shrink-0 whitespace-nowrap border border-amber-300/40"
               >
                 <span>Launch Platform</span>
                 <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
@@ -228,7 +216,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Mobile Menu Trigger */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 rounded-full bg-[var(--surface-bg)] border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer min-h-[36px] min-w-[36px] flex items-center justify-center shrink-0 shadow-sm"
+            className="lg:hidden p-2 rounded-full bg-[var(--surface-bg)] border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer h-8 w-8 flex items-center justify-center shrink-0 shadow-sm"
             aria-label="Toggle menu"
           >
             {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
