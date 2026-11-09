@@ -30,8 +30,11 @@ export function getSqliteDb() {
     }
   });
 
-  // Enable WAL mode (Write-Ahead Logging) for superior concurrent read/write throughput
+  // Enable WAL mode (Write-Ahead Logging) & high-concurrency cache for 500-1000 users
   db.run('PRAGMA journal_mode = WAL;');
+  db.run('PRAGMA synchronous = NORMAL;');
+  db.run('PRAGMA cache_size = -64000;');
+  db.run('PRAGMA temp_store = MEMORY;');
   db.run('PRAGMA foreign_keys = ON;');
 
   // Initialize Tables

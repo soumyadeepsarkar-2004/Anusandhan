@@ -7,7 +7,7 @@ services:
     name: anusandhan-web-gateway
     env: docker
     dockerfilePath: Dockerfile.unified
-    plan: starter
+    plan: free
     region: frankfurt
     numInstances: 1
     envVars:
@@ -34,7 +34,7 @@ services:
     env: docker
     dockerContext: backend
     dockerfilePath: backend/Dockerfile
-    plan: starter
+    plan: free
     region: frankfurt
     numInstances: 1
     envVars:
@@ -51,6 +51,6 @@ services:
   # 3. High-Speed Redis Memory Cache
   - type: redis
     name: anusandhan-redis-cache
-    plan: starter
+    plan: free
     region: frankfurt
     ipAllowList: [] # internal access only

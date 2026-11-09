@@ -44,6 +44,7 @@ yarn-debug.log*
 yarn-error.log*
 
 # Editor & OS files
+cloudflared.exe
 .DS_Store
 Thumbs.db
 .vscode/
