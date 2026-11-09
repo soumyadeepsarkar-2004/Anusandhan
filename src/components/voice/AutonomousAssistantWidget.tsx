@@ -209,39 +209,87 @@ export const AutonomousAssistantWidget: React.FC<AutonomousAssistantWidgetProps>
     }
   }, [messages, mode, isProcessing]);
 
-  // Initialize Speech Recognition
+  // Initialize Multilingual Speech Recognition with Interim Elaboration & Debounced Pacing
+  const speechTimeoutRef = useRef<any>(null);
+  const speechBufferRef = useRef<string>('');
+
   useEffect(() => {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (SpeechRecognition) {
       const recognition = new SpeechRecognition();
-      recognition.continuous = false;
-      recognition.interimResults = false;
-      recognition.lang = 'hi-IN';
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.maxAlternatives = 1;
+      // Default to en-IN for optimal multilingual Indian English / Hinglish speech recognition
+      recognition.lang = voiceEngine === 'sarvam' ? 'en-IN' : 'en-US';
 
       recognition.onstart = () => {
         setIsListening(true);
-        setStatusText('Listening (Speak now)...');
+        speechBufferRef.current = '';
+        setStatusText('Listening... (Speak naturally in English or Hindi)');
       };
 
       recognition.onend = () => {
         setIsListening(false);
+        if (speechBufferRef.current.trim()) {
+          const finalQuery = speechBufferRef.current.trim();
+          speechBufferRef.current = '';
+          handleExecuteQuery(finalQuery);
+        }
       };
 
-      recognition.onerror = () => {
+      recognition.onerror = (event: any) => {
         setIsListening(false);
-        setStatusText('Mic idle');
+        if (event.error === 'not-allowed') {
+          setStatusText('Microphone permission blocked. Please allow mic in browser settings.');
+        } else if (event.error === 'no-speech') {
+          setStatusText('No speech detected. Tap mic to speak.');
+        } else {
+          setStatusText('Mic idle');
+        }
       };
 
       recognition.onresult = (event: any) => {
-        const transcript = event.results[0]?.[0]?.transcript;
-        if (transcript) {
-          handleExecuteQuery(transcript);
+        let interimText = '';
+        let finalSegment = '';
+
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const trans = event.results[i][0].transcript;
+          if (event.results[i].isFinal) {
+            finalSegment += ' ' + trans;
+          } else {
+            interimText += trans;
+          }
+        }
+
+        if (interimText) {
+          setStatusText(`Transcribing: "${interimText}"...`);
+        }
+
+        if (finalSegment.trim()) {
+          speechBufferRef.current = (speechBufferRef.current + ' ' + finalSegment).trim();
+          setStatusText(`Understood: "${speechBufferRef.current}"`);
+
+          // Debounce submission by 1.2s to permit natural breath & pauses
+          if (speechTimeoutRef.current) clearTimeout(speechTimeoutRef.current);
+          speechTimeoutRef.current = setTimeout(() => {
+            if (speechBufferRef.current.trim()) {
+              const query = speechBufferRef.current.trim();
+              speechBufferRef.current = '';
+              recognition.stop();
+              handleExecuteQuery(query);
+            }
+          }, 1200);
         }
       };
 
       recognitionRef.current = recognition;
     }
-  }, [student, selectedModel, voiceEngine, fellowships, professors, drafts, feedItems]);
+
+    return () => {
+      if (speechTimeoutRef.current) clearTimeout(speechTimeoutRef.current);
+    };
+  }, [student, selectedModel, voiceEngine, fellowships, professors, drafts, feedItems, currentTab]);
 
   // Toggle quick inline voice listening (does not open large modal)
   const toggleInlineListening = () => {
@@ -316,7 +364,10 @@ export const AutonomousAssistantWidget: React.FC<AutonomousAssistantWidgetProps>
           preferred_language: voiceEngine === 'sarvam' ? 'hi-IN' : 'en-US',
           voice_engine: voiceEngine,
           model: selectedModel,
-          student_context: student
+          student_context: {
+            ...student,
+            currentTab
+          }
         }),
         new Promise(resolve => setTimeout(resolve, 600)) // Guarantee visible loading screen animation
       ]);
@@ -358,6 +409,7 @@ export const AutonomousAssistantWidget: React.FC<AutonomousAssistantWidgetProps>
 
     if (!response) {
       response = processVoiceQuery(queryText, student, voiceEngine, selectedModel, {
+        currentTab,
         fellowships,
         professors,
         feedItems,
@@ -416,6 +468,7 @@ export const AutonomousAssistantWidget: React.FC<AutonomousAssistantWidgetProps>
     switch (action) {
       case 'navigate_discover':
       case 'open_programs':
+      case 'apply_portal':
       case 'FILTER_OPPORTUNITIES':
         onNavigateView('app', 'discover');
         break;

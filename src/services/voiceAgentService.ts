@@ -48,6 +48,7 @@ export interface ProcessAgentContext {
   student: StudentProfile;
   engine?: VoiceEngineType;
   model?: AgentModelId;
+  currentTab?: string;
   fellowships?: FellowshipProgram[];
   professors?: Professor[];
   feedItems?: ActivityFeedItem[];
@@ -134,6 +135,138 @@ export function processVoiceQuery(query: string, student: StudentProfile, engine
       detectedLanguage: lang,
       suggestedAction: 'open_rewards',
       modelUsed: activeModelDisplay
+    };
+  }
+
+  // =========================================================================
+  // Intent 0A: Full Student Profile Context & Records Query
+  // =========================================================================
+  if (
+    q.includes('who am i') || 
+    q.includes('mera profile') || 
+    q.includes('my profile') || 
+    q.includes('meri profile') ||
+    q.includes('my record') || 
+    q.includes('mera record') ||
+    q.includes('mere skills') || 
+    q.includes('my skills') || 
+    q.includes('mera cgpa') || 
+    q.includes('my cgpa') ||
+    q.includes('my university') ||
+    q.includes('meri university') ||
+    q.includes('my details') ||
+    q.includes('meri details')
+  ) {
+    const studentDomains = student.targetDomains?.join(', ') || 'AI & Distributed Systems';
+    const topSkills = student.skills?.slice(0, 5).join(', ') || 'Python, PyTorch, Research Writing';
+    return {
+      spokenText: lang === 'Hinglish'
+        ? `Aap ${student.fullName || 'Scholar'} hain, studying at ${student.university || 'Premier Institute'}, ${student.degreeLevel || 'Undergraduate Researcher'} (Year ${student.currentYear || '3rd Year'}). Aapka CGPA ${student.cgpa || 8.5}/10.0 hai. Target domains: ${studentDomains}. Top skills: ${topSkills}. Aapka Research Readiness Score abhi ${student.rrsScore || 85}/100 hai (${student.rrsTier || 'Senior Scholar'}). Main aapke har action aur application ko aapke is verified profile ke sath synchronize rakhta hoon.`
+        : `You are ${student.fullName || 'Scholar'} from ${student.university || 'State / Central University'}, enrolled in ${student.degreeLevel || 'B.Tech / B.S.'} (${student.currentYear || '3rd Year'}). Your academic standing is ${student.cgpa || 8.5}/10.0 CGPA. Target domains: ${studentDomains}. Key skills: ${topSkills}. Your Research Readiness Score is ${student.rrsScore || 85}/100 (${student.rrsTier || 'Senior Scholar'}). All platform workflows strictly synchronize with your verified profile footprint.`,
+      detectedLanguage: lang,
+      suggestedAction: 'navigate_profile',
+      modelUsed: activeModelDisplay
+    };
+  }
+
+  // =========================================================================
+  // Intent 0B: Current Screen & Platform View Context Awareness
+  // =========================================================================
+  if (
+    q.includes('where am i') ||
+    q.includes('what is on my screen') ||
+    q.includes('what am i seeing') ||
+    q.includes('screen pe kya') ||
+    q.includes('kahan hoon') ||
+    q.includes('current screen') ||
+    q.includes('explain this view') ||
+    q.includes('yeh kya hai')
+  ) {
+    const activeTab = context?.currentTab || 'discover';
+    let screenDescriptionHinglish = '';
+    let screenDescriptionEnglish = '';
+
+    switch (activeTab) {
+      case 'discover':
+        screenDescriptionHinglish = `Abhi aap Opportunities Explorer screen par hain. Yahan ${fellowships.filter(f => f.status === 'active').length} live verified fellowships aur top faculty databases available hain.`;
+        screenDescriptionEnglish = `You are currently viewing the Opportunity Explorer screen with ${fellowships.filter(f => f.status === 'active').length} active verified fellowship portals and premier faculty labs.`;
+        break;
+      case 'crm':
+        screenDescriptionHinglish = `Abhi aap Research Pipeline CRM screen par hain. Yahan aap apne saare outreach applications ko interview offers tak Kanban board me track kar rahe hain.`;
+        screenDescriptionEnglish = `You are on the Research Pipeline CRM Kanban board, tracking outreach applications from drafted to interview offers.`;
+        break;
+      case 'outreach':
+        screenDescriptionHinglish = `Abhi aap 146-Word Pitch Composer screen par hain, jahan anti-burnout pacing aur human confirmation safeguards ke sath emails compose hoti hain.`;
+        screenDescriptionEnglish = `You are in the 146-Word Pitch Composer with anti-burnout pacing and OAuth verified sending safeguards.`;
+        break;
+      case 'followups':
+        screenDescriptionHinglish = `Abhi aap 7-Day Follow-Up Manager screen par hain, jahan respectful timed bumps handle hote hain.`;
+        screenDescriptionEnglish = `You are on the 7-Day Follow-Up Manager handling respectful, timed outreach bumps.`;
+        break;
+      case 'diagnostic':
+        screenDescriptionHinglish = `Abhi aap RRS Diagnostic Studio screen par hain, jahan aapke 5 research pillars ka breakdown dikh raha hai.`;
+        screenDescriptionEnglish = `You are on the Research Readiness Score Diagnostic Studio evaluating your 5 foundational research pillars.`;
+        break;
+      case 'pitch':
+        screenDescriptionHinglish = `Abhi aap Paper-to-Pitch Deconstructive Canvas screen par hain.`;
+        screenDescriptionEnglish = `You are viewing the Paper-to-Pitch Deconstruction Canvas.`;
+        break;
+      case 'profile':
+        screenDescriptionHinglish = `Abhi aap Student Profile Hub screen par hain, jahan aapke ORCID, GitHub footprint aur verified badges synced hain.`;
+        screenDescriptionEnglish = `You are on the Student Profile Hub reviewing your verified scholar credentials, badges, and linked accounts.`;
+        break;
+      default:
+        screenDescriptionHinglish = `Abhi aap Anusandhan platform ke ${activeTab} section par hain. Main pure screen state aur aapke profile ka poora context maintain kar raha hoon.`;
+        screenDescriptionEnglish = `You are on the ${activeTab} section of Anusandhan. I maintain full context of your active screen state and profile records.`;
+        break;
+    }
+
+    return {
+      spokenText: lang === 'Hinglish' ? screenDescriptionHinglish : screenDescriptionEnglish,
+      detectedLanguage: lang,
+      modelUsed: activeModelDisplay
+    };
+  }
+
+  // =========================================================================
+  // Intent 0C: Autonomous Portal Application Execution
+  // =========================================================================
+  if (
+    q.includes('apply') ||
+    q.includes('portal') ||
+    q.includes('auto-apply') ||
+    q.includes('auto apply') ||
+    q.includes('application form') ||
+    q.includes('form bhar') ||
+    q.includes('dossier')
+  ) {
+    let matchedFellowship = fellowships.find(f => 
+      (q.includes('daad') && f.name.toLowerCase().includes('daad')) ||
+      (q.includes('cern') && f.name.toLowerCase().includes('cern')) ||
+      (q.includes('mitacs') && f.name.toLowerCase().includes('mitacs')) ||
+      (q.includes('bose') && f.name.toLowerCase().includes('bose')) ||
+      (q.includes('iisc') && f.name.toLowerCase().includes('iisc'))
+    );
+
+    if (!matchedFellowship) {
+      matchedFellowship = fellowships.find(f => f.status === 'active') || fellowships[0];
+    }
+
+    const portalUrl = matchedFellowship.applicationPortalUrl || matchedFellowship.officialUrl;
+    return {
+      spokenText: lang === 'Hinglish'
+        ? `Autonomous Portal Agent activate kar diya hai bhai! ${matchedFellowship.name} ke eligibility criteria audit ho rahe hain. Aapka publication-grounded SOP synthesize karke direct verified portal open ho raha hai.`
+        : `Launching the Autonomous Portal Agent for ${matchedFellowship.name}. Auditing eligibility criteria, synthesizing your publication-grounded Statement of Purpose, and preparing direct launch to the verified portal.`,
+      detectedLanguage: lang,
+      suggestedAction: 'navigate_discover',
+      modelUsed: activeModelDisplay,
+      opportunityLinks: [{
+        id: matchedFellowship.id,
+        name: matchedFellowship.name,
+        url: portalUrl,
+        status: matchedFellowship.status || 'active',
+        statusLabel: matchedFellowship.statusLabel
+      }]
     };
   }
 
