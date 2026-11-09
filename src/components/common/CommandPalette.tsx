@@ -50,7 +50,7 @@ export interface CommandPaletteProps {
 
 interface PaletteItem {
   id: string;
-  category: 'Navigation' | '24/7 Bot' | 'Faculty' | 'Fellowships' | 'Actions';
+  category: 'Navigation' | '24/7 Bot' | 'Faculty' | 'Fellowships' | 'Actions' | 'Documentation';
   title: string;
   subtitle: string;
   icon: React.ComponentType<{ className?: string }>;
@@ -202,6 +202,19 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
       badgeColor: 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20',
       action: () => {
         onNavigateView('intake');
+        onClose();
+      }
+    },
+    {
+      id: 'act-view-docs',
+      category: 'Documentation',
+      title: 'Open Platform Documentation (VitePress)',
+      subtitle: 'Architecture, 1,000-user concurrency benchmarks, API reference & onboarding',
+      icon: BookOpen,
+      badge: 'Docs',
+      badgeColor: 'text-amber-400 bg-amber-400/10 border-amber-400/20',
+      action: () => {
+        window.open('https://soumyadeepsarkar-2004.github.io/Anusandhan/', '_blank');
         onClose();
       }
     },

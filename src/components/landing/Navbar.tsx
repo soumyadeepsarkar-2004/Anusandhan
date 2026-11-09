@@ -35,7 +35,8 @@ export const Navbar: React.FC<NavbarProps> = ({
     { name: 'Opportunities', href: '#opportunities', id: 'opportunities' },
     { name: 'How It Works', href: '#how-it-works', id: 'how-it-works' },
     { name: 'Fellowships', href: '#fellowships', id: 'fellowships' },
-    { name: 'Plans', href: '#pricing', id: 'pricing' }
+    { name: 'Plans', href: '#pricing', id: 'pricing' },
+    { name: 'Docs', href: 'https://soumyadeepsarkar-2004.github.io/Anusandhan/', id: 'docs', isExternal: true }
   ];
 
   // Active section scroll spy
@@ -92,7 +93,12 @@ export const Navbar: React.FC<NavbarProps> = ({
               <a
                 key={link.name}
                 href={link.href}
+                target={link.isExternal ? '_blank' : undefined}
+                rel={link.isExternal ? 'noreferrer' : undefined}
                 onClick={(e) => {
+                  if (link.isExternal) {
+                    return;
+                  }
                   if (link.id === 'pricing' && onOpenPricingModal) {
                     e.preventDefault();
                     onOpenPricingModal();
@@ -246,8 +252,11 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <a
                   key={link.name}
                   href={link.href}
+                  target={link.isExternal ? '_blank' : undefined}
+                  rel={link.isExternal ? 'noreferrer' : undefined}
                   onClick={(e) => {
                     setMobileMenuOpen(false);
+                    if (link.isExternal) return;
                     handleNavScroll(e, link.href);
                   }}
                   className="px-3 py-2.5 rounded-xl bg-white/[0.04] hover:bg-amber-500/10 border border-[var(--border-subtle)] hover:border-amber-500/30 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all cursor-pointer font-medium text-center"

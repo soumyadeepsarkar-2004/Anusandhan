@@ -1,6 +1,7 @@
 import { defineConfig } from 'vitepress';
 
 export default defineConfig({
+  base: '/Anusandhan/',
   title: "Anusandhan",
   description: "Autonomous AI Platform for Global Research Internships & Academic Outreach",
   lang: 'en-US',

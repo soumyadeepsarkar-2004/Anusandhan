@@ -13,6 +13,17 @@
 
 ---
 
+<p align="center">
+  <img src="public/anusandhan-preview.svg" alt="Anusandhan Platform Architecture & Interface Preview" width="100%" />
+</p>
+
+### 🌐 Live Production Deployments & Access
+- 🚀 **Live Production Platform**: [https://cab-pdf-camping-navigator.trycloudflare.com](https://cab-pdf-camping-navigator.trycloudflare.com)
+- 📚 **VitePress Documentation (GitHub Pages)**: [https://soumyadeepsarkar-2004.github.io/Anusandhan/](https://soumyadeepsarkar-2004.github.io/Anusandhan/)
+- 📦 **GitHub Repository**: [https://github.com/soumyadeepsarkar-2004/Anusandhan](https://github.com/soumyadeepsarkar-2004/Anusandhan)
+
+---
+
 ## 🏛 Multi-Disciplinary Scope
 
 Anusandhan goes beyond standard computer science scrapers by actively indexing and matching opportunities across **5 academic faculties**:
