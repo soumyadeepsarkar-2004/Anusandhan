@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import { ShieldCheck, Scale, ExternalLink, Sparkles, Heart } from 'lucide-react';
 import { PrivacyPolicyModal } from '../legal/PrivacyPolicyModal';
 import { TermsOfServiceModal } from '../legal/TermsOfServiceModal';
@@ -11,7 +12,7 @@ export const Footer: React.FC = () => {
   const { isDark } = useTheme();
 
   return (
-    <footer className="relative mt-24 border-t border-[var(--border-subtle)] bg-[var(--surface-bg)]/80 backdrop-blur-3xl py-16 text-xs transition-colors duration-300">
+    <footer className="relative mt-24 border-t border-[var(--border-subtle)] bg-[var(--surface-bg)]/90 backdrop-blur-3xl py-16 text-xs transition-colors duration-300">
       {/* Specular Top Sheen Highlight */}
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-400/40 to-transparent" />
       
@@ -34,7 +35,7 @@ export const Footer: React.FC = () => {
             </p>
 
             <div className="flex items-center space-x-2 pt-1 text-[11px] text-[var(--text-muted)] font-mono">
-              <span className="inline-block w-2 h-2 rounded-full bg-emerald-500/80" />
+              <span className="inline-block w-2 h-2 rounded-full bg-emerald-500/80 animate-pulse" />
               <span>Multi-domain continuous ingestion active</span>
             </div>
           </div>
@@ -46,31 +47,31 @@ export const Footer: React.FC = () => {
             </h4>
             <ul className="space-y-2 text-[var(--text-secondary)] font-sans">
               <li>
-                <a href="https://www.daad.in/en/" target="_blank" rel="noreferrer" className="hover:text-amber-500 transition-colors inline-flex items-center gap-1">
+                <a href="https://www.daad.in/en/" target="_blank" rel="noreferrer" className="hover:text-amber-500 hover:translate-x-0.5 transition-all inline-flex items-center gap-1">
                   <span>DAAD WISE (Germany)</span>
                   <ExternalLink className="w-3 h-3 text-[var(--text-muted)]" />
                 </a>
               </li>
               <li>
-                <a href="https://www.mitacs.ca/" target="_blank" rel="noreferrer" className="hover:text-amber-500 transition-colors inline-flex items-center gap-1">
+                <a href="https://www.mitacs.ca/" target="_blank" rel="noreferrer" className="hover:text-amber-500 hover:translate-x-0.5 transition-all inline-flex items-center gap-1">
                   <span>Mitacs Globalink (Canada)</span>
                   <ExternalLink className="w-3 h-3 text-[var(--text-muted)]" />
                 </a>
               </li>
               <li>
-                <a href="https://careers.cern/summer" target="_blank" rel="noreferrer" className="hover:text-amber-500 transition-colors inline-flex items-center gap-1">
+                <a href="https://careers.cern/summer" target="_blank" rel="noreferrer" className="hover:text-amber-500 hover:translate-x-0.5 transition-all inline-flex items-center gap-1">
                   <span>CERN Summer Student (Geneva)</span>
                   <ExternalLink className="w-3 h-3 text-[var(--text-muted)]" />
                 </a>
               </li>
               <li>
-                <a href="https://ethz.ch" target="_blank" rel="noreferrer" className="hover:text-amber-500 transition-colors inline-flex items-center gap-1">
+                <a href="https://ethz.ch" target="_blank" rel="noreferrer" className="hover:text-amber-500 hover:translate-x-0.5 transition-all inline-flex items-center gap-1">
                   <span>ETH Student Summer Research</span>
                   <ExternalLink className="w-3 h-3 text-[var(--text-muted)]" />
                 </a>
               </li>
               <li>
-                <a href="https://iusstf.org/" target="_blank" rel="noreferrer" className="hover:text-amber-500 transition-colors inline-flex items-center gap-1">
+                <a href="https://iusstf.org/" target="_blank" rel="noreferrer" className="hover:text-amber-500 hover:translate-x-0.5 transition-all inline-flex items-center gap-1">
                   <span>S.N. Bose Scholars (USA)</span>
                   <ExternalLink className="w-3 h-3 text-[var(--text-muted)]" />
                 </a>
@@ -85,27 +86,27 @@ export const Footer: React.FC = () => {
             </h4>
             <ul className="space-y-2 text-[var(--text-secondary)] font-sans">
               <li>
-                <a href="https://openalex.org/" target="_blank" rel="noreferrer" className="hover:text-amber-500 transition-colors">
+                <a href="https://openalex.org/" target="_blank" rel="noreferrer" className="hover:text-amber-500 hover:translate-x-0.5 transition-all inline-block">
                   OpenAlex Scholarly Graph
                 </a>
               </li>
               <li>
-                <a href="https://arxiv.org/" target="_blank" rel="noreferrer" className="hover:text-amber-500 transition-colors">
+                <a href="https://arxiv.org/" target="_blank" rel="noreferrer" className="hover:text-amber-500 hover:translate-x-0.5 transition-all inline-block">
                   arXiv CS & Physics Preprints
                 </a>
               </li>
               <li>
-                <a href="https://www.semanticscholar.org/" target="_blank" rel="noreferrer" className="hover:text-amber-500 transition-colors">
+                <a href="https://www.semanticscholar.org/" target="_blank" rel="noreferrer" className="hover:text-amber-500 hover:translate-x-0.5 transition-all inline-block">
                   Semantic Scholar API
                 </a>
               </li>
               <li>
-                <a href="https://orcid.org/" target="_blank" rel="noreferrer" className="hover:text-amber-500 transition-colors">
+                <a href="https://orcid.org/" target="_blank" rel="noreferrer" className="hover:text-amber-500 hover:translate-x-0.5 transition-all inline-block">
                   ORCID Researcher Registry
                 </a>
               </li>
               <li>
-                <a href="https://csrankings.org/" target="_blank" rel="noreferrer" className="hover:text-amber-500 transition-colors">
+                <a href="https://csrankings.org/" target="_blank" rel="noreferrer" className="hover:text-amber-500 hover:translate-x-0.5 transition-all inline-block">
                   CSRankings Global Faculty Metrics
                 </a>
               </li>

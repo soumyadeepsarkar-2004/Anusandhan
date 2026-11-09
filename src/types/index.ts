@@ -162,11 +162,13 @@ export interface ActivityFeedItem {
 export type VoiceEngineType = 'web-speech' | 'sarvam' | 'google-live';
 
 export type AgentModelId = 
-  | 'gemini-flash'
+  | 'deepseek-r1'
+  | 'qwen-2.5-coder'
   | 'llama-3-70b'
   | 'mistral-nemo'
-  | 'deepseek-r1'
-  | 'local-academic';
+  | 'gemma-2-9b'
+  | 'local-academic'
+  | 'gemini-flash';
 
 export interface VoiceMessage {
   id: string;

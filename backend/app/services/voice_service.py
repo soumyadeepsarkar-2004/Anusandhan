@@ -37,17 +37,53 @@ class VoiceAgentService:
                 }
             ]
 
+        # Model display name
+        model_name = req.model or "deepseek-r1"
+        model_tag = {
+            "deepseek-r1": "DeepSeek-R1 (Open Reasoning)",
+            "qwen-2.5-coder": "Qwen 2.5 Coder 32B (Open Weights)",
+            "llama-3-70b": "Llama 3.3 70B (Open Weights)",
+            "mistral-nemo": "Mistral NeMo 12B (Open Weights)",
+            "gemma-2-9b": "Gemma 2 9B (Ultra-Fast)",
+            "local-academic": "Anusandhan Core (Zero-Cost Local)",
+            "gemini-flash": "Gemini 2.5 Flash"
+        }.get(model_name, model_name)
+
         return VoiceTurnResponse(
             agent_text_response=response_text,
             detected_intent=intent,
             recommended_action=action,
             suggested_ui_filter=ui_filter,
             opportunity_links=opportunity_links,
-            engine_used=f"{engine} ({lang})",
+            engine_used=f"{engine} · {model_tag} ({lang})",
             latency_ms=max(12, elapsed_ms)
         )
 
     def _resolve_intent(self, text: str, lang: str) -> Tuple[str, str, str, Dict[str, Any]]:
+        # 0. Language switching
+        if "english" in text:
+            return "Switching to English. I am your Anusandhan AI autonomous mentor with full access across fellowships, faculty grants, and RRS gap remediation.", "switch_language", "NOOP", {}
+        elif "hindi" in text and not "hinglish" in text:
+            return "हिंदी संवाद सक्रिय है। अनुसंधान मंच के किसी भी खंड को संचालित करने के लिए मुझे निर्देश दें।", "switch_language", "NOOP", {}
+
+        # 0.5 Theme switching
+        elif any(w in text for w in ["theme", "light mode", "dark mode", "white theme", "off-white"]):
+            if any(w in text for w in ["light", "white", "off-white", "soft"]):
+                return "Soothing warm off-white oat parchment theme activate kar diya hai.", "toggle_theme", "set_theme_light", {}
+            else:
+                return "Celestial obsidian dark theme activate kar diya hai.", "toggle_theme", "set_theme_dark", {}
+
+        # 0.6 Rewards and Shodh tokens
+        elif any(w in text for w in ["token", "reward", "shodh", "coin", "streak"]):
+            return "Shodh Token Wallet aur daily streak reward modal open ho gaya hai!", "open_rewards", "open_rewards", {}
+
+        # 0.7 Pitch / Outreach
+        elif any(w in text for w in ["pitch", "outreach", "email", "draft"]):
+            return "146-word precision pitch composer open kar diya hai. Anti-burnout pacing aur human verification safeguards active hain.", "navigate_outreach", "navigate_outreach", {}
+
+        # 0.8 Mock interview / Viva
+        elif any(w in text for w in ["interview", "mock", "viva", "tayari"]):
+            return "Technical viva aur mock interview simulator launch kar raha hoon.", "mock_interview", "START_MOCK_INTERVIEW", {}
         # 1. Status / Application queries
         if any(w in text for w in ["status", "kya update hai", "update", "application", "kahan tak pahucha", "progress"]):
             if "hi" in lang:

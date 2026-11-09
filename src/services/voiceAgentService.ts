@@ -16,6 +16,10 @@ export type PlatformAction =
   | 'navigate_livefeed'
   | 'navigate_landing'
   | 'open_pricing'
+  | 'open_rewards'
+  | 'toggle_theme'
+  | 'set_theme_light'
+  | 'set_theme_dark'
   | 'trigger_cv_audit';
 
 export interface OpportunityLinkItem {
@@ -57,23 +61,81 @@ export function processVoiceQuery(query: string, student: StudentProfile, engine
   const feedItems = context?.feedItems || [];
   const drafts = context?.drafts || [];
 
-  // Model branding display
+  // Model branding display with Open Source Free tiers
   const modelNames: Record<AgentModelId, string> = {
-    'gemini-flash': 'Gemini 2.5 Flash',
-    'llama-3-70b': 'Llama 3.3 70B (Groq)',
-    'mistral-nemo': 'Mistral Nemo 12B',
-    'deepseek-r1': 'DeepSeek R1',
-    'local-academic': 'Anusandhan Core'
+    'deepseek-r1': 'DeepSeek-R1 (Open Reasoning · Free)',
+    'qwen-2.5-coder': 'Qwen 2.5 Coder 32B (Open Weights · Free)',
+    'llama-3-70b': 'Llama 3.3 70B (Open Weights · Free)',
+    'mistral-nemo': 'Mistral NeMo 12B (Open Weights · Free)',
+    'gemma-2-9b': 'Gemma 2 9B (Ultra-Fast · Free)',
+    'local-academic': 'Anusandhan Core (Zero-Cost Local)',
+    'gemini-flash': 'Gemini 2.5 Flash'
   };
   const activeModelDisplay = modelNames[model] || 'AnusandhanAI';
 
-  // 1. Language detection
-  const isHinglish = /bhai|kya|mera|meri|kaise|batao|kuch|hai|wala|wali|aur|kitna|kab|kaun|chahiye|dikhao|le|chal/i.test(q);
-  const isPureHindi = /नमस्ते|इंटर्नशिप|शोध|आवेदन|छात्रवृत्ति/i.test(q);
+  // 1. Language detection & Explicit Language Commands
+  const isHinglish = /bhai|kya|mera|meri|kaise|batao|kuch|hai|wala|wali|aur|kitna|kab|kaun|chahiye|dikhao|le|chal|bana/i.test(q);
+  const isPureHindi = /नमस्ते|इंटर्नशिप|शोध|आवेदन|छात्रवृत्ति|प्रणाम|सहायता/i.test(q);
 
   let lang: 'Hinglish' | 'Hindi' | 'English' = 'English';
   if (isPureHindi) lang = 'Hindi';
   else if (isHinglish) lang = 'Hinglish';
+
+  // Explicit Language Switching Requests
+  if (q.includes('speak in english') || q.includes('talk in english') || q.includes('english me bolo') || q.includes('english please') || q === 'english') {
+    return {
+      spokenText: `Understood! English mode is active, powered by ${activeModelDisplay}. I have full contextual control over the platform—including active fellowship forms, faculty citation velocity, RRS diagnostics, and cold email synthesis. How can I direct your research today?`,
+      detectedLanguage: 'English',
+      modelUsed: activeModelDisplay
+    };
+  }
+
+  if (q.includes('hindi me bolo') || q.includes('hindi me baat karo') || q.includes('shuddh hindi') || q.includes('hindi please') || q === 'hindi') {
+    return {
+      spokenText: `अवगत हुआ! हिंदी मोड सक्रिय है, संचालित बाय ${activeModelDisplay}। मैं अनुसंधान मंच का पूर्ण संचालन कर सकता हूँ—सक्रिय फ़ेलोशिप, आर.आर.एस. डायग्नोस्टिक, और प्रोफ़ेसर संपर्क। बताएं, आज किस दिशा में कार्य करना है?`,
+      detectedLanguage: 'Hindi',
+      modelUsed: activeModelDisplay
+    };
+  }
+
+  if (q.includes('hinglish me bolo') || q.includes('hinglish me baat') || q.includes('hinglish please') || q === 'hinglish') {
+    return {
+      spokenText: `Haan bhai! Hinglish conversational mode active ho gaya hai, powered by ${activeModelDisplay}. Main platform ke saare sections control kar sakta hoon. Boliye kis lab ya fellowship par kaam karna hai?`,
+      detectedLanguage: 'Hinglish',
+      modelUsed: activeModelDisplay
+    };
+  }
+
+  // Theme Toggling Voice Commands
+  if (q.includes('theme') || q.includes('light mode') || q.includes('dark mode') || q.includes('white theme') || q.includes('off-white') || q.includes('dark theme')) {
+    const wantsLight = q.includes('light') || q.includes('white') || q.includes('off-white') || q.includes('soft');
+    const wantsDark = q.includes('dark') || q.includes('black') || q.includes('obsidian');
+    const action = wantsLight ? 'set_theme_light' : wantsDark ? 'set_theme_dark' : 'toggle_theme';
+    return {
+      spokenText: lang === 'Hinglish'
+        ? (wantsLight 
+            ? `Theek hai bhai! Soothing warm off-white parchment theme activate kar diya hai. Header, footer aur cards soft natural tone me switch ho gaye hain.` 
+            : `Theek hai bhai! Celestial obsidian dark theme activate kar diya hai.`)
+        : (wantsLight
+            ? `Switching to the soothing warm off-white oat parchment theme with fluid Apple glass highlights.`
+            : `Switching to the celestial obsidian dark theme.`),
+      detectedLanguage: lang,
+      suggestedAction: action,
+      modelUsed: activeModelDisplay
+    };
+  }
+
+  // Token Rewards & Payment Commands
+  if (q.includes('reward') || q.includes('token') || q.includes('shodh token') || q.includes('coins') || q.includes('daily streak')) {
+    return {
+      spokenText: lang === 'Hinglish'
+        ? `Aapka Shodh Token Wallet aur Daily Rewards modal open kar diya hai bhai! Daily check-in karke aap aur tokens claim kar sakte hain.`
+        : `Opening your Shodh Token Wallet and Daily Rewards modal. You can earn tokens through streak check-ins.`,
+      detectedLanguage: lang,
+      suggestedAction: 'open_rewards',
+      modelUsed: activeModelDisplay
+    };
+  }
 
   // =========================================================================
   // Intent 1: Direct Navigation Commands

@@ -74,7 +74,36 @@ router.post('/turn', async (req, res) => {
     } else if (input.includes('interview') || input.includes('mock') || input.includes('viva')) {
       responseText = "Technical viva aur mock interview simulator launch kar raha hoon.";
       action = "START_MOCK_INTERVIEW";
+    } else if (input.includes('theme') || input.includes('light') || input.includes('white') || input.includes('dark')) {
+      responseText = input.includes('light') || input.includes('white')
+        ? "Soothing warm off-white oat parchment theme activate kar diya hai."
+        : "Celestial obsidian dark theme activate kar diya hai.";
+      action = input.includes('light') || input.includes('white') ? "set_theme_light" : "set_theme_dark";
+    } else if (input.includes('token') || input.includes('reward') || input.includes('shodh') || input.includes('coin')) {
+      responseText = "Shodh Token Wallet aur daily streak reward modal open ho gaya hai!";
+      action = "open_rewards";
+    } else if (input.includes('pitch') || input.includes('outreach') || input.includes('draft') || input.includes('email')) {
+      responseText = "146-word precision pitch composer open kar diya hai. Yahan anti-burnout pacing aur human confirmation safeguards active hain.";
+      action = "navigate_outreach";
+    } else if (input.includes('english')) {
+      responseText = `Switching to English. I am Anusandhan AI, with full platform control across fellowships, faculty grants, and RRS gap remediation.`;
+      action = "NOOP";
+    } else if (input.includes('hindi')) {
+      responseText = `हिंदी संवाद सक्रिय है। अनुसंधान मंच के किसी भी खंड को संचालित करने के लिए मुझे निर्देश दें।`;
+      action = "NOOP";
     }
+
+    const modelLabel = req.body.model === 'deepseek-r1'
+      ? 'DeepSeek-R1 (Free Open Reasoning)'
+      : req.body.model === 'qwen-2.5-coder'
+      ? 'Qwen 2.5 Coder (Free Open Weights)'
+      : req.body.model === 'llama-3-70b'
+      ? 'Llama 3.3 70B (Free Open Weights)'
+      : req.body.model === 'mistral-nemo'
+      ? 'Mistral NeMo (Free Open Weights)'
+      : req.body.model === 'gemma-2-9b'
+      ? 'Gemma 2 9B (Free Ultra-Fast)'
+      : req.body.model || 'Anusandhan Core';
 
     res.json({
       agent_text_response: responseText,
@@ -82,7 +111,7 @@ router.post('/turn', async (req, res) => {
       recommended_action: action,
       suggested_ui_filter,
       opportunity_links,
-      engine_used: `${req.body.voice_engine || 'sarvam'} · ${req.body.model || 'gemini-flash'} (Node Gateway)`,
+      engine_used: `${req.body.voice_engine || 'sarvam'} · ${modelLabel}`,
       latency_ms: 18
     });
   } catch (err) {

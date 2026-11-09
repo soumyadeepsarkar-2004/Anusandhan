@@ -103,13 +103,13 @@ export const Navbar: React.FC<NavbarProps> = ({
                 onMouseEnter={() => setHoveredNav(link.name)}
                 onMouseLeave={() => setHoveredNav(null)}
                 className={`relative px-3 py-1.5 text-xs font-medium transition-colors cursor-pointer rounded-full ${
-                  isSelected ? 'text-amber-300 font-semibold' : 'text-zinc-300 hover:text-white'
+                  isSelected ? 'text-amber-500 font-semibold' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                 }`}
               >
                 {isSelected && (
                   <motion.div
                     layoutId="navbar-hover-pill"
-                    className="absolute inset-0 rounded-full bg-white/[0.1] border border-white/15 shadow-[0_0_15px_rgba(245,158,11,0.2)]"
+                    className="absolute inset-0 rounded-full bg-amber-500/10 border border-amber-500/25 shadow-sm"
                     transition={{ type: 'spring', bounce: 0.2, duration: 0.3 }}
                   />
                 )}
@@ -222,7 +222,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Mobile Menu Trigger */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-zinc-100 transition-colors cursor-pointer min-h-[36px] min-w-[36px] flex items-center justify-center shrink-0"
+            className="lg:hidden p-2 rounded-full bg-[var(--surface-bg)] border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer min-h-[36px] min-w-[36px] flex items-center justify-center shrink-0 shadow-sm"
             aria-label="Toggle menu"
           >
             {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
@@ -239,7 +239,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             animate={{ opacity: 1, y: 8, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.98 }}
             transition={{ duration: 0.2 }}
-            className="pointer-events-auto lg:hidden apple-glass rounded-2xl p-4 mt-2 border border-zinc-700/60 shadow-2xl space-y-3"
+            className="pointer-events-auto lg:hidden apple-glass-pill rounded-3xl p-4 mt-2 border border-[var(--border-subtle)] shadow-2xl space-y-3 bg-[var(--surface-bg)]"
           >
             <div className="grid grid-cols-2 gap-2 text-xs">
               {navLinks.map((link) => (
@@ -250,28 +250,36 @@ export const Navbar: React.FC<NavbarProps> = ({
                     setMobileMenuOpen(false);
                     handleNavScroll(e, link.href);
                   }}
-                  className="px-3 py-2 rounded-lg bg-zinc-900/60 hover:bg-zinc-800 border border-zinc-800/80 text-zinc-300 hover:text-white transition-colors cursor-pointer"
+                  className="px-3 py-2.5 rounded-xl bg-white/[0.04] hover:bg-amber-500/10 border border-[var(--border-subtle)] hover:border-amber-500/30 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all cursor-pointer font-medium text-center"
                 >
                   {link.name}
                 </a>
               ))}
             </div>
 
-            <div className="pt-2 border-t border-zinc-800 flex items-center justify-between text-xs">
+            <div className="pt-2 border-t border-[var(--border-subtle)] flex items-center justify-between text-xs">
               <button
                 onClick={() => { setMobileMenuOpen(false); onOpenVoiceModal(); }}
-                className="flex items-center space-x-1.5 text-amber-400 font-mono"
+                className="flex items-center space-x-1.5 text-amber-500 font-mono font-medium"
               >
                 <Mic className="w-3.5 h-3.5" />
                 <span>Voice Mentor</span>
               </button>
 
-              {!isAuthenticated && (
+              {!isAuthenticated ? (
                 <button
                   onClick={() => { setMobileMenuOpen(false); onOpenAuth(); }}
-                  className="px-3 py-1 rounded-lg bg-zinc-800 text-zinc-200 font-medium"
+                  className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-zinc-950 font-bold text-xs shadow-sm cursor-pointer"
                 >
                   Sign In
+                </button>
+              ) : (
+                <button
+                  onClick={() => { setMobileMenuOpen(false); onLaunchApp(); }}
+                  className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-zinc-950 font-bold text-xs shadow-sm cursor-pointer flex items-center gap-1"
+                >
+                  <span>App</span>
+                  <ArrowRight className="w-3 h-3" />
                 </button>
               )}
             </div>

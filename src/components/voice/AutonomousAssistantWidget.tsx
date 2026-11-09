@@ -60,6 +60,7 @@ interface AutonomousAssistantWidgetProps {
   feedItems: ActivityFeedItem[];
   onOpenPricingModal: () => void;
   onOpenMockInterview?: () => void;
+  onOpenRewardsModal?: () => void;
   isOpenExternal?: boolean;
   onCloseExternal?: () => void;
   onClose?: () => void;
@@ -79,6 +80,7 @@ export const AutonomousAssistantWidget: React.FC<AutonomousAssistantWidgetProps>
   feedItems,
   onOpenPricingModal,
   onOpenMockInterview,
+  onOpenRewardsModal,
   isOpenExternal,
   onCloseExternal,
   onClose
@@ -87,9 +89,9 @@ export const AutonomousAssistantWidget: React.FC<AutonomousAssistantWidgetProps>
   // 'orb': Minimal circular floating icon (DEFAULT on initial load / reload)
   // 'capsule': Horizontal bar with voice mic & audio visualizer (opens on orb click)
   // 'chat': Full conversational window with foundation models (opens on expand)
-  const { isDark } = useTheme();
+  const { isDark, toggleTheme, setTheme } = useTheme();
   const [mode, setMode] = useState<AssistantWidgetMode>('orb');
-  const [selectedModel, setSelectedModel] = useState<AgentModelId>('gemini-flash');
+  const [selectedModel, setSelectedModel] = useState<AgentModelId>('deepseek-r1');
   const [voiceEngine, setVoiceEngine] = useState<VoiceEngineType>('sarvam');
   const [voiceFeedbackEnabled, setVoiceFeedbackEnabled] = useState<boolean>(true);
   
@@ -287,15 +289,19 @@ export const AutonomousAssistantWidget: React.FC<AutonomousAssistantWidgetProps>
     setTextInput('');
     setIsProcessing(true);
 
-    const modelName = selectedModel === 'gemini-flash'
-      ? 'Gemini 2.5 Flash'
+    const modelName = selectedModel === 'deepseek-r1'
+      ? 'DeepSeek-R1 (Open Reasoning · Free)'
+      : selectedModel === 'qwen-2.5-coder'
+      ? 'Qwen 2.5 Coder 32B (Open Weights · Free)'
       : selectedModel === 'llama-3-70b'
-      ? 'Llama 3.3 70B'
+      ? 'Llama 3.3 70B (Open Weights · Free)'
       : selectedModel === 'mistral-nemo'
-      ? 'Mistral Nemo'
-      : selectedModel === 'deepseek-r1'
-      ? 'DeepSeek R1'
-      : 'Local Academic Engine';
+      ? 'Mistral NeMo 12B (Open Weights · Free)'
+      : selectedModel === 'gemma-2-9b'
+      ? 'Gemma 2 9B (Ultra-Fast · Free)'
+      : selectedModel === 'local-academic'
+      ? 'Anusandhan Core (Zero-Cost Local)'
+      : 'Gemini 2.5 Flash';
 
     setStatusText(`Reasoning with ${modelName}...`);
 
@@ -467,6 +473,22 @@ export const AutonomousAssistantWidget: React.FC<AutonomousAssistantWidgetProps>
         break;
       case 'open_pricing':
         onOpenPricingModal();
+        break;
+      case 'open_rewards':
+        if (onOpenRewardsModal) {
+          onOpenRewardsModal();
+        } else {
+          onNavigateView('app', 'profile');
+        }
+        break;
+      case 'toggle_theme':
+        toggleTheme();
+        break;
+      case 'set_theme_light':
+        setTheme('light');
+        break;
+      case 'set_theme_dark':
+        setTheme('dark');
         break;
       default:
         break;
@@ -946,14 +968,16 @@ export const AutonomousAssistantWidget: React.FC<AutonomousAssistantWidgetProps>
                 <select
                   value={selectedModel}
                   onChange={(e) => setSelectedModel(e.target.value as AgentModelId)}
-                  className="text-[10px] font-mono px-2 py-1 rounded-xl glass-input text-amber-300 outline-none cursor-pointer border border-white/15"
-                  title="Switch between free and open-source foundation models"
+                  className="text-[10px] font-mono px-2 py-1 rounded-xl glass-input text-amber-400 font-semibold outline-none cursor-pointer border border-amber-500/30"
+                  title="Switch between high-capability free and open-source models"
                 >
-                  <option value="gemini-flash" className="bg-zinc-900 text-zinc-100">Gemini 2.5</option>
-                  <option value="llama-3-70b" className="bg-zinc-900 text-zinc-100">Llama 3.3</option>
-                  <option value="mistral-nemo" className="bg-zinc-900 text-zinc-100">Mistral NeMo</option>
-                  <option value="deepseek-r1" className="bg-zinc-900 text-zinc-100">DeepSeek R1</option>
-                  <option value="local-academic" className="bg-zinc-900 text-zinc-100">Local AI</option>
+                  <option value="deepseek-r1" className="bg-zinc-900 text-zinc-100">DeepSeek-R1 (Open Reasoning · Free)</option>
+                  <option value="qwen-2.5-coder" className="bg-zinc-900 text-zinc-100">Qwen 2.5 Coder (Open Weights · Free)</option>
+                  <option value="llama-3-70b" className="bg-zinc-900 text-zinc-100">Llama 3.3 70B (Open Weights · Free)</option>
+                  <option value="mistral-nemo" className="bg-zinc-900 text-zinc-100">Mistral NeMo (Open Weights · Free)</option>
+                  <option value="gemma-2-9b" className="bg-zinc-900 text-zinc-100">Gemma 2 9B (Ultra-Fast · Free)</option>
+                  <option value="local-academic" className="bg-zinc-900 text-zinc-100">Anusandhan Core (Zero-Cost Local)</option>
+                  <option value="gemini-flash" className="bg-zinc-900 text-zinc-100">Gemini 2.5 Flash</option>
                 </select>
               </div>
 

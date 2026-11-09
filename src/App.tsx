@@ -647,6 +647,7 @@ const AppContent: React.FC = () => {
         feedItems={feedItems}
         onOpenPricingModal={() => setIsPricingModalOpen(true)}
         onOpenMockInterview={() => setIsMockInterviewOpen(true)}
+        onOpenRewardsModal={() => setIsRewardsModalOpen(true)}
         isOpenExternal={isVoiceModalOpen}
         onCloseExternal={() => setIsVoiceModalOpen(false)}
         onClose={() => setIsVoiceModalOpen(false)}
