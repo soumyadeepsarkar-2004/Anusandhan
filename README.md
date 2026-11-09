@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://anusandhan.antideploy.app">
+  <a href="https://anusandhan.vercel.app">
     <img src="public/brand-emblem-dark.svg" alt="Anusandhan Official Logo Emblem" width="108" height="108" />
   </a>
 </p>
@@ -28,9 +28,10 @@
 </p>
 
 ### 🌐 Live Production Deployments & Access
-- 🚀 **Live Production Platform (Antideploy)**: [https://anusandhan.antideploy.app](https://anusandhan.antideploy.app)
+- 🚀 **Live Production Platform (Vercel)**: [https://anusandhan.vercel.app](https://anusandhan.vercel.app)
 - 📚 **VitePress Documentation (GitHub Pages)**: [https://soumyadeepsarkar-2004.github.io/Anusandhan/](https://soumyadeepsarkar-2004.github.io/Anusandhan/)
 - 📦 **GitHub Repository**: [https://github.com/soumyadeepsarkar-2004/Anusandhan](https://github.com/soumyadeepsarkar-2004/Anusandhan)
+- ⚡ **1-Click Vercel Deploy**: [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/soumyadeepsarkar-2004/Anusandhan)
 
 ---
 

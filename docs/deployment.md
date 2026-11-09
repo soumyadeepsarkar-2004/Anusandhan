@@ -99,20 +99,16 @@ TARGET_URL=http://your-server-ip:5000 CONCURRENT_USERS=1000 DURATION=15 node tes
 
 ---
 
-## 6. Antideploy Production Deployment
+## 6. Vercel Production Deployment
 
-Anusandhan is deployed to **Antideploy** (`antideploy.com`), the zero-configuration autonomous hosting platform:
+Anusandhan is fully configured for zero-configuration, production deployment on **Vercel** (`vercel.app`):
 
-- **Live Production Endpoint**: `https://anusandhan.antideploy.app`
-- **Antideploy Application ID**: `cc8b1276-a866-4436-ae47-38411d419136`
-- **Antideploy Dashboard**: `https://antideploy.com/app/cc8b1276-a866-4436-ae47-38411d419136`
+- **Live Production Endpoint**: `https://anusandhan.vercel.app`
+- **1-Click Deploy**: [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/soumyadeepsarkar-2004/Anusandhan)
 - **VitePress Documentation**: `https://soumyadeepsarkar-2004.github.io/Anusandhan/`
+- **GitHub Repository**: `https://github.com/soumyadeepsarkar-2004/Anusandhan`
 
-### Automated Deployment to Antideploy
-To deploy the application and all backend microservices to Antideploy:
-```bash
-npm run deploy:antideploy
-# or directly:
-python deploy_antideploy.py
-```
-This automatically packages the codebase into a compressed tarball, uploads it to Antideploy's deployment API, and monitors rollout health until the application is live at `https://anusandhan.antideploy.app`.
+### Deployment Architecture
+- **Static Assets**: Compiled with `tsc && vite build` into `dist/` and served over Vercel's global Edge Network CDN.
+- **Serverless API Bridge**: `api/index.js` routes all `/api/*` requests through the full Node.js Express Gateway, complete with authentication, scholar CRM, and AI microservice bridges.
+- **Client-Side Routing**: SPA rewrites configured in `vercel.json` to route all non-API paths to `index.html`.
