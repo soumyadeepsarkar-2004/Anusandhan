@@ -13,6 +13,12 @@ Historically, this has resulted in:
 
 ---
 
+<p align="center">
+  <img src="/anusandhan-preview.svg" alt="Anusandhan Platform Architecture & Interface Preview" width="100%" />
+</p>
+
+---
+
 ## Core Pillars of the Platform
 
 ### 1. Research Readiness Score (RRS™)

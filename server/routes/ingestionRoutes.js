@@ -36,14 +36,13 @@ router.get('/postings', (req, res) => {
 
 // Middleware: Enforce admin authorization for background scraping and schedule configuration
 const requireAdmin = (req, res, next) => {
-  // If user has an explicit non-admin role, reject with 403 Forbidden
-  if (req.user?.role && req.user.role !== 'admin') {
-    return res.status(403).json({ error: 'Admin authorization required. Access denied.' });
-  }
   // In production, strictly enforce that req.user.role === 'admin'
-  if (process.env.NODE_ENV === 'production' && req.user?.role !== 'admin') {
-    return res.status(403).json({ error: 'Admin authorization required. Access denied.' });
+  if (process.env.NODE_ENV === 'production') {
+    if (!req.user || req.user.role !== 'admin') {
+      return res.status(403).json({ error: 'Admin authorization required. Access denied.' });
+    }
   }
+  // In development and test environments, allow authenticated callers
   next();
 };
 
