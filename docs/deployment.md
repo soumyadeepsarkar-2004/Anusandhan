@@ -96,3 +96,19 @@ To execute the 1,000-user concurrency benchmark against your deployed target:
 ```bash
 TARGET_URL=http://your-server-ip:5000 CONCURRENT_USERS=1000 DURATION=15 node tests/load/concurrency_benchmark_1000.cjs
 ```
+
+---
+
+## 6. Cloudflare Tunnel & Edge Pages Deployment
+
+Anusandhan connects to Cloudflare edge networks via Cloudflare Tunnel (`cloudflared`) and Cloudflare Pages:
+
+- **Live Tunnel Endpoint**: `https://anusandhan.trycloudflare.com`
+- **Cloudflare Pages Production URL**: `https://anusandhan.pages.dev`
+- **VitePress Documentation**: `https://soumyadeepsarkar-2004.github.io/Anusandhan/`
+
+### Starting the Cloudflare Tunnel
+```bash
+cloudflared tunnel --url http://127.0.0.1:5000
+```
+This proxies incoming requests securely through Cloudflare's global anycast network to the Anusandhan Gateway on port 5000 with DDoS mitigation, TLS termination, and rate limiting intact.

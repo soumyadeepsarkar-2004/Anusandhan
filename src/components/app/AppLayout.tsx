@@ -33,6 +33,7 @@ interface AppLayoutProps {
   onOpenOnboarding: () => void;
   onBackToLanding: () => void;
   onOpenCommandPalette?: () => void;
+  onOpenAuth?: () => void;
   student: StudentProfile;
   followUpDueCount: number;
   children: React.ReactNode;
@@ -47,6 +48,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
   onOpenOnboarding,
   onBackToLanding,
   onOpenCommandPalette,
+  onOpenAuth,
   student,
   followUpDueCount,
   children
@@ -102,22 +104,34 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
             
             {/* Daily Streak Flame */}
             <button
-              onClick={() => setIsStreakModalOpen(true)}
+              onClick={() => {
+                if (!isAuthenticated && onOpenAuth) {
+                  onOpenAuth();
+                  return;
+                }
+                setIsStreakModalOpen(true);
+              }}
               className="flex items-center space-x-1 px-2.5 py-1 rounded-full bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-500 font-mono text-xs transition-all cursor-pointer shadow-sm active:scale-95 group"
-              title="View Scholar Streak & Rewards"
+              title={isAuthenticated ? "View Scholar Streak & Rewards" : "Sign In to Claim Daily Streak & Tokens"}
             >
               <Flame className="w-3.5 h-3.5 text-amber-500 fill-amber-500/30 group-hover:scale-110 transition-transform" />
-              <span className="font-bold">{user?.loginStreak || 3}d</span>
+              <span className="font-bold">{isAuthenticated ? `${user?.loginStreak || 1}d` : 'Claim 🪙'}</span>
             </button>
 
             {/* Shodh Tokens Balance */}
             <button
-              onClick={() => setIsTokenModalOpen(true)}
+              onClick={() => {
+                if (!isAuthenticated && onOpenAuth) {
+                  onOpenAuth();
+                  return;
+                }
+                setIsTokenModalOpen(true);
+              }}
               className="hidden sm:flex items-center space-x-1 px-2.5 py-1 rounded-full bg-white/[0.04] hover:bg-white/[0.08] border border-[var(--border-subtle)] hover:border-amber-400/40 text-amber-500 font-mono text-xs transition-all cursor-pointer shadow-sm active:scale-95"
-              title="Your Shodh Token Balance & Reward Claims"
+              title={isAuthenticated ? "Your Shodh Token Balance & Reward Claims" : "Sign In to View Token Wallet"}
             >
               <span className="text-xs">🪙</span>
-              <span className="font-bold text-[var(--text-primary)]">{user?.tokensBalance || 14}</span>
+              <span className="font-bold text-[var(--text-primary)]">{isAuthenticated ? (user?.tokensBalance || 0) : 0}</span>
             </button>
 
             {/* Credits Balance Pill */}
@@ -149,33 +163,42 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
               <PullChainBulb size="sm" />
             </div>
 
-            {/* Scholar Profile Avatar */}
+            {/* Scholar Profile / Sign In Action */}
             <div className="flex items-center space-x-1.5 pl-2 border-l border-[var(--border-subtle)]">
-              <button
-                onClick={onOpenOnboarding}
-                className="flex items-center space-x-2 cursor-pointer text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
-                title="Edit Profile & Re-parse CV"
-              >
-                <div className="w-8 h-8 rounded-full bg-amber-500/15 text-amber-500 font-mono font-bold text-xs flex items-center justify-center border border-amber-500/30 shadow-inner">
-                  {(user?.fullName || student.fullName).charAt(0)}
-                </div>
-                <div className="hidden xl:flex flex-col text-left">
-                  <span className="text-xs font-medium max-w-[110px] truncate text-[var(--text-primary)]">
-                    {user?.fullName || student.fullName}
-                  </span>
-                  <span className="text-[10px] font-mono text-[var(--text-muted)]">
-                    {isAuthenticated ? 'Scholar' : `RRS ${student.rrsScore || 94}`}
-                  </span>
-                </div>
-              </button>
+              {isAuthenticated && user ? (
+                <>
+                  <button
+                    onClick={onOpenOnboarding}
+                    className="flex items-center space-x-2 cursor-pointer text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                    title="Edit Profile & Re-parse CV"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-amber-500/15 text-amber-500 font-mono font-bold text-xs flex items-center justify-center border border-amber-500/30 shadow-inner">
+                      {(user?.fullName || student.fullName).charAt(0)}
+                    </div>
+                    <div className="hidden xl:flex flex-col text-left">
+                      <span className="text-xs font-medium max-w-[110px] truncate text-[var(--text-primary)]">
+                        {user?.fullName || student.fullName}
+                      </span>
+                      <span className="text-[10px] font-mono text-[var(--text-muted)]">
+                        Scholar · RRS {user?.rrsScore || student.rrsScore || 94}
+                      </span>
+                    </div>
+                  </button>
 
-              {isAuthenticated && (
+                  <button
+                    onClick={logout}
+                    className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-white/10 transition-colors cursor-pointer"
+                    title="Sign Out"
+                  >
+                    <LogOut className="w-3.5 h-3.5" />
+                  </button>
+                </>
+              ) : (
                 <button
-                  onClick={logout}
-                  className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-white/10 transition-colors cursor-pointer"
-                  title="Sign Out"
+                  onClick={onOpenAuth}
+                  className="flex items-center space-x-1 px-3 py-1.5 rounded-full bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 font-bold text-xs shadow-sm shadow-amber-500/25 transition-all cursor-pointer active:scale-95 whitespace-nowrap"
                 >
-                  <LogOut className="w-3.5 h-3.5" />
+                  <span>Sign In</span>
                 </button>
               )}
             </div>
@@ -246,6 +269,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
           isOpen={isStreakModalOpen}
           onClose={() => setIsStreakModalOpen(false)}
           onOpenPricingModal={onOpenPricingModal}
+          onOpenAuth={onOpenAuth}
         />
 
         {/* Shodh Token Wallet & Rewards Claim Modal */}
@@ -253,6 +277,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
           isOpen={isTokenModalOpen}
           onClose={() => setIsTokenModalOpen(false)}
           onOpenPricingModal={onOpenPricingModal}
+          onOpenAuth={onOpenAuth}
         />
       </React.Suspense>
 

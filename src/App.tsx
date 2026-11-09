@@ -351,13 +351,9 @@ const AppContent: React.FC = () => {
     }));
   };
 
-  // Authenticated Gateway Handler (Blocks anonymous free plan & token consumption)
+  // Launch Platform Handler: Allows exploring opportunities & diagnostic studio freely,
+  // while privileged actions (daily tokens, email dispatch, payments) require authentication
   const handleLaunchPlatform = (targetTab: AppTab = 'discover') => {
-    if (!isAuthenticated) {
-      setAuthInitialMode('signin');
-      setIsAuthModalOpen(true);
-      return;
-    }
     navigateToView('app', targetTab);
   };
 
@@ -531,6 +527,10 @@ const AppContent: React.FC = () => {
             onOpenPricingModal={() => setIsPricingModalOpen(true)}
             onOpenOnboarding={() => setIsOnboardingOpen(true)}
             onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
+            onOpenAuth={() => {
+              setAuthInitialMode('signin');
+              setIsAuthModalOpen(true);
+            }}
             onBackToLanding={() => navigateToView('landing')}
             student={student}
             followUpDueCount={followUpDueCount}
@@ -762,6 +762,11 @@ const AppContent: React.FC = () => {
           onOpenPricingModal={() => {
             setIsRewardsModalOpen(false);
             setIsPricingModalOpen(true);
+          }}
+          onOpenAuth={() => {
+            setIsRewardsModalOpen(false);
+            setAuthInitialMode('signin');
+            setIsAuthModalOpen(true);
           }}
         />
       </Suspense>

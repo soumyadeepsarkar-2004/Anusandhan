@@ -10,12 +10,14 @@ interface TokenRewardsModalProps {
   isOpen: boolean;
   onClose: () => void;
   onOpenPricingModal?: () => void;
+  onOpenAuth?: () => void;
 }
 
 export const TokenRewardsModal: React.FC<TokenRewardsModalProps> = ({
   isOpen,
   onClose,
-  onOpenPricingModal
+  onOpenPricingModal,
+  onOpenAuth
 }) => {
   if (!isOpen) return null;
 
@@ -27,6 +29,15 @@ export const TokenRewardsModal: React.FC<TokenRewardsModalProps> = ({
   const streak = user?.loginStreak || 1;
 
   const handleClaimDaily = async () => {
+    if (!user) {
+      if (onOpenAuth) {
+        onClose();
+        onOpenAuth();
+      } else {
+        setClaimFeedback('Please sign in or create an account to claim daily Shodh tokens.');
+      }
+      return;
+    }
     setIsClaiming(true);
     setClaimFeedback(null);
     try {

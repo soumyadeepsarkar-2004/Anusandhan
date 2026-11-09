@@ -22,12 +22,14 @@ interface ScholarStreakModalProps {
   isOpen: boolean;
   onClose: () => void;
   onOpenPricingModal?: () => void;
+  onOpenAuth?: () => void;
 }
 
 export const ScholarStreakModal: React.FC<ScholarStreakModalProps> = ({
   isOpen,
   onClose,
-  onOpenPricingModal
+  onOpenPricingModal,
+  onOpenAuth
 }) => {
   if (!isOpen) return null;
 
@@ -59,6 +61,15 @@ export const ScholarStreakModal: React.FC<ScholarStreakModalProps> = ({
 
   // Handle claiming daily credits and random tokens
   const handleClaim = async () => {
+    if (!user) {
+      if (onOpenAuth) {
+        onClose();
+        onOpenAuth();
+      } else {
+        setClaimFeedback('Please sign in with Google or your academic CV to claim daily tokens.');
+      }
+      return;
+    }
     if (isClaimedToday || isClaiming) return;
     setIsClaiming(true);
     setClaimFeedback(null);
