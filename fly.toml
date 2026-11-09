@@ -1,5 +1,5 @@
 # ==============================================================================
-# Anusandhan PRO - Fly.io Application Manifest
+# Anusandhan - Fly.io Application Manifest
 # ==============================================================================
 app = "anusandhan-pro"
 primary_region = "bom"

@@ -446,7 +446,7 @@ const AppContent: React.FC = () => {
               className="flex items-center cursor-pointer select-none"
               onClick={() => navigateToView('landing')}
             >
-              <AnusandhanLogo size="sm" badge="PRO" />
+              <AnusandhanLogo size="sm" />
             </div>
 
             <div className="flex items-center space-x-3">

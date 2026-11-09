@@ -1,5 +1,5 @@
 # ==============================================================================
-# Anusandhan PRO - Render.com Blueprint Infrastructure as Code (IaC)
+# Anusandhan - Render.com Blueprint Infrastructure as Code (IaC)
 # ==============================================================================
 services:
   # 1. Main Unified Web Service (React SPA + Express Gateway + SQLite)

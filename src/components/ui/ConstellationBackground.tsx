@@ -86,7 +86,7 @@ export const ConstellationBackground: React.FC = () => {
         // Outer Astrolabe Ring
         ctx.beginPath();
         ctx.arc(0, 0, Math.min(width, height) * 0.45, 0, Math.PI * 2);
-        ctx.strokeStyle = 'rgba(2, 132, 199, 0.04)';
+        ctx.strokeStyle = 'rgba(180, 83, 9, 0.04)';
         ctx.lineWidth = 1.5;
         ctx.setLineDash([8, 12]);
         ctx.stroke();
@@ -94,7 +94,7 @@ export const ConstellationBackground: React.FC = () => {
         // Secondary Elliptical Orbital Path
         ctx.beginPath();
         ctx.ellipse(0, 0, Math.min(width, height) * 0.38, Math.min(width, height) * 0.22, ringAngle * 0.6, 0, Math.PI * 2);
-        ctx.strokeStyle = 'rgba(217, 119, 6, 0.05)';
+        ctx.strokeStyle = 'rgba(180, 83, 9, 0.04)';
         ctx.lineWidth = 1.2;
         ctx.setLineDash([4, 8]);
         ctx.stroke();
@@ -134,14 +134,14 @@ export const ConstellationBackground: React.FC = () => {
           // Labeled key institution anchors
           ctx.fillStyle = dark
             ? 'rgba(245, 158, 11, 0.85)'
-            : 'rgba(217, 119, 6, 0.9)';
-          ctx.shadowColor = dark ? 'rgba(245, 158, 11, 0.5)' : 'rgba(217, 119, 6, 0.35)';
+            : 'rgba(217, 119, 6, 0.85)';
+          ctx.shadowColor = dark ? 'rgba(245, 158, 11, 0.5)' : 'rgba(217, 119, 6, 0.25)';
           ctx.shadowBlur = 6;
         } else {
           // Ambient constellation dust
           ctx.fillStyle = dark
             ? 'rgba(161, 161, 170, 0.4)'
-            : 'rgba(2, 132, 199, 0.35)';
+            : 'rgba(120, 113, 108, 0.30)';
           ctx.shadowBlur = 0;
         }
         ctx.fill();
@@ -151,7 +151,7 @@ export const ConstellationBackground: React.FC = () => {
           ctx.font = '500 10px "JetBrains Mono", monospace';
           ctx.fillStyle = dark
             ? (distMouse < 180 ? 'rgba(251, 191, 36, 0.95)' : 'rgba(217, 119, 6, 0.5)')
-            : (distMouse < 180 ? 'rgba(180, 83, 9, 0.95)' : 'rgba(3, 105, 161, 0.55)');
+            : (distMouse < 180 ? 'rgba(180, 83, 9, 0.95)' : 'rgba(120, 113, 108, 0.65)');
           ctx.fillText(p1.label, p1.x + 8, p1.y - 4);
         }
 
@@ -163,13 +163,13 @@ export const ConstellationBackground: React.FC = () => {
           const dist = Math.sqrt(dx * dx + dy * dy);
 
           if (dist < 135) {
-            const alpha = (1 - dist / 135) * (dark ? 0.16 : 0.13);
+            const alpha = (1 - dist / 135) * (dark ? 0.16 : 0.12);
             ctx.beginPath();
             ctx.moveTo(p1.x, p1.y);
             ctx.lineTo(p2.x, p2.y);
             ctx.strokeStyle = dark
               ? `rgba(212, 212, 216, ${alpha})`
-              : (p1.label || p2.label ? `rgba(217, 119, 6, ${alpha * 1.5})` : `rgba(2, 132, 199, ${alpha})`);
+              : (p1.label || p2.label ? `rgba(217, 119, 6, ${alpha * 1.4})` : `rgba(120, 113, 108, ${alpha})`);
             ctx.lineWidth = p1.label || p2.label ? 1.0 : 0.75;
             ctx.setLineDash([]);
             ctx.stroke();
@@ -194,17 +194,17 @@ export const ConstellationBackground: React.FC = () => {
       {/* Dynamic Animated Ambient Aurora Atmosphere */}
       <div
         className={`absolute inset-0 transition-opacity duration-700 pointer-events-none ${
-          isDark ? 'opacity-40' : 'opacity-90'
+          isDark ? 'opacity-40' : 'opacity-45'
         }`}
       >
-        {/* Soft Golden Amber Orb */}
-        <div className="absolute -top-32 -left-32 w-[650px] h-[650px] rounded-full bg-gradient-to-br from-amber-400/20 via-amber-500/10 to-transparent blur-[120px] animate-pulse" style={{ animationDuration: '9s' }} />
+        {/* Soft Warm Honey Amber Orb */}
+        <div className="absolute -top-32 -left-32 w-[650px] h-[650px] rounded-full bg-gradient-to-br from-amber-300/12 via-amber-400/6 to-transparent blur-[130px] animate-pulse" style={{ animationDuration: '9s' }} />
 
-        {/* Ethereal Sky Sapphire Orb */}
-        <div className="absolute top-1/4 -right-28 w-[700px] h-[700px] rounded-full bg-gradient-to-bl from-sky-400/20 via-indigo-500/10 to-transparent blur-[140px] animate-pulse" style={{ animationDuration: '12s', animationDelay: '2s' }} />
+        {/* Soothing Warm Oat Apricot Orb */}
+        <div className="absolute top-1/4 -right-28 w-[700px] h-[700px] rounded-full bg-gradient-to-bl from-orange-200/10 via-amber-200/6 to-transparent blur-[140px] animate-pulse" style={{ animationDuration: '12s', animationDelay: '2s' }} />
 
-        {/* Gentle Rose / Emerald Undulation Orb */}
-        <div className="absolute -bottom-40 left-1/3 w-[800px] h-[600px] rounded-full bg-gradient-to-tr from-emerald-400/15 via-amber-300/10 to-transparent blur-[140px] animate-pulse" style={{ animationDuration: '14s', animationDelay: '4s' }} />
+        {/* Gentle Warm Sage Cream Undulation Orb */}
+        <div className="absolute -bottom-40 left-1/3 w-[800px] h-[600px] rounded-full bg-gradient-to-tr from-emerald-300/8 via-amber-200/5 to-transparent blur-[140px] animate-pulse" style={{ animationDuration: '14s', animationDelay: '4s' }} />
       </div>
 
       {/* Interactive Mathematical Constellation Canvas */}

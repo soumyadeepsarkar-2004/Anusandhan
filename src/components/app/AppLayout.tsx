@@ -74,7 +74,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
             </button>
 
             <div className="flex items-center cursor-pointer select-none" onClick={onBackToLanding}>
-              <AnusandhanLogo size="sm" badge="PRO" />
+              <AnusandhanLogo size="sm" />
             </div>
           </div>
 

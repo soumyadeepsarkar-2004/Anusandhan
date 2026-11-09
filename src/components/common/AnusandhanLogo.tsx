@@ -12,7 +12,7 @@ interface AnusandhanLogoProps {
 export const AnusandhanLogo: React.FC<AnusandhanLogoProps> = ({
   size = 'md',
   showText = true,
-  badge = 'PRO',
+  badge = null,
   className = '',
   themeOverride
 }) => {

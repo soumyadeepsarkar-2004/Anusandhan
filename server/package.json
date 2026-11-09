@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js",
-    "test": "node --test --env-file=.env tests/gateway.test.js"
+    "test": "node --test tests/gateway.test.js"
   },
   "dependencies": {
     "axios": "^1.7.9",

@@ -1,5 +1,5 @@
 # ==============================================================================
-# Anusandhan PRO - Unified Full-Stack Production Container
+# Anusandhan - Unified Full-Stack Production Container
 # Builds React SPA & packages into Node.js Express Gateway
 # Ideal for single-port deployments on Render, Railway, Fly.io, Heroku, AWS ECS
 # ==============================================================================

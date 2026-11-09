@@ -80,7 +80,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           className="flex items-center cursor-pointer group select-none shrink-0"
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
         >
-          <AnusandhanLogo size="sm" badge="PRO" />
+          <AnusandhanLogo size="sm" />
         </div>
 
         {/* Center Navigation Links with Sliding Pill */}

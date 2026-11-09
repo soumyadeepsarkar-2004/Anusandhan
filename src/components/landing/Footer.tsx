@@ -26,7 +26,7 @@ export const Footer: React.FC = () => {
           {/* Column 1: Brand & Purpose */}
           <div className="space-y-3.5">
             <div className="flex items-center">
-              <AnusandhanLogo size="sm" badge="PRO" />
+              <AnusandhanLogo size="sm" />
             </div>
 
             <p className="text-[var(--text-secondary)] text-xs leading-relaxed font-sans">

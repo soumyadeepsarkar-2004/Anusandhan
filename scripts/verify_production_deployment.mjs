@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * ==============================================================================
- * Anusandhan PRO - Autonomous Production Deployment Verification Engine
+ * Anusandhan - Autonomous Production Deployment Verification Engine
  * Validates full stack contracts: SPA Serving, REST APIs, SQLite DB, and Security
  * ==============================================================================
  */

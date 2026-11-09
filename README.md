@@ -1,4 +1,4 @@
-# Anusandhan PRO (अनुसंधान)
+# Anusandhan (अनुसंधान)
 ### Autonomous Research Internship Intelligence & Literature-Grounded Outreach Platform
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-amber.svg)](https://opensource.org/licenses/MIT)
