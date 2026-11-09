@@ -20,6 +20,12 @@ export default defineConfig({
   },
   server: {
     port: 5173,
+    proxy: {
+      '/api': {
+        target: 'https://anusandhan.vercel.app',
+        changeOrigin: true
+      }
+    },
     watch: {
       ignored: [
         '**/android/**',
