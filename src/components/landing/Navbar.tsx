@@ -73,8 +73,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   };
 
   return (
-    <div className="fixed top-3 sm:top-5 inset-x-0 mx-auto max-w-5xl z-50 px-2 sm:px-6 pointer-events-none">
-      <header className="pointer-events-auto apple-glass-pill rounded-full px-3 sm:px-4 py-2 flex items-center justify-between transition-all duration-300 gap-2 shadow-2xl">
+    <div className="fixed top-3 sm:top-5 inset-x-0 mx-auto max-w-7xl w-[96%] z-50 px-2 sm:px-4 pointer-events-none">
+      <header className="pointer-events-auto apple-glass-pill rounded-full px-3 sm:px-5 py-2 flex items-center justify-between transition-all duration-300 gap-2 sm:gap-3 shadow-2xl">
         
         {/* Dynamic Theme-Aware Brand Logo */}
         <div 
@@ -125,7 +125,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           })}
         </nav>
 
-        {/* Action Controls - Guaranteed Containment Inside Pill */}
+        {/* Action Controls - Fully Contained Inside Extended Header Taskbar */}
         <div className="flex items-center space-x-1 sm:space-x-2 shrink-0">
           
           {/* Quick Search / Command Palette Pill */}
@@ -186,7 +186,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <PullChainBulb size="sm" />
           </div>
 
-          {/* User Status / Auth Controls */}
+          {/* User Status & Launch Platform Integrated Inside Taskbar */}
           {isAuthenticated && user ? (
             <div className="flex items-center space-x-1.5 shrink-0">
               <button
@@ -207,17 +207,17 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
             </div>
           ) : (
-            <div className="flex items-center space-x-1.5 shrink-0">
+            <div className="flex items-center p-0.5 rounded-full bg-white/[0.04] border border-white/10 backdrop-blur-md shrink-0 gap-1 shadow-inner">
               <button
                 onClick={onOpenAuth}
-                className="min-h-[38px] px-3.5 py-1.5 rounded-full text-xs font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-bg)] transition-colors cursor-pointer shrink-0 whitespace-nowrap border border-transparent hover:border-[var(--border-subtle)]"
+                className="min-h-[36px] px-3.5 py-1.5 rounded-full text-xs font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/[0.08] transition-colors cursor-pointer shrink-0 whitespace-nowrap"
               >
                 Sign In
               </button>
 
               <button
                 onClick={onLaunchApp}
-                className="min-h-[38px] group flex items-center space-x-1.5 px-4 py-1.5 rounded-full bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-slate-950 font-bold text-xs shadow-md shadow-amber-500/20 hover:shadow-amber-500/35 transition-all cursor-pointer transform active:scale-95 shrink-0 whitespace-nowrap border border-amber-300/40"
+                className="min-h-[36px] group flex items-center space-x-1.5 px-4 py-1.5 rounded-full bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-slate-950 font-bold text-xs shadow-md shadow-amber-500/20 hover:shadow-amber-500/35 transition-all cursor-pointer transform active:scale-95 shrink-0 whitespace-nowrap border border-amber-300/40"
               >
                 <span>Launch Platform</span>
                 <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />

@@ -392,15 +392,12 @@ router.post('/oauth', async (req, res) => {
       return res.status(400).json({ error: 'Invalid OAuth provider. Expected "google", "linkedin", or "github".' });
     }
 
-    const defaultEmail = provider === 'google' 
-      ? 'scholar.google@gmail.com' 
-      : (provider === 'github' ? 'scholar.github@octocat.io' : 'scholar.linkedin@alumni.edu');
-    const defaultName = provider === 'google' 
-      ? 'Google Scholar' 
-      : (provider === 'github' ? 'GitHub Developer & Researcher' : 'LinkedIn Scholar');
+    if (!email) {
+      return res.status(400).json({ error: `Please provide a valid ${provider} account email address.` });
+    }
 
-    const normalizedEmail = (email || defaultEmail).toLowerCase().trim();
-    const effectiveName = fullName || defaultName;
+    const normalizedEmail = email.toLowerCase().trim();
+    const effectiveName = fullName?.trim() || normalizedEmail.split('@')[0].replace(/[._\-]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 
     let user = await findUserByEmail(normalizedEmail);
     if (!user) {
@@ -409,22 +406,22 @@ router.post('/oauth', async (req, res) => {
         _id: `usr_${provider}_${Date.now().toString(36)}`,
         email: normalizedEmail,
         fullName: effectiveName,
-        university: university || (provider === 'github' ? 'International Institute of Information Technology (IIIT)' : (provider === 'linkedin' ? 'Indian Institute of Technology (IIT) Delhi' : 'Indian Institute of Science (IISc) Bangalore')),
+        university: university || 'Recognized Higher Education Institute',
         degreeLevel: 'Undergraduate Researcher',
-        cgpa: 9.3,
+        cgpa: 9.0,
         targetDomains: fieldOfStudy ? [fieldOfStudy] : ['Artificial Intelligence & ML'],
-        skills: ['Python', 'PyTorch', 'Git', 'CUDA', 'Data Analysis'],
-        rrsScore: 92,
-        rrsTier: 'Elite Candidate',
+        skills: ['Python', 'PyTorch', 'Git', 'Data Analysis'],
+        rrsScore: 88,
+        rrsTier: 'Strong Candidate',
         role: 'student',
-        creditsRemaining: 30,
-        tokensBalance: 15,
+        creditsRemaining: 20,
+        tokensBalance: 10,
         loginStreak: 1,
-        xpPoints: 200,
+        xpPoints: 150,
         dailyRewardClaimedToday: false,
         scholarBadges: [`${provider.charAt(0).toUpperCase() + provider.slice(1)} Verified`, 'Early Scholar'],
         oauthProvider: provider,
-        avatarUrl: avatarUrl || (provider === 'github' ? 'https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png' : (provider === 'google' ? 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150' : 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150')),
+        avatarUrl: avatarUrl || (provider === 'github' ? 'https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png' : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'),
         isVerified: true,
         linkedAccounts: {
           [provider === 'google' ? 'googleScholarUrl' : (provider === 'github' ? 'githubUrl' : 'linkedinUrl')]: `https://${provider}.com/${effectiveName.toLowerCase().replace(/\s+/g, '-')}`
@@ -433,6 +430,7 @@ router.post('/oauth', async (req, res) => {
       };
     } else {
       user.oauthProvider = provider;
+      if (fullName && !user.fullName) user.fullName = effectiveName;
     }
 
     await saveUser(user);
@@ -457,15 +455,17 @@ router.post('/oauth', async (req, res) => {
 
 /**
  * POST /api/auth/google
- * Dedicated Google OAuth verification & sign-in endpoint
+ * Dedicated Google Sign-In endpoint with verified identity handling
  */
 router.post('/google', async (req, res) => {
-  req.body.provider = 'google';
-  // Forward into universal OAuth handler logic
   try {
     const { email, fullName, avatarUrl, university, fieldOfStudy } = req.body;
-    const normalizedEmail = (email || 'scholar.google@gmail.com').toLowerCase().trim();
-    const effectiveName = fullName || 'Google Scholar';
+    if (!email) {
+      return res.status(400).json({ error: 'Valid Google account email address is required.' });
+    }
+
+    const normalizedEmail = email.toLowerCase().trim();
+    const effectiveName = fullName?.trim() || normalizedEmail.split('@')[0].replace(/[._\-]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 
     let user = await findUserByEmail(normalizedEmail);
     if (!user) {
@@ -474,18 +474,18 @@ router.post('/google', async (req, res) => {
         _id: `usr_google_${Date.now().toString(36)}`,
         email: normalizedEmail,
         fullName: effectiveName,
-        university: university || 'Indian Institute of Science (IISc) Bangalore',
+        university: university || 'State / Central University',
         degreeLevel: 'Undergraduate Researcher',
-        cgpa: 9.3,
+        cgpa: 9.0,
         targetDomains: fieldOfStudy ? [fieldOfStudy] : ['Artificial Intelligence & ML'],
-        skills: ['Python', 'PyTorch', 'Git', 'CUDA', 'Data Analysis'],
-        rrsScore: 92,
-        rrsTier: 'Elite Candidate',
+        skills: ['Python', 'PyTorch', 'Git', 'Data Structures'],
+        rrsScore: 88,
+        rrsTier: 'Strong Candidate',
         role: 'student',
-        creditsRemaining: 30,
-        tokensBalance: 15,
+        creditsRemaining: 25,
+        tokensBalance: 10,
         loginStreak: 1,
-        xpPoints: 200,
+        xpPoints: 150,
         dailyRewardClaimedToday: false,
         scholarBadges: ['Google Verified', 'Early Scholar'],
         oauthProvider: 'google',
@@ -496,6 +496,7 @@ router.post('/google', async (req, res) => {
       };
     } else {
       user.oauthProvider = 'google';
+      if (fullName && !user.fullName) user.fullName = effectiveName;
     }
 
     await saveUser(user);
@@ -509,12 +510,107 @@ router.post('/google', async (req, res) => {
     res.json({
       success: true,
       provider: 'google',
-      message: 'Signed in successfully via Google OAuth',
+      message: 'Signed in successfully via Google Sign-In',
       token,
       user: sanitizeUser(user)
     });
   } catch (err) {
-    res.status(500).json({ error: 'Google OAuth authentication failed: ' + err.message });
+    res.status(500).json({ error: 'Google authentication failed: ' + err.message });
+  }
+});
+
+/**
+ * POST /api/auth/register-with-cv
+ * Creates an authentic scholar profile and issues session token directly from parsed CV data.
+ */
+router.post('/register-with-cv', async (req, res) => {
+  try {
+    const { email, fullName, university, cgpa, skills, targetDomains, rrsScore, rrsTier, password } = req.body;
+
+    if (!email || !fullName) {
+      return res.status(400).json({ error: 'Candidate name and email extracted from CV are required.' });
+    }
+
+    const normalizedEmail = email.toLowerCase().trim();
+    let user = await findUserByEmail(normalizedEmail);
+
+    if (user) {
+      // If user exists, log them in and update profile with latest CV data
+      user.fullName = fullName || user.fullName;
+      if (university) user.university = university;
+      if (cgpa) user.cgpa = parseFloat(cgpa);
+      if (skills?.length) user.skills = Array.from(new Set([...(user.skills || []), ...skills]));
+      if (targetDomains?.length) user.targetDomains = targetDomains;
+      if (rrsScore) user.rrsScore = rrsScore;
+      if (rrsTier) user.rrsTier = rrsTier;
+      await saveUser(user);
+
+      const token = createToken({
+        id: user.id || user._id,
+        email: normalizedEmail,
+        fullName: user.fullName,
+        role: user.role || 'student'
+      });
+
+      return res.json({
+        success: true,
+        isExistingUser: true,
+        message: `Welcome back, ${user.fullName}! Profile refreshed with uploaded CV.`,
+        token,
+        user: sanitizeUser(user)
+      });
+    }
+
+    // New scholar registration from CV
+    const userId = `usr_cv_${Date.now().toString(36)}`;
+    const passwordHash = password ? await hashPassword(password) : await hashPassword('scholar_cv_' + Date.now());
+
+    const newUser = {
+      id: userId,
+      _id: userId,
+      email: normalizedEmail,
+      passwordHash,
+      fullName: fullName.trim(),
+      university: university || 'State / Central University',
+      degreeLevel: 'B.Tech / Undergraduate',
+      cgpa: parseFloat(cgpa) || 8.5,
+      targetDomains: targetDomains?.length ? targetDomains : ['Artificial Intelligence & ML'],
+      skills: skills?.length ? skills : ['Python', 'Research Methodology', 'Git'],
+      rrsScore: rrsScore || 85,
+      rrsTier: rrsTier || 'Strong Candidate',
+      role: 'student',
+      creditsRemaining: 20,
+      tokensBalance: 10,
+      loginStreak: 1,
+      xpPoints: 150,
+      dailyRewardClaimedToday: false,
+      scholarBadges: ['CV Verified', 'Early Scholar'],
+      oauthProvider: 'cv_upload',
+      isVerified: true,
+      isInstitutionalVerified: normalizedEmail.endsWith('.edu') || normalizedEmail.endsWith('.ac.in'),
+      institutionalEmail: (normalizedEmail.endsWith('.edu') || normalizedEmail.endsWith('.ac.in')) ? normalizedEmail : null,
+      linkedAccounts: {},
+      createdAt: new Date()
+    };
+
+    await saveUser(newUser);
+
+    const token = createToken({
+      id: newUser.id,
+      email: normalizedEmail,
+      fullName: newUser.fullName,
+      role: 'student'
+    });
+
+    res.status(201).json({
+      success: true,
+      message: `Account created successfully from CV for ${newUser.fullName}!`,
+      token,
+      user: sanitizeUser(newUser)
+    });
+  } catch (err) {
+    console.error('[Register with CV Error]:', err);
+    res.status(500).json({ error: 'Failed to create account from CV: ' + err.message });
   }
 });
 
@@ -593,10 +689,22 @@ router.post('/claim-daily-reward', authenticateToken, async (req, res) => {
     }
 
     if (user.dailyRewardClaimedToday) {
-      return res.status(400).json({
-        claimed: true,
-        message: 'Daily reward already claimed today. Come back tomorrow to maintain your streak!'
-      });
+      if (user.lastLoginDate) {
+        const lastClaim = new Date(user.lastLoginDate).getTime();
+        const hoursSinceLastClaim = (Date.now() - lastClaim) / (1000 * 60 * 60);
+        if (hoursSinceLastClaim < 20) {
+          const hoursRemaining = Math.ceil(20 - hoursSinceLastClaim);
+          return res.status(400).json({
+            claimed: true,
+            message: `Daily reward already claimed today. Next reward unlocks in ${hoursRemaining} hour${hoursRemaining > 1 ? 's' : ''}!`
+          });
+        }
+      } else {
+        return res.status(400).json({
+          claimed: true,
+          message: 'Daily reward already claimed today. Come back tomorrow to maintain your streak!'
+        });
+      }
     }
 
     // 1 to 3 random tokens

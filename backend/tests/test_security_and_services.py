@@ -44,6 +44,40 @@ def test_pdf_validation_accepts_clean_pdf():
     clean_pdf = b"%PDF-1.5\n%Clean minimal binary payload for test\n"
     assert validate_pdf_content(clean_pdf) is True
 
+def test_resume_validation_rejects_invoice_and_non_cv():
+    from app.services.pdf_service import validate_is_resume
+    invoice_text = "Tax Invoice\nBill To: John Doe\nAmount Due: $450.00\nPayment Receipt\nThank you for your business."
+    with pytest.raises(HTTPException) as exc:
+        validate_is_resume(invoice_text)
+    assert exc.value.status_code == 422
+
+    short_text = "Hello world this is not a CV."
+    with pytest.raises(HTTPException) as exc2:
+        validate_is_resume(short_text)
+    assert exc2.value.status_code == 422
+
+def test_resume_validation_accepts_valid_academic_cv():
+    from app.services.pdf_service import validate_is_resume
+    cv_text = """
+    Aarav Sharma
+    aarav.sharma@iisc.ac.in | github.com/aarav | Bengaluru, India
+    
+    Education:
+    Indian Institute of Science (IISc), Bangalore
+    Bachelor of Science in Research (Physics & Computer Science)
+    CGPA: 9.4 / 10.0 (Class of 2026)
+    
+    Research Experience & Projects:
+    - Distributed Attention Kernels for Diffusion Models: Developed custom CUDA primitives
+      reducing memory footprint by 38% under high-concurrency benchmarks.
+    - Vision-Language Grounding: Evaluated multimodal latent representations with PyTorch.
+    
+    Technical Skills:
+    Python, C++, PyTorch, CUDA, Linux, Git, LaTeX, Distributed Systems.
+    """
+    # Should pass without raising HTTPException
+    validate_is_resume(cv_text)
+
 # 3. Outreach Word Count & Academic Standard
 def test_outreach_draft_within_academic_guidelines():
     req = OutreachDraftRequest(

@@ -1,0 +1,11 @@
+# =========================================================================
+# Cloudflare Pages Configuration for Anusandhan (अनुसंधान AI)
+# =========================================================================
+
+name = "anusandhan"
+compatibility_date = "2024-11-01"
+pages_build_output_dir = "dist"
+
+[vars]
+NODE_VERSION = "22"
+VITE_API_BASE_URL = "/api"

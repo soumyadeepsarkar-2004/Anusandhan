@@ -108,6 +108,7 @@ export interface StudentProfile {
     orcidId?: string;
     huggingFaceUrl?: string;
     arxivAuthorId?: string;
+    linkedinUrl?: string;
   };
 
   // Proof-of-work project summary

@@ -1,13 +1,23 @@
-# Anusandhan (अनुसंधान)
-### Autonomous Research Internship Intelligence & Literature-Grounded Outreach Platform
+<p align="center">
+  <a href="https://cab-pdf-camping-navigator.trycloudflare.com">
+    <img src="public/brand-emblem-dark.svg" alt="Anusandhan Official Logo Emblem" width="108" height="108" />
+  </a>
+</p>
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-amber.svg)](https://opensource.org/licenses/MIT)
-[![Build Status](https://img.shields.io/badge/Build-Passing-emerald.svg)](https://github.com)
-[![Vite](https://img.shields.io/badge/Frontend-Vite%205%20%7C%20React%2018%20%7C%20TypeScript-646CFF.svg)](https://vitejs.dev)
-[![FastAPI](https://img.shields.io/badge/AI%20Microservice-FastAPI%20%7C%20Python%203.12-009688.svg)](https://fastapi.tiangolo.com)
-[![Express Gateway](https://img.shields.io/badge/Gateway-Express%20%7C%20Node.js%2020-339933.svg)](https://nodejs.org)
-[![DPDP Act 2023](https://img.shields.io/badge/Privacy-DPDP%20Act%202023%20Compliant-blue.svg)](https://meity.gov.in)
-[![WCAG AAA](https://img.shields.io/badge/Accessibility-WCAG%20AAA%20Calibrated-purple.svg)](https://www.w3.org/WAI/standards-guidelines/wcag/)
+<h1 align="center">Anusandhan (अनुसंधान)</h1>
+<p align="center">
+  <em>Autonomous Research Internship Intelligence &amp; Literature-Grounded Outreach Platform</em>
+</p>
+
+<p align="center">
+  <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-amber.svg" alt="License: MIT" /></a>
+  <a href="https://github.com"><img src="https://img.shields.io/badge/Build-Passing-emerald.svg" alt="Build Status" /></a>
+  <a href="https://vitejs.dev"><img src="https://img.shields.io/badge/Frontend-Vite%205%20%7C%20React%2018%20%7C%20TypeScript-646CFF.svg" alt="Vite" /></a>
+  <a href="https://fastapi.tiangolo.com"><img src="https://img.shields.io/badge/AI%20Microservice-FastAPI%20%7C%20Python%203.12-009688.svg" alt="FastAPI" /></a>
+  <a href="https://nodejs.org"><img src="https://img.shields.io/badge/Gateway-Express%20%7C%20Node.js%2022-339933.svg" alt="Express Gateway" /></a>
+  <a href="https://meity.gov.in"><img src="https://img.shields.io/badge/Privacy-DPDP%20Act%202023%20Compliant-blue.svg" alt="DPDP Act 2023" /></a>
+  <a href="https://www.w3.org/WAI/standards-guidelines/wcag/"><img src="https://img.shields.io/badge/Accessibility-WCAG%20AAA%20Calibrated-purple.svg" alt="WCAG AAA" /></a>
+</p>
 
 > **Anusandhan** (Sanskrit: *अनुसंधान* — *systematic research, investigation, discovery*) is an enterprise-grade autonomous intelligence platform that levels the global playing field for ambitious undergraduate and graduate scholars across **Science, Technology, Humanities, Commerce, and Law**.
 
