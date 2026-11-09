@@ -21,7 +21,8 @@ import {
   Cpu,
   X,
   GripVertical,
-  Minus
+  Minus,
+  Maximize2
 } from 'lucide-react';
 import { 
   StudentProfile, 
@@ -92,6 +93,7 @@ export const AutonomousAssistantWidget: React.FC<AutonomousAssistantWidgetProps>
   const { isDark, toggleTheme, setTheme } = useTheme();
   const [mode, setMode] = useState<AssistantWidgetMode>('orb');
   const [selectedModel, setSelectedModel] = useState<AgentModelId>('deepseek-r1');
+  const [isExpandedWide, setIsExpandedWide] = useState<boolean>(false);
   const [voiceEngine, setVoiceEngine] = useState<VoiceEngineType>('sarvam');
   const [voiceFeedbackEnabled, setVoiceFeedbackEnabled] = useState<boolean>(true);
   
@@ -919,12 +921,14 @@ export const AutonomousAssistantWidget: React.FC<AutonomousAssistantWidgetProps>
                     Free Foundation Model Switcher, File Upload
           ========================================================================= */}
       {mode === 'chat' && (
-        <div className="w-[430px] max-w-[calc(100vw-2rem)] h-[620px] max-h-[85vh] glass-modal rounded-3xl border border-white/20 shadow-[0_30px_90px_rgba(0,0,0,0.9)] flex flex-col overflow-hidden animate-fadeIn relative backdrop-blur-3xl">
+        <div className={`${isExpandedWide ? 'w-[580px] sm:w-[620px]' : 'w-[430px]'} max-w-[calc(100vw-2rem)] h-[620px] max-h-[85vh] glass-modal rounded-3xl border border-white/20 shadow-[0_30px_90px_rgba(0,0,0,0.9)] flex flex-col overflow-hidden animate-fadeIn relative backdrop-blur-3xl transition-all duration-300`}>
           
           {/* Specular Top Sheen */}
           <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-300/40 to-transparent" />
 
-          {/* Header Bar with Drag Handle & Prominent Controls */}
+          {/* =========================================================================
+              UPPER SECTION: Clean macOS-Inspired Window Control & Drag Bar
+              ========================================================================= */}
           <div 
             onPointerDown={(e) => {
               const target = e.target as HTMLElement;
@@ -932,55 +936,54 @@ export const AutonomousAssistantWidget: React.FC<AutonomousAssistantWidgetProps>
                 dragControls.start(e);
               }
             }}
-            className="p-3.5 sm:p-4 border-b border-white/10 bg-white/[0.03] backdrop-blur-xl flex items-center justify-between gap-2 shrink-0 cursor-grab active:cursor-grabbing"
+            className="px-4 py-2.5 border-b border-white/10 bg-white/[0.04] backdrop-blur-2xl flex items-center justify-between shrink-0 cursor-grab active:cursor-grabbing select-none"
           >
-            
-            <div className="flex items-center gap-2">
-              {/* Drag Handle */}
-              <div 
-                onPointerDown={(e) => dragControls.start(e)}
-                className="text-zinc-500 hover:text-zinc-300 cursor-grab active:cursor-grabbing p-0.5 transition-colors touch-none"
-                title="Drag to reposition window anywhere"
+            {/* Left: Window Traffic Light Controls */}
+            <div className="flex items-center space-x-2 shrink-0">
+              {/* Red Dot: Close window */}
+              <button
+                onClick={handleMinimizeToCapsule}
+                className="w-3 h-3 rounded-full bg-red-500/80 hover:bg-red-400 border border-red-600/40 transition-transform active:scale-90 cursor-pointer shadow-sm flex items-center justify-center group"
+                title="Close chat window"
+                aria-label="Close chat window"
               >
-                <GripVertical className="w-4 h-4" />
-              </div>
+                <X className="w-2 h-2 text-red-950 opacity-0 group-hover:opacity-100 transition-opacity" />
+              </button>
 
-              <div className="relative w-8 h-8 rounded-xl bg-zinc-900 border border-zinc-700 p-1 flex items-center justify-center shadow-md shrink-0">
-                <img src={isDark ? '/brand-emblem-dark.svg' : '/brand-emblem-light.svg'} alt="Emblem" className="w-full h-full object-contain" />
-              </div>
+              {/* Yellow Dot: Minimize to Capsule Bar */}
+              <button
+                onClick={handleMinimizeToCapsule}
+                className="w-3 h-3 rounded-full bg-amber-500/80 hover:bg-amber-400 border border-amber-600/40 transition-transform active:scale-90 cursor-pointer shadow-sm flex items-center justify-center group"
+                title="Minimize chat window to bottom bar"
+                aria-label="Minimize to bottom bar"
+              >
+                <Minus className="w-2 h-2 text-amber-950 opacity-0 group-hover:opacity-100 transition-opacity" />
+              </button>
 
-              <div>
-                <div className="flex items-center gap-1.5">
-                  <h3 className="text-xs font-semibold text-zinc-100">AnusandhanAI</h3>
-                  <span className="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                    24/7 ACTIVE
-                  </span>
-                </div>
-                <p className="text-[10px] text-zinc-400 font-mono">Autonomous Research Assistant</p>
-              </div>
+              {/* Green Dot: Expand/Standard Width Toggle */}
+              <button
+                onClick={() => setIsExpandedWide(!isExpandedWide)}
+                className="w-3 h-3 rounded-full bg-emerald-500/80 hover:bg-emerald-400 border border-emerald-600/40 transition-transform active:scale-90 cursor-pointer shadow-sm flex items-center justify-center group"
+                title={isExpandedWide ? "Restore standard width (430px)" : "Expand to wide studio (620px)"}
+                aria-label="Toggle Wide Window"
+              >
+                <Maximize2 className="w-2 h-2 text-emerald-950 opacity-0 group-hover:opacity-100 transition-opacity" />
+              </button>
             </div>
 
-            {/* Model Switcher & Header Controls */}
-            <div className="flex items-center gap-1.5 shrink-0">
-              
-              {/* Free / Open Source Model Switcher */}
-              <div className="relative">
-                <select
-                  value={selectedModel}
-                  onChange={(e) => setSelectedModel(e.target.value as AgentModelId)}
-                  className="text-[10px] font-mono px-2 py-1 rounded-xl glass-input text-amber-400 font-semibold outline-none cursor-pointer border border-amber-500/30"
-                  title="Switch between high-capability free and open-source models"
-                >
-                  <option value="deepseek-r1" className="bg-zinc-900 text-zinc-100">DeepSeek-R1 (Open Reasoning · Free)</option>
-                  <option value="qwen-2.5-coder" className="bg-zinc-900 text-zinc-100">Qwen 2.5 Coder (Open Weights · Free)</option>
-                  <option value="llama-3-70b" className="bg-zinc-900 text-zinc-100">Llama 3.3 70B (Open Weights · Free)</option>
-                  <option value="mistral-nemo" className="bg-zinc-900 text-zinc-100">Mistral NeMo (Open Weights · Free)</option>
-                  <option value="gemma-2-9b" className="bg-zinc-900 text-zinc-100">Gemma 2 9B (Ultra-Fast · Free)</option>
-                  <option value="local-academic" className="bg-zinc-900 text-zinc-100">Anusandhan Core (Zero-Cost Local)</option>
-                  <option value="gemini-flash" className="bg-zinc-900 text-zinc-100">Gemini 2.5 Flash</option>
-                </select>
+            {/* Center: Title & Emblem */}
+            <div className="flex items-center space-x-2">
+              <div className="w-5 h-5 rounded-full bg-zinc-900 border border-zinc-700 p-0.5 flex items-center justify-center shadow-inner shrink-0">
+                <img src={isDark ? '/brand-emblem-dark.svg' : '/brand-emblem-light.svg'} alt="Emblem" className="w-full h-full object-contain" />
               </div>
+              <span className="text-xs font-semibold text-zinc-100 tracking-tight">AnusandhanAI</span>
+              <span className="text-[9px] font-mono px-1.5 py-0.2 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30 font-bold">
+                24/7 ACTIVE
+              </span>
+            </div>
 
+            {/* Right: Quick Window Action Controls */}
+            <div className="flex items-center space-x-1 shrink-0">
               {/* Voice Feedback Mute Toggle */}
               <button
                 onClick={() => {
@@ -990,39 +993,69 @@ export const AutonomousAssistantWidget: React.FC<AutonomousAssistantWidgetProps>
                     setIsSpeaking(false);
                   }
                 }}
-                className={`p-1.5 rounded-xl border transition-colors cursor-pointer shrink-0 ${
+                className={`p-1.5 rounded-lg border transition-colors cursor-pointer ${
                   voiceFeedbackEnabled
                     ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
-                    : 'glass-chip text-zinc-500 hover:text-zinc-300'
+                    : 'bg-white/[0.04] text-zinc-500 hover:text-zinc-300 border-white/10'
                 }`}
-                title={voiceFeedbackEnabled ? 'Voice feedback is ON (Click to mute)' : 'Voice feedback is MUTED (Click to unmute)'}
+                title={voiceFeedbackEnabled ? 'Voice feedback is ON (Click to mute)' : 'Voice feedback is MUTED'}
               >
                 {voiceFeedbackEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
               </button>
 
-              {/* Dedicated Minimize to Previous Capsule Button */}
+              {/* Dedicated Prominent Minimize Button */}
               <button
                 onClick={handleMinimizeToCapsule}
-                className="px-2.5 py-1.5 rounded-xl glass-chip hover:bg-amber-400 hover:text-zinc-950 text-zinc-300 transition-all cursor-pointer flex items-center gap-1.5 shadow-sm active:scale-95 shrink-0"
+                className="p-1.5 rounded-lg bg-white/[0.05] hover:bg-amber-400 hover:text-zinc-950 text-zinc-300 border border-white/12 transition-all cursor-pointer shadow-sm active:scale-95"
                 title="Minimize chat back to capsule bar"
-                aria-label="Minimize chat back to capsule bar"
+                aria-label="Minimize Chat Window"
               >
                 <Minus className="w-3.5 h-3.5" />
-                <span className="text-[10px] font-mono font-medium">Minimize</span>
               </button>
 
-              {/* Close Button (Returns to capsule) */}
+              {/* Prominent Close Button */}
               <button
                 onClick={handleMinimizeToCapsule}
-                className="p-1.5 rounded-xl glass-chip hover:bg-red-500/20 text-zinc-400 hover:text-red-300 hover:border-red-500/30 transition-colors cursor-pointer shrink-0"
-                title="Close chat window to capsule"
-                aria-label="Close chat window to capsule"
+                className="p-1.5 rounded-lg bg-white/[0.05] hover:bg-red-500/20 text-zinc-400 hover:text-red-300 border border-white/12 transition-all cursor-pointer shadow-sm active:scale-95"
+                title="Close chat window"
+                aria-label="Close Chat Window"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
-
             </div>
 
+          </div>
+
+          {/* =========================================================================
+              SUB-HEADER: Foundation Model Switcher & Operational Status Strip
+              ========================================================================= */}
+          <div className="px-4 py-2 border-b border-white/10 bg-white/[0.02] flex items-center justify-between gap-2 shrink-0">
+            <div className="flex items-center space-x-2 min-w-0">
+              <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-wider shrink-0">Model:</span>
+              <select
+                value={selectedModel}
+                onChange={(e) => setSelectedModel(e.target.value as AgentModelId)}
+                className="text-xs font-mono px-2.5 py-1 rounded-xl glass-input text-amber-300 font-semibold outline-none cursor-pointer border border-amber-500/30 max-w-[260px] truncate"
+                title="Switch between high-capability free and open-source models"
+              >
+                <optgroup label="Free & Open Hosted (Unlimited)" className="bg-zinc-900 text-zinc-100 font-semibold">
+                  <option value="deepseek-r1">DeepSeek-R1 (Open Reasoning · Free)</option>
+                  <option value="qwen-2.5-coder">Qwen 2.5 Coder 32B (Open Weights · Free)</option>
+                  <option value="llama-3-70b">Llama 3.3 70B (Open Weights · Free)</option>
+                  <option value="mistral-nemo">Mistral NeMo 12B (Open Weights · Free)</option>
+                  <option value="gemma-2-9b">Gemma 2 9B (Ultra-Fast · Free)</option>
+                  <option value="local-academic">Anusandhan Core (Zero-Cost Local)</option>
+                </optgroup>
+                <optgroup label="Advanced / Custom API Key" className="bg-zinc-900 text-zinc-100 font-semibold">
+                  <option value="gemini-flash">Gemini 2.5 Flash</option>
+                </optgroup>
+              </select>
+            </div>
+
+            <span className="text-[10px] font-mono text-emerald-400 flex items-center gap-1 shrink-0 font-medium">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span>Edge Hosted</span>
+            </span>
           </div>
 
           {/* Quick Action Suggestion Chips - Frosted Glass Bar */}

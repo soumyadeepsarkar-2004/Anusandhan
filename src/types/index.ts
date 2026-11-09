@@ -90,6 +90,15 @@ export interface RRSBadge {
   category: 'code' | 'paper' | 'model' | 'trust';
 }
 
+export interface UserApiKeys {
+  geminiApiKey?: string;
+  openaiApiKey?: string;
+  anthropicApiKey?: string;
+  groqApiKey?: string;
+  deepseekApiKey?: string;
+  openrouterApiKey?: string;
+}
+
 export interface StudentProfile {
   fullName: string;
   email: string;
@@ -110,6 +119,9 @@ export interface StudentProfile {
     arxivAuthorId?: string;
     linkedinUrl?: string;
   };
+
+  // Bring-Your-Own-Key (BYOK) Foundation Model Keys
+  userApiKeys?: UserApiKeys;
 
   // Proof-of-work project summary
   featuredProject: {

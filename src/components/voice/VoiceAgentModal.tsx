@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Send, VolumeX, Volume2, Mic, Sparkles, ArrowRight, Zap, RefreshCw } from 'lucide-react';
+import { X, Minus, Send, VolumeX, Volume2, Mic, Sparkles, ArrowRight, Zap, RefreshCw } from 'lucide-react';
 import { StudentProfile, VoiceEngineType, VoiceMessage } from '../../types';
 import { processVoiceQuery, speakText } from '../../services/voiceAgentService';
 import { ApiClient } from '../../services/apiClient';
@@ -12,13 +12,15 @@ interface VoiceAgentModalProps {
   onClose: () => void;
   student: StudentProfile;
   onActionTrigger?: (action: string) => void;
+  onMinimize?: () => void;
 }
 
 export const VoiceAgentModal: React.FC<VoiceAgentModalProps> = ({
   isOpen,
   onClose,
   student,
-  onActionTrigger
+  onActionTrigger,
+  onMinimize
 }) => {
   if (!isOpen) return null;
 
@@ -290,9 +292,19 @@ export const VoiceAgentModal: React.FC<VoiceAgentModalProps> = ({
               </button>
             )}
 
+            {/* Dedicated Minimize Button to dock into floating assistant widget */}
+            <button
+              onClick={onMinimize || onClose}
+              className="p-2 rounded-xl text-zinc-400 hover:text-amber-400 hover:bg-white/10 transition-colors cursor-pointer flex items-center justify-center"
+              title="Minimize to floating assistant widget"
+              aria-label="Minimize assistant to floating widget"
+            >
+              <Minus className="w-4 h-4" />
+            </button>
+
             <button
               onClick={onClose}
-              className="p-2 rounded-xl text-zinc-400 hover:text-zinc-100 hover:bg-white/10 transition-colors cursor-pointer"
+              className="p-2 rounded-xl text-zinc-400 hover:text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer flex items-center justify-center"
               aria-label="Close voice assistant"
             >
               <X className="w-4 h-4" />

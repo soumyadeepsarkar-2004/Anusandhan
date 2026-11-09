@@ -114,64 +114,98 @@ export const Footer: React.FC = () => {
           </div>
 
           {/* Column 4: Compliance & Ethics */}
-          <div>
-            <h4 className="font-sans text-xs font-semibold uppercase tracking-wider text-[var(--text-primary)] mb-3">
-              Ethics & Compliance
+          <div className="space-y-3">
+            <h4 className="font-sans text-xs font-semibold uppercase tracking-wider text-[var(--text-primary)] mb-1 flex items-center gap-1.5">
+              <ShieldCheck className="w-4 h-4 text-emerald-400" />
+              <span>Statutory Compliance & Ethics</span>
             </h4>
-            <p className="text-[11px] leading-relaxed text-[var(--text-secondary)] mb-3 font-sans">
-              Anusandhan adheres strictly to university email standards. We enforce mandatory human confirmation, 7-day pacing, and zero bulk spam.
+            <p className="text-[11px] leading-relaxed text-[var(--text-secondary)] font-sans">
+              Anusandhan enforces mandatory human confirmation, 7-day anti-burnout pacing, and strict DPDP Act 2023 data fiduciary compliance.
             </p>
 
-            <div className="space-y-2 text-[11px] font-mono">
-              <div>
-                <button
-                  onClick={() => setShowPrivacy(true)}
-                  className="text-[var(--text-secondary)] hover:text-amber-500 transition-colors inline-flex items-center gap-1.5 cursor-pointer"
-                >
-                  <ShieldCheck className="w-3.5 h-3.5 text-amber-500" />
-                  <span>Privacy Policy (DPDP Act 2023)</span>
-                </button>
-              </div>
-              <div>
-                <button
-                  onClick={() => setShowTerms(true)}
-                  className="text-[var(--text-secondary)] hover:text-amber-500 transition-colors inline-flex items-center gap-1.5 cursor-pointer"
-                >
-                  <Scale className="w-3.5 h-3.5 text-amber-500" />
-                  <span>Terms & Research Ethics Code</span>
-                </button>
-              </div>
+            <div className="space-y-2 pt-1">
+              <button
+                onClick={() => setShowPrivacy(true)}
+                className="w-full p-2.5 rounded-xl bg-white/[0.04] hover:bg-amber-500/10 border border-white/12 hover:border-amber-500/40 text-left transition-all group cursor-pointer backdrop-blur-md shadow-sm"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 group-hover:text-amber-400 transition-colors" />
+                    <span className="text-xs font-semibold text-zinc-100 group-hover:text-amber-300 transition-colors">
+                      Privacy Policy
+                    </span>
+                  </div>
+                  <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                    DPDP 2023
+                  </span>
+                </div>
+                <p className="text-[10px] text-zinc-400 mt-1 font-sans">
+                  Data fiduciary safeguards, consent controls & grievance redressal
+                </p>
+              </button>
+
+              <button
+                onClick={() => setShowTerms(true)}
+                className="w-full p-2.5 rounded-xl bg-white/[0.04] hover:bg-amber-500/10 border border-white/12 hover:border-amber-500/40 text-left transition-all group cursor-pointer backdrop-blur-md shadow-sm"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Scale className="w-3.5 h-3.5 text-amber-400" />
+                    <span className="text-xs font-semibold text-zinc-100 group-hover:text-amber-300 transition-colors">
+                      Terms & Research Ethics
+                    </span>
+                  </div>
+                  <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                    Ethics Code
+                  </span>
+                </div>
+                <p className="text-[10px] text-zinc-400 mt-1 font-sans">
+                  Anti-spam quotas, human-in-the-loop verification & scholar code
+                </p>
+              </button>
             </div>
           </div>
 
         </div>
 
-        {/* Bottom Bar Strip */}
-        <div className="pt-6 border-t border-[var(--border-subtle)] flex flex-col sm:flex-row items-center justify-between text-[var(--text-muted)] text-[11px] font-mono gap-2">
-          <div>
-            © 2026–2027 Anusandhan. Built for ambitious global researchers.
+        {/* Bottom Bar Strip - High Contrast, Prominent Interactive Action Badges */}
+        <div className="pt-6 border-t border-[var(--border-subtle)] flex flex-col md:flex-row items-center justify-between text-xs font-mono gap-4">
+          <div className="text-[var(--text-secondary)] text-center md:text-left text-[11px]">
+            © 2026–2027 Anusandhan Technologies Pvt. Ltd. · All research rights reserved.
           </div>
-          <div className="flex items-center space-x-4">
+
+          <div className="flex flex-wrap items-center justify-center gap-2">
             <a 
               href="https://soumyadeepsarkar-2004.github.io/Anusandhan/" 
               target="_blank" 
               rel="noreferrer" 
-              className="text-amber-500 hover:text-amber-400 font-semibold transition-colors inline-flex items-center gap-1"
+              className="px-3 py-1.5 rounded-full bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 hover:text-amber-200 font-semibold transition-all inline-flex items-center gap-1.5 shadow-sm text-[11px]"
             >
-              <span>Documentation</span>
+              <span>VitePress Docs</span>
               <ExternalLink className="w-3 h-3" />
             </a>
-            <span>·</span>
-            <button onClick={() => setShowPrivacy(true)} className="hover:text-[var(--text-primary)] transition-colors cursor-pointer">
-              Privacy
+
+            <button 
+              onClick={() => setShowPrivacy(true)} 
+              className="px-3 py-1.5 rounded-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/15 text-zinc-200 hover:text-white font-medium transition-all inline-flex items-center gap-1.5 cursor-pointer shadow-sm text-[11px]"
+            >
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Privacy Policy</span>
             </button>
-            <span>·</span>
-            <button onClick={() => setShowTerms(true)} className="hover:text-[var(--text-primary)] transition-colors cursor-pointer">
-              Terms
+
+            <button 
+              onClick={() => setShowTerms(true)} 
+              className="px-3 py-1.5 rounded-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/15 text-zinc-200 hover:text-white font-medium transition-all inline-flex items-center gap-1.5 cursor-pointer shadow-sm text-[11px]"
+            >
+              <Scale className="w-3.5 h-3.5 text-amber-400" />
+              <span>Terms of Service</span>
             </button>
-            <span>·</span>
-            <a href="mailto:support@anusandhan.ai" className="hover:text-[var(--text-primary)] transition-colors">
-              Support & Inquiries
+
+            <a 
+              href="mailto:support@anusandhan.ai" 
+              className="px-3 py-1.5 rounded-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/15 text-zinc-200 hover:text-white font-medium transition-all inline-flex items-center gap-1.5 shadow-sm text-[11px]"
+            >
+              <span>Support & Inquiries</span>
             </a>
           </div>
         </div>
