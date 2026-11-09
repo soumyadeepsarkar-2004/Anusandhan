@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://harbor-municipal-major-page.trycloudflare.com">
+  <a href="https://anusandhan.antideploy.app">
     <img src="public/brand-emblem-dark.svg" alt="Anusandhan Official Logo Emblem" width="108" height="108" />
   </a>
 </p>
@@ -28,7 +28,7 @@
 </p>
 
 ### 🌐 Live Production Deployments & Access
-- 🚀 **Live Production Platform**: [https://harbor-municipal-major-page.trycloudflare.com](https://harbor-municipal-major-page.trycloudflare.com)
+- 🚀 **Live Production Platform (Antideploy)**: [https://anusandhan.antideploy.app](https://anusandhan.antideploy.app)
 - 📚 **VitePress Documentation (GitHub Pages)**: [https://soumyadeepsarkar-2004.github.io/Anusandhan/](https://soumyadeepsarkar-2004.github.io/Anusandhan/)
 - 📦 **GitHub Repository**: [https://github.com/soumyadeepsarkar-2004/Anusandhan](https://github.com/soumyadeepsarkar-2004/Anusandhan)
 

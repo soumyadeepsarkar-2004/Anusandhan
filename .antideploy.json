@@ -1,0 +1,15 @@
+{
+  "applicationId": "cc8b1276-a866-4436-ae47-38411d419136",
+  "name": "anusandhan",
+  "subdomain": "anusandhan",
+  "note": "Deploy to it with POST /api/v1/deploy and this applicationId.",
+  "account": {
+    "email": "soumyadeepsarkar2004@outlook.com",
+    "login": "soumyadeepsarkar-2004",
+    "signsInWith": [
+      "GitHub"
+    ],
+    "label": "soumyadeepsarkar2004@outlook.com (signs in with GitHub)"
+  },
+  "dashboard": "https://antideploy.com/app/cc8b1276-a866-4436-ae47-38411d419136"
+}

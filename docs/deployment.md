@@ -99,15 +99,20 @@ TARGET_URL=http://your-server-ip:5000 CONCURRENT_USERS=1000 DURATION=15 node tes
 
 ---
 
-## 6. Cloudflare Tunnel & Edge Pages Deployment
+## 6. Antideploy Production Deployment
 
-Anusandhan connects to Cloudflare edge networks via Cloudflare Tunnel (`cloudflared`) and Cloudflare Pages:
+Anusandhan is deployed to **Antideploy** (`antideploy.com`), the zero-configuration autonomous hosting platform:
 
-- **Live Tunnel Endpoint**: `https://harbor-municipal-major-page.trycloudflare.com`
+- **Live Production Endpoint**: `https://anusandhan.antideploy.app`
+- **Antideploy Application ID**: `cc8b1276-a866-4436-ae47-38411d419136`
+- **Antideploy Dashboard**: `https://antideploy.com/app/cc8b1276-a866-4436-ae47-38411d419136`
 - **VitePress Documentation**: `https://soumyadeepsarkar-2004.github.io/Anusandhan/`
 
-### Starting the Cloudflare Tunnel
+### Automated Deployment to Antideploy
+To deploy the application and all backend microservices to Antideploy:
 ```bash
-cloudflared tunnel --url http://127.0.0.1:5000
+npm run deploy:antideploy
+# or directly:
+python deploy_antideploy.py
 ```
-This proxies incoming requests securely through Cloudflare's global anycast network to the Anusandhan Gateway on port 5000 with DDoS mitigation, TLS termination, and rate limiting intact.
+This automatically packages the codebase into a compressed tarball, uploads it to Antideploy's deployment API, and monitors rollout health until the application is live at `https://anusandhan.antideploy.app`.
