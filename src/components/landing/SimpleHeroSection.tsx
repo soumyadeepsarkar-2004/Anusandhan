@@ -11,7 +11,7 @@ interface SimpleHeroSectionProps {
   userName?: string;
 }
 
-export const SimpleHeroSection: React.FC<SimpleHeroSectionProps> = ({
+const SimpleHeroSectionComponent: React.FC<SimpleHeroSectionProps> = ({
   onLaunchPlatform,
   onExploreLabs,
   onOpenAuth,
@@ -150,3 +150,5 @@ export const SimpleHeroSection: React.FC<SimpleHeroSectionProps> = ({
     </section>
   );
 };
+
+export const SimpleHeroSection = React.memo(SimpleHeroSectionComponent);

@@ -18,38 +18,44 @@ export const AppleGlassCard: React.FC<AppleGlassCardProps> = ({
   ...props
 }) => {
   const cardRef = useRef<HTMLDivElement>(null);
+  const spotlightRef = useRef<HTMLDivElement>(null);
   const { isDark } = useTheme();
-  const [position, setPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
-  const [opacity, setOpacity] = useState<number>(0);
-  const [tilt, setTilt] = useState<{ rx: number; ry: number }>({ rx: 0, ry: 0 });
 
   // Theme-calibrated refractive spotlight color
   const effectiveSpotlight = spotlightColor || (isDark ? 'rgba(245, 158, 11, 0.12)' : 'rgba(217, 119, 6, 0.16)');
 
   const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current || !glowOnHover) return;
+    if (!cardRef.current) return;
     const rect = cardRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-    setPosition({ x, y });
+
+    if (spotlightRef.current && glowOnHover) {
+      spotlightRef.current.style.opacity = '1';
+      spotlightRef.current.style.background = `radial-gradient(400px circle at ${x}px ${y}px, ${effectiveSpotlight}, transparent 75%)`;
+    }
 
     if (enableTilt) {
       const centerX = rect.width / 2;
       const centerY = rect.height / 2;
-      const rx = ((y - centerY) / centerY) * -6; // max 6 deg
-      const ry = ((x - centerX) / centerX) * 6;
-      setTilt({ rx, ry });
+      const rx = ((y - centerY) / centerY) * -5;
+      const ry = ((x - centerX) / centerX) * 5;
+      cardRef.current.style.transform = `perspective(1000px) rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg)`;
     }
   };
 
   const handleMouseEnter = () => {
-    if (glowOnHover) setOpacity(1);
+    if (spotlightRef.current && glowOnHover) {
+      spotlightRef.current.style.opacity = '1';
+    }
   };
 
   const handleMouseLeave = () => {
-    setOpacity(0);
-    if (enableTilt) {
-      setTilt({ rx: 0, ry: 0 });
+    if (spotlightRef.current && glowOnHover) {
+      spotlightRef.current.style.opacity = '0';
+    }
+    if (cardRef.current && enableTilt) {
+      cardRef.current.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg)';
     }
   };
 
@@ -60,20 +66,17 @@ export const AppleGlassCard: React.FC<AppleGlassCardProps> = ({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       style={{
-        transform: enableTilt ? `perspective(1000px) rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg)` : undefined,
-        transition: 'transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease'
+        transition: 'transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease',
+        willChange: enableTilt ? 'transform' : undefined
       }}
       className={`relative overflow-hidden rounded-2xl apple-glass-card ${className}`}
       {...props}
     >
-      {/* 21st.dev Style Cursor Spotlight Glow */}
+      {/* 21st.dev Style Cursor Spotlight Glow (Zero React Re-render Direct Paint) */}
       {glowOnHover && (
         <div
-          className="pointer-events-none absolute -inset-px transition-opacity duration-300"
-          style={{
-            opacity,
-            background: `radial-gradient(400px circle at ${position.x}px ${position.y}px, ${effectiveSpotlight}, transparent 75%)`
-          }}
+          ref={spotlightRef}
+          className="pointer-events-none absolute -inset-px transition-opacity duration-300 opacity-0"
         />
       )}
 

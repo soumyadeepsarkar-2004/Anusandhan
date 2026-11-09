@@ -7,7 +7,7 @@ interface PricingSectionProps {
   onSelectPlan: (planId: string) => void;
 }
 
-export const PricingSection: React.FC<PricingSectionProps> = ({ onSelectPlan }) => {
+const PricingSectionComponent: React.FC<PricingSectionProps> = ({ onSelectPlan }) => {
   const [currency, setCurrency] = useState<'INR' | 'USD'>('INR');
 
   return (
@@ -132,3 +132,5 @@ export const PricingSection: React.FC<PricingSectionProps> = ({ onSelectPlan }) 
     </section>
   );
 };
+
+export const PricingSection = React.memo(PricingSectionComponent);

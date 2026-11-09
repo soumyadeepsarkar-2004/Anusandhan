@@ -28,7 +28,7 @@
 </p>
 
 ### 🌐 Live Production Deployments & Access
-- 🚀 **Live Production Platform**: [https://anusandhan.pages.dev](https://anusandhan.pages.dev) · [https://anusandhan.trycloudflare.com](https://anusandhan.trycloudflare.com)
+- 🚀 **Live Production Platform**: [https://anusandhan.trycloudflare.com](https://anusandhan.trycloudflare.com)
 - 📚 **VitePress Documentation (GitHub Pages)**: [https://soumyadeepsarkar-2004.github.io/Anusandhan/](https://soumyadeepsarkar-2004.github.io/Anusandhan/)
 - 📦 **GitHub Repository**: [https://github.com/soumyadeepsarkar-2004/Anusandhan](https://github.com/soumyadeepsarkar-2004/Anusandhan)
 

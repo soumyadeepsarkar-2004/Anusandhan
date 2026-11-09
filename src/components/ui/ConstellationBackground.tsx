@@ -45,7 +45,7 @@ export const ConstellationBackground: React.FC = () => {
       'IIT Delhi', 'Stanford', 'MIT CSAIL', 'Cambridge'
     ];
 
-    const count = 48;
+    const count = 36;
     const points: Point[] = [];
 
     for (let i = 0; i < count; i++) {
@@ -131,20 +131,21 @@ export const ConstellationBackground: React.FC = () => {
         ctx.arc(p1.x, p1.y, radius, 0, Math.PI * 2);
 
         if (p1.label) {
-          // Labeled key institution anchors
-          ctx.fillStyle = dark
-            ? 'rgba(245, 158, 11, 0.85)'
-            : 'rgba(217, 119, 6, 0.85)';
-          ctx.shadowColor = dark ? 'rgba(245, 158, 11, 0.5)' : 'rgba(217, 119, 6, 0.25)';
-          ctx.shadowBlur = 6;
+          // Labeled key institution anchors with crisp direct paint (no shadowBlur lag)
+          ctx.fillStyle = dark ? 'rgba(245, 158, 11, 0.9)' : 'rgba(217, 119, 6, 0.9)';
+          ctx.fill();
+
+          // Subtle zero-cost outer halo ring
+          ctx.beginPath();
+          ctx.arc(p1.x, p1.y, radius + 2.5, 0, Math.PI * 2);
+          ctx.strokeStyle = dark ? 'rgba(245, 158, 11, 0.25)' : 'rgba(217, 119, 6, 0.18)';
+          ctx.lineWidth = 1;
+          ctx.stroke();
         } else {
           // Ambient constellation dust
-          ctx.fillStyle = dark
-            ? 'rgba(161, 161, 170, 0.4)'
-            : 'rgba(120, 113, 108, 0.30)';
-          ctx.shadowBlur = 0;
+          ctx.fillStyle = dark ? 'rgba(161, 161, 170, 0.4)' : 'rgba(120, 113, 108, 0.30)';
+          ctx.fill();
         }
-        ctx.fill();
 
         // Labeled tag on nearby hover or subtle presence
         if (p1.label && (distMouse < 220 || !dark)) {
@@ -155,15 +156,16 @@ export const ConstellationBackground: React.FC = () => {
           ctx.fillText(p1.label, p1.x + 8, p1.y - 4);
         }
 
-        // Inter-node links with distance falloff
+        // Inter-node links with squared distance pre-filtering (Zero Math.sqrt on non-connections)
         for (let j = i + 1; j < points.length; j++) {
           const p2 = points[j];
           const dx = p1.x - p2.x;
           const dy = p1.y - p2.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
+          const distSq = dx * dx + dy * dy;
 
-          if (dist < 135) {
-            const alpha = (1 - dist / 135) * (dark ? 0.16 : 0.12);
+          if (distSq < 16900) { // 130 * 130
+            const dist = Math.sqrt(distSq);
+            const alpha = (1 - dist / 130) * (dark ? 0.16 : 0.12);
             ctx.beginPath();
             ctx.moveTo(p1.x, p1.y);
             ctx.lineTo(p2.x, p2.y);
@@ -182,7 +184,18 @@ export const ConstellationBackground: React.FC = () => {
 
     render();
 
+    const handleVisibility = () => {
+      if (document.hidden) {
+        cancelAnimationFrame(animationFrameId);
+      } else {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = requestAnimationFrame(render);
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+
     return () => {
+      document.removeEventListener('visibilitychange', handleVisibility);
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('mousemove', handleMouseMove);
       cancelAnimationFrame(animationFrameId);
@@ -198,13 +211,13 @@ export const ConstellationBackground: React.FC = () => {
         }`}
       >
         {/* Soft Warm Honey Amber Orb */}
-        <div className="absolute -top-32 -left-32 w-[650px] h-[650px] rounded-full bg-gradient-to-br from-amber-300/12 via-amber-400/6 to-transparent blur-[130px] animate-pulse" style={{ animationDuration: '9s' }} />
+        <div className="absolute -top-32 -left-32 w-[550px] h-[550px] rounded-full bg-gradient-to-br from-amber-300/12 via-amber-400/6 to-transparent blur-[70px] transform-gpu pointer-events-none" />
 
         {/* Soothing Warm Oat Apricot Orb */}
-        <div className="absolute top-1/4 -right-28 w-[700px] h-[700px] rounded-full bg-gradient-to-bl from-orange-200/10 via-amber-200/6 to-transparent blur-[140px] animate-pulse" style={{ animationDuration: '12s', animationDelay: '2s' }} />
+        <div className="absolute top-1/4 -right-28 w-[600px] h-[600px] rounded-full bg-gradient-to-bl from-orange-200/10 via-amber-200/6 to-transparent blur-[80px] transform-gpu pointer-events-none" />
 
         {/* Gentle Warm Sage Cream Undulation Orb */}
-        <div className="absolute -bottom-40 left-1/3 w-[800px] h-[600px] rounded-full bg-gradient-to-tr from-emerald-300/8 via-amber-200/5 to-transparent blur-[140px] animate-pulse" style={{ animationDuration: '14s', animationDelay: '4s' }} />
+        <div className="absolute -bottom-40 left-1/3 w-[650px] h-[500px] rounded-full bg-gradient-to-tr from-emerald-300/8 via-amber-200/5 to-transparent blur-[80px] transform-gpu pointer-events-none" />
       </div>
 
       {/* Interactive Mathematical Constellation Canvas */}

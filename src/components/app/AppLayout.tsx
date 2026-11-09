@@ -169,30 +169,6 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
               <PullChainBulb size="sm" />
             </div>
 
-            {/* Legal & Compliance Quick Access Buttons */}
-            {(onOpenPrivacyModal || onOpenTermsModal) && (
-              <div className="hidden xl:flex items-center space-x-1 pl-1 border-l border-[var(--border-subtle)]">
-                {onOpenPrivacyModal && (
-                  <button
-                    onClick={onOpenPrivacyModal}
-                    className="p-1.5 rounded-full bg-[var(--surface-card)] hover:bg-amber-500/10 border border-[var(--border-subtle)] hover:border-amber-500/40 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all cursor-pointer shadow-sm"
-                    title="DPDP Act 2023 Privacy Policy"
-                  >
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-                  </button>
-                )}
-                {onOpenTermsModal && (
-                  <button
-                    onClick={onOpenTermsModal}
-                    className="p-1.5 rounded-full bg-[var(--surface-card)] hover:bg-amber-500/10 border border-[var(--border-subtle)] hover:border-amber-500/40 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all cursor-pointer shadow-sm"
-                    title="Terms of Service & Research Ethics"
-                  >
-                    <Scale className="w-3.5 h-3.5 text-amber-500" />
-                  </button>
-                )}
-              </div>
-            )}
-
             {/* Scholar Profile / Sign In Action */}
             <div className="flex items-center space-x-1.5 pl-2 border-l border-[var(--border-subtle)]">
               {isAuthenticated && user ? (

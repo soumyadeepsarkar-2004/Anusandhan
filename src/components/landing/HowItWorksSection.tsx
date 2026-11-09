@@ -7,7 +7,7 @@ interface HowItWorksSectionProps {
   onLaunchPlatform: () => void;
 }
 
-export const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({ onLaunchPlatform }) => {
+const HowItWorksSectionComponent: React.FC<HowItWorksSectionProps> = ({ onLaunchPlatform }) => {
   const [activeStep, setActiveStep] = useState<number>(1);
 
   const steps = [
@@ -224,3 +224,5 @@ export const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({ onLaunchPl
     </section>
   );
 };
+
+export const HowItWorksSection = React.memo(HowItWorksSectionComponent);

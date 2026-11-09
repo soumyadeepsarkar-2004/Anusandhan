@@ -10,7 +10,7 @@ interface FellowshipsMarqueeProps {
   fellowships?: FellowshipProgram[];
 }
 
-export const FellowshipsMarquee: React.FC<FellowshipsMarqueeProps> = ({ onLaunchApp, fellowships }) => {
+const FellowshipsMarqueeComponent: React.FC<FellowshipsMarqueeProps> = ({ onLaunchApp, fellowships }) => {
   const displayedPrograms = (fellowships && fellowships.length > 0 ? fellowships : FELLOWSHIP_PROGRAMS).slice(0, 3);
 
   return (
@@ -131,3 +131,5 @@ export const FellowshipsMarquee: React.FC<FellowshipsMarqueeProps> = ({ onLaunch
     </section>
   );
 };
+
+export const FellowshipsMarquee = React.memo(FellowshipsMarqueeComponent);

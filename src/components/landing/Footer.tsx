@@ -11,7 +11,7 @@ interface FooterProps {
   onOpenTerms?: () => void;
 }
 
-export const Footer: React.FC<FooterProps> = ({ onOpenPrivacy, onOpenTerms }) => {
+const FooterComponent: React.FC<FooterProps> = ({ onOpenPrivacy, onOpenTerms }) => {
   const [showPrivacyLocal, setShowPrivacyLocal] = useState(false);
   const [showTermsLocal, setShowTermsLocal] = useState(false);
   const { isDark } = useTheme();
@@ -135,55 +135,34 @@ export const Footer: React.FC<FooterProps> = ({ onOpenPrivacy, onOpenTerms }) =>
           </div>
 
           {/* Column 4: Compliance & Ethics */}
-          <div className="space-y-3">
-            <h4 className="font-sans text-xs font-semibold uppercase tracking-wider text-[var(--text-primary)] mb-1 flex items-center gap-1.5">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              <span>Statutory Compliance & Ethics</span>
+          <div>
+            <h4 className="font-sans text-xs font-semibold uppercase tracking-wider text-[var(--text-primary)] mb-3 flex items-center gap-1.5">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+              <span>Ethics & Compliance</span>
             </h4>
-            <p className="text-[11px] leading-relaxed text-[var(--text-secondary)] font-sans">
-              Anusandhan enforces mandatory human confirmation, 7-day anti-burnout pacing, and strict DPDP Act 2023 data fiduciary compliance.
+            <p className="text-[11px] leading-relaxed text-[var(--text-secondary)] mb-3 font-sans">
+              Anusandhan adheres strictly to university email standards. We enforce mandatory human confirmation, 7-day anti-burnout pacing, and DPDP Act 2023 data fiduciary compliance.
             </p>
 
-            <div className="space-y-2.5 pt-1">
-              <button
-                onClick={handleOpenPrivacy}
-                className="w-full p-3 rounded-xl bg-[var(--surface-card)] hover:bg-amber-500/10 border border-[var(--border-subtle)] hover:border-amber-500/50 text-left transition-all group cursor-pointer shadow-sm"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <ShieldCheck className="w-4 h-4 text-emerald-500 group-hover:text-amber-500 transition-colors" />
-                    <span className="text-xs font-semibold text-[var(--text-primary)] group-hover:text-amber-500 transition-colors">
-                      Privacy Policy
-                    </span>
-                  </div>
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 font-medium">
-                    DPDP 2023
-                  </span>
-                </div>
-                <p className="text-[11px] text-[var(--text-secondary)] mt-1 font-sans">
-                  Data fiduciary safeguards, consent controls & grievance redressal
-                </p>
-              </button>
-
-              <button
-                onClick={handleOpenTerms}
-                className="w-full p-3 rounded-xl bg-[var(--surface-card)] hover:bg-amber-500/10 border border-[var(--border-subtle)] hover:border-amber-500/50 text-left transition-all group cursor-pointer shadow-sm"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <Scale className="w-4 h-4 text-amber-500" />
-                    <span className="text-xs font-semibold text-[var(--text-primary)] group-hover:text-amber-500 transition-colors">
-                      Terms & Research Ethics
-                    </span>
-                  </div>
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-medium">
-                    Ethics Code
-                  </span>
-                </div>
-                <p className="text-[11px] text-[var(--text-secondary)] mt-1 font-sans">
-                  Anti-spam quotas, human-in-the-loop verification & scholar code
-                </p>
-              </button>
+            <div className="space-y-2 text-[11px] font-sans">
+              <div>
+                <button
+                  onClick={handleOpenPrivacy}
+                  className="text-[var(--text-secondary)] hover:text-amber-500 hover:translate-x-0.5 transition-all inline-flex items-center gap-1.5 cursor-pointer text-left"
+                >
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                  <span>Privacy Policy (DPDP Act 2023)</span>
+                </button>
+              </div>
+              <div>
+                <button
+                  onClick={handleOpenTerms}
+                  className="text-[var(--text-secondary)] hover:text-amber-500 hover:translate-x-0.5 transition-all inline-flex items-center gap-1.5 cursor-pointer text-left"
+                >
+                  <Scale className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                  <span>Terms & Research Ethics Code</span>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -239,3 +218,5 @@ export const Footer: React.FC<FooterProps> = ({ onOpenPrivacy, onOpenTerms }) =>
     </footer>
   );
 };
+
+export const Footer = React.memo(FooterComponent);

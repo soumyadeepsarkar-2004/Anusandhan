@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Search, 
@@ -27,7 +27,7 @@ interface OpportunitiesSectionProps {
   student?: StudentProfile;
 }
 
-export const OpportunitiesSection: React.FC<OpportunitiesSectionProps> = ({
+const OpportunitiesSectionComponent: React.FC<OpportunitiesSectionProps> = ({
   onSelectProfessor,
   onLaunchPlatform,
   professors,
@@ -52,18 +52,21 @@ export const OpportunitiesSection: React.FC<OpportunitiesSectionProps> = ({
     { id: 'Computational Biology & Genomics', label: 'Computational Biology' }
   ];
 
-  const sourceFaculty = (professors && professors.length > 0) ? professors : FACULTY_DATABASE;
-  const filteredFaculty = sourceFaculty.filter((prof) => {
-    const matchesDomain = selectedDomain === 'all' || prof.domain === selectedDomain;
-    const matchesScope = selectedScope === 'all' || prof.scope === selectedScope;
-    const matchesSearch = 
-      searchQuery === '' ||
-      prof.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      prof.university.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      prof.researchFocus.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      prof.labName.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesDomain && matchesScope && matchesSearch;
-  });
+  const sourceFaculty = useMemo(() => (professors && professors.length > 0) ? professors : FACULTY_DATABASE, [professors]);
+  const filteredFaculty = useMemo(() => {
+    const q = searchQuery.toLowerCase().trim();
+    return sourceFaculty.filter((prof) => {
+      const matchesDomain = selectedDomain === 'all' || prof.domain === selectedDomain;
+      const matchesScope = selectedScope === 'all' || prof.scope === selectedScope;
+      const matchesSearch = 
+        !q ||
+        prof.name.toLowerCase().includes(q) ||
+        prof.university.toLowerCase().includes(q) ||
+        prof.researchFocus.toLowerCase().includes(q) ||
+        prof.labName.toLowerCase().includes(q);
+      return matchesDomain && matchesScope && matchesSearch;
+    });
+  }, [sourceFaculty, selectedDomain, selectedScope, searchQuery]);
 
   const handleCardPitchClick = (prof: Professor) => {
     if (!hasCompletedProfile) {
@@ -376,3 +379,5 @@ export const OpportunitiesSection: React.FC<OpportunitiesSectionProps> = ({
     </section>
   );
 };
+
+export const OpportunitiesSection = React.memo(OpportunitiesSectionComponent);

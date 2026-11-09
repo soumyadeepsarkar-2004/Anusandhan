@@ -104,7 +104,6 @@ TARGET_URL=http://your-server-ip:5000 CONCURRENT_USERS=1000 DURATION=15 node tes
 Anusandhan connects to Cloudflare edge networks via Cloudflare Tunnel (`cloudflared`) and Cloudflare Pages:
 
 - **Live Tunnel Endpoint**: `https://anusandhan.trycloudflare.com`
-- **Cloudflare Pages Production URL**: `https://anusandhan.pages.dev`
 - **VitePress Documentation**: `https://soumyadeepsarkar-2004.github.io/Anusandhan/`
 
 ### Starting the Cloudflare Tunnel

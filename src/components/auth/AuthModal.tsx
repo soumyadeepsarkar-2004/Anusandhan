@@ -44,21 +44,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [cvDragOver, setCvDragOver] = useState(false);
   const [cvPassword, setCvPassword] = useState('');
 
-  // Google Direct Input
-  const [showGooglePrompt, setShowGooglePrompt] = useState(false);
-  const [googleEmailInput, setGoogleEmailInput] = useState('');
-
   const handleOAuth = async (provider: 'google' | 'linkedin' | 'github') => {
-    if (provider === 'google' && !showGooglePrompt) {
-      setShowGooglePrompt(true);
-      return;
-    }
-
     setErrorMessage(null);
     setIsSubmitting(true);
     try {
-      const emailToUse = provider === 'google' ? googleEmailInput : undefined;
-      await oauthLogin(provider, emailToUse ? { email: emailToUse } : undefined);
+      const emailToUse = (email && email.trim()) ? email.trim() : undefined;
+      const nameToUse = fullName && fullName.trim() ? fullName.trim() : undefined;
+      await oauthLogin(provider, { email: emailToUse, fullName: nameToUse });
       confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } });
       onSuccess();
       onClose();
@@ -239,7 +231,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         {/* Tab Toggle - 3-Way Liquid Glass Pill */}
         <div className="mx-4 mt-4 p-1 apple-glass-pill rounded-2xl grid grid-cols-3 text-xs font-mono shrink-0 gap-1">
           <button
-            onClick={() => { setMode('signin'); setErrorMessage(null); setShowGooglePrompt(false); }}
+            onClick={() => { setMode('signin'); setErrorMessage(null); }}
             className={`min-h-[38px] py-1.5 px-2 rounded-xl transition-colors cursor-pointer font-medium ${
               mode === 'signin'
                 ? 'bg-amber-400 text-zinc-950 font-semibold shadow-md'
@@ -249,7 +241,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             Sign In
           </button>
           <button
-            onClick={() => { setMode('register'); setErrorMessage(null); setShowGooglePrompt(false); }}
+            onClick={() => { setMode('register'); setErrorMessage(null); }}
             className={`min-h-[38px] py-1.5 px-2 rounded-xl transition-colors cursor-pointer font-medium ${
               mode === 'register'
                 ? 'bg-amber-400 text-zinc-950 font-semibold shadow-md'
@@ -259,7 +251,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             Register
           </button>
           <button
-            onClick={() => { setMode('cv_upload'); setErrorMessage(null); setShowGooglePrompt(false); }}
+            onClick={() => { setMode('cv_upload'); setErrorMessage(null); }}
             className={`min-h-[38px] py-1.5 px-2 rounded-xl transition-colors cursor-pointer font-medium flex items-center justify-center gap-1 ${
               mode === 'cv_upload'
                 ? 'bg-amber-400 text-zinc-950 font-semibold shadow-md'
@@ -449,32 +441,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     <span className="hidden sm:inline">GitHub</span>
                   </button>
                 </div>
-
-                {showGooglePrompt && (
-                  <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 space-y-2 animate-fadeIn">
-                    <label className="block text-[11px] font-medium text-amber-300">
-                      Enter your Google Account email to authenticate:
-                    </label>
-                    <div className="flex gap-2">
-                      <input
-                        type="email"
-                        required
-                        value={googleEmailInput}
-                        onChange={(e) => setGoogleEmailInput(e.target.value)}
-                        placeholder="your.email@gmail.com"
-                        className="flex-1 px-3 py-1.5 rounded-lg bg-zinc-900 border border-white/15 text-xs text-zinc-100"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => handleOAuth('google')}
-                        disabled={!googleEmailInput || isSubmitting}
-                        className="px-3 py-1.5 rounded-lg bg-amber-400 text-zinc-950 font-bold text-xs cursor-pointer"
-                      >
-                        Sign In
-                      </button>
-                    </div>
-                  </div>
-                )}
               </div>
 
               {/* Divider */}
