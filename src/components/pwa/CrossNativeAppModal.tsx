@@ -59,10 +59,14 @@ export const CrossNativeAppModal: React.FC<CrossNativeAppModalProps> = ({
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 15 }}
           transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-          className="relative w-full max-w-2xl bg-zinc-950/95 border border-white/10 rounded-3xl p-5 sm:p-7 shadow-2xl text-zinc-100 z-10 overflow-hidden font-sans backdrop-blur-2xl"
+          className="relative w-full max-w-2xl aceternity-glass rounded-3xl border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.48)] p-5 sm:p-7 text-zinc-100 z-10 overflow-hidden font-sans backdrop-blur-2xl bg-zinc-950/85"
         >
-          {/* Subtle Ambient Glow */}
-          <div className="absolute -top-24 -right-24 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+          {/* Ambient Glowing Orbs */}
+          <div className="ambient-orb -top-20 -right-20 w-80 h-80 bg-amber-500/15" />
+          <div className="ambient-orb -bottom-20 -left-20 w-80 h-80 bg-indigo-500/15" />
+
+          {/* Specular Top Sheen */}
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/35 to-transparent" />
 
           {/* Header */}
           <div className="flex items-center justify-between pb-4 border-b border-white/10">

@@ -70,14 +70,15 @@ export const TokenRewardsModal: React.FC<TokenRewardsModalProps> = ({
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/75 backdrop-blur-2xl animate-fadeIn">
-      {/* Specular Ambient Glow */}
-      <div className="absolute w-[500px] h-[500px] bg-amber-500/15 rounded-full blur-[140px] pointer-events-none -z-10" />
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/80 backdrop-blur-2xl animate-fadeIn">
+      {/* Ambient Glowing Orbs */}
+      <div className="ambient-orb -top-20 -left-20 w-80 h-80 bg-amber-500/15" />
+      <div className="ambient-orb -bottom-20 -right-20 w-80 h-80 bg-indigo-500/15" />
 
       {/* Glass Dialog */}
-      <div className="w-full max-w-xl apple-glass rounded-3xl border border-white/20 shadow-[0_30px_90px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col relative max-h-[92vh]">
+      <div className="w-full max-w-xl aceternity-glass rounded-3xl border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.48)] overflow-hidden flex flex-col relative max-h-[92vh] bg-zinc-950/85">
         {/* Specular Sheen Line */}
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-300/40 to-transparent pointer-events-none" />
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/35 to-transparent pointer-events-none" />
 
         {/* Header */}
         <div className="p-5 border-b border-white/10 flex items-center justify-between bg-white/[0.03] backdrop-blur-md">

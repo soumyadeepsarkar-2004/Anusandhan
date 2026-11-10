@@ -124,8 +124,14 @@ export const AutonomousPortalModal: React.FC<AutonomousPortalModalProps> = ({
   const portalUrl = fellowship.applicationPortalUrl || fellowship.officialUrl || 'https://example.edu';
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-fadeIn">
-      <div className="relative w-full max-w-2xl bg-zinc-950 border border-white/15 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-2xl animate-fadeIn">
+      {/* Ambient background glow orbs */}
+      <div className="absolute top-1/4 -left-12 w-72 h-72 bg-amber-500/10 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute bottom-1/4 -right-12 w-72 h-72 bg-indigo-500/10 rounded-full blur-[100px] pointer-events-none" />
+
+      <div className="relative w-full max-w-2xl aceternity-glass rounded-3xl border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.48)] bg-zinc-950/85 overflow-hidden flex flex-col max-h-[90vh]">
+        {/* Specular top highlight sheen */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-400/30 to-transparent" />
         
         {/* Header */}
         <div className="p-4 sm:p-5 border-b border-white/10 flex items-center justify-between bg-white/[0.02]">

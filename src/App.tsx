@@ -448,7 +448,7 @@ const AppContent: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--canvas-bg)] text-[var(--text-primary)] font-sans relative overflow-x-hidden transition-colors duration-300">
+    <div className="min-h-screen bg-[var(--canvas-bg)] text-[var(--text-primary)] font-sans relative overflow-x-hidden transition-colors duration-300 dark-canvas-grid">
       {/* Offline Status & Outbox Synchronization Banner */}
       <OfflineBanner />
 

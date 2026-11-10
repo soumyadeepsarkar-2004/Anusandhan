@@ -326,13 +326,19 @@ const OpportunitiesSectionComponent: React.FC<OpportunitiesSectionProps> = ({
       {/* CV Intake Prerequisite Prompt Modal */}
       <AnimatePresence>
         {intakePromptProf && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-2xl animate-fadeIn">
+            <div className="ambient-orb -top-20 -left-20 w-72 h-72 bg-amber-500/15" />
+            <div className="ambient-orb -bottom-20 -right-20 w-72 h-72 bg-indigo-500/15" />
+
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="w-full max-w-lg bg-zinc-900 border border-amber-500/30 rounded-2xl p-6 shadow-2xl relative"
+              className="w-full max-w-lg aceternity-glass rounded-3xl border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.48)] p-6 relative overflow-hidden bg-zinc-950/85 z-10"
             >
+              {/* Specular Top Sheen */}
+              <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-400/30 to-transparent" />
+
               <button
                 onClick={() => setIntakePromptProf(null)}
                 className="absolute top-4 right-4 p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-white/10 transition-colors"

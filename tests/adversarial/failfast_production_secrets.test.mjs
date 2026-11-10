@@ -23,7 +23,8 @@ export async function runFailFastTests() {
     const proc = spawnSync('node', ['server/server.js'], {
       env,
       cwd: rootDir,
-      encoding: 'utf8'
+      encoding: 'utf8',
+      timeout: 10000
     });
     const duration = Date.now() - start;
 
@@ -47,7 +48,8 @@ export async function runFailFastTests() {
     const proc = spawnSync('node', ['server/server.js'], {
       env,
       cwd: rootDir,
-      encoding: 'utf8'
+      encoding: 'utf8',
+      timeout: 10000
     });
     const duration = Date.now() - start;
 

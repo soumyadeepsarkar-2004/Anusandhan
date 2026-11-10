@@ -18,8 +18,12 @@ import compression from 'compression';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-dotenv.config({ path: path.resolve(__dirname, '.env') });
-dotenv.config();
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config({ path: path.resolve(__dirname, '.env') });
+  dotenv.config();
+} else if (process.env.DOTENV_CONFIG_PATH) {
+  dotenv.config({ path: process.env.DOTENV_CONFIG_PATH });
+}
 
 import authRoutes from './routes/authRoutes.js';
 import studentRoutes from './routes/studentRoutes.js';
@@ -39,8 +43,13 @@ import { pool } from './db/supabaseClient.js';
 
 // Fail fast if critical secrets are missing in production; derive safe ephemeral secret in dev/test
 if (!process.env.JWT_SECRET || !process.env.JWT_SECRET.trim()) {
-  process.env.JWT_SECRET = crypto.randomBytes(32).toString('hex');
-  console.log('[SECURITY NOTICE] Derived safe signing secret for session verification.');
+  if (process.env.NODE_ENV === 'production') {
+    console.error('[FATAL] JWT_SECRET environment variable is missing in production mode.');
+    process.exit(1);
+  } else {
+    process.env.JWT_SECRET = crypto.randomBytes(32).toString('hex');
+    console.log('[SECURITY NOTICE] Derived safe signing secret for session verification.');
+  }
 }
 
 const app = express();

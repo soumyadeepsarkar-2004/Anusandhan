@@ -57,12 +57,18 @@ interface AuthContextType {
   token: string | null;
   isLoading: boolean;
   isAuthenticated: boolean;
+  oauthConfig: {
+    googleClientId: string;
+    githubClientId: string;
+    linkedinClientId: string;
+    redirectUri: string;
+  };
   login: (email: string, password: string) => Promise<void>;
   register: (data: RegisterData) => Promise<void>;
   registerWithCv: (cvData: any, password?: string) => Promise<void>;
   initiateOAuth: (provider: 'google' | 'linkedin' | 'github') => void;
   openOAuthPopup: (provider: 'google' | 'linkedin' | 'github') => Promise<UserProfile>;
-  oauthLogin: (provider: 'google' | 'linkedin' | 'github', userDetails?: { email?: string; fullName?: string }) => Promise<void>;
+  oauthLogin: (provider: 'google' | 'linkedin' | 'github', userDetails?: { email?: string; fullName?: string; credential?: string }) => Promise<void>;
   claimDailyReward: () => Promise<DailyClaimResult>;
   claimDailyStreak: () => Promise<DailyClaimResult>;
   redeemTokensForPlan: (planId: string, tokenCost: number, creditsToAdd: number) => Promise<{ success: boolean; message: string }>;
@@ -115,6 +121,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<UserProfile | null>(null);
   const [token, setToken] = useState<string | null>(() => localStorage.getItem('rip_auth_token'));
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [oauthConfig, setOAuthConfig] = useState<{
+    googleClientId: string;
+    githubClientId: string;
+    linkedinClientId: string;
+    redirectUri: string;
+  }>({
+    googleClientId: (import.meta.env.VITE_GOOGLE_CLIENT_ID || (import.meta.env.GOOGLE_CLIENT_ID as string) || ''),
+    githubClientId: (import.meta.env.VITE_GITHUB_CLIENT_ID || (import.meta.env.GITHUB_CLIENT_ID as string) || ''),
+    linkedinClientId: (import.meta.env.VITE_LINKEDIN_CLIENT_ID || (import.meta.env.LINKEDIN_CLIENT_ID as string) || ''),
+    redirectUri: ''
+  });
+
+  // Fetch dynamic server-configured OAuth client IDs
+  useEffect(() => {
+    fetchWithCandidateUrls('/oauth/config', { method: 'GET' })
+      .then(res => res.json())
+      .then(cfg => {
+        if (cfg) {
+          setOAuthConfig(prev => ({
+            googleClientId: cfg.googleClientId || prev.googleClientId,
+            githubClientId: cfg.githubClientId || prev.githubClientId,
+            linkedinClientId: cfg.linkedinClientId || prev.linkedinClientId,
+            redirectUri: cfg.redirectUri || prev.redirectUri
+          }));
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   // Restore authenticated session on mount
   useEffect(() => {
@@ -124,16 +158,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const urlParams = new URLSearchParams(window.location.search);
         const code = urlParams.get('code');
         const oauthError = urlParams.get('error') || urlParams.get('error_description');
+        const stateParam = urlParams.get('state') || '';
+        const providerFromState = stateParam.includes('_') ? (stateParam.split('_')[0] as 'google' | 'linkedin' | 'github') : null;
+        const resolvedProvider = providerFromState || (sessionStorage.getItem('rip_oauth_provider') as 'google' | 'linkedin' | 'github') || 'google';
 
         // Check if inside a popup window with parent opener
         if (window.opener && window.opener !== window) {
           try {
             window.opener.postMessage({
               type: 'rip_oauth_response',
-              provider: sessionStorage.getItem('rip_oauth_provider') || 'google',
+              provider: resolvedProvider,
               code,
               error: oauthError,
-              state: urlParams.get('state')
+              state: stateParam
             }, window.location.origin);
             window.close();
             return;
@@ -146,7 +183,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           console.warn('[OAuth Provider Error]:', oauthError);
           window.history.replaceState({}, document.title, window.location.pathname);
         } else if (code) {
-          const provider = (sessionStorage.getItem('rip_oauth_provider') || 'google') as 'google' | 'linkedin' | 'github';
+          const provider = resolvedProvider;
           const redirectUri = sessionStorage.getItem('rip_oauth_redirect_uri') || window.location.origin;
 
           // Clear URL parameters cleanly
@@ -306,10 +343,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const getOAuthUrl = (provider: 'google' | 'linkedin' | 'github', redirectUri: string, state: string): { url: string; hasClientId: boolean } => {
     const clientId = provider === 'google'
-      ? (import.meta.env.VITE_GOOGLE_CLIENT_ID || (import.meta.env.GOOGLE_CLIENT_ID as string) || '')
+      ? (oauthConfig.googleClientId || import.meta.env.VITE_GOOGLE_CLIENT_ID || (import.meta.env.GOOGLE_CLIENT_ID as string) || '')
       : provider === 'github'
-      ? (import.meta.env.VITE_GITHUB_CLIENT_ID || (import.meta.env.GITHUB_CLIENT_ID as string) || '')
-      : (import.meta.env.VITE_LINKEDIN_CLIENT_ID || (import.meta.env.LINKEDIN_CLIENT_ID as string) || '');
+      ? (oauthConfig.githubClientId || import.meta.env.VITE_GITHUB_CLIENT_ID || (import.meta.env.GITHUB_CLIENT_ID as string) || '')
+      : (oauthConfig.linkedinClientId || import.meta.env.VITE_LINKEDIN_CLIENT_ID || (import.meta.env.LINKEDIN_CLIENT_ID as string) || '');
 
     if (!clientId) {
       return { url: '', hasClientId: false };
@@ -317,19 +354,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     let authUrl = '';
     if (provider === 'google') {
-      authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${encodeURIComponent(clientId)}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${encodeURIComponent('openid email profile')}&prompt=select_account&state=${state}`;
+      authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${encodeURIComponent(clientId)}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${encodeURIComponent('openid email profile')}&prompt=select_account&state=${encodeURIComponent(state)}`;
     } else if (provider === 'github') {
-      authUrl = `https://github.com/login/oauth/authorize?client_id=${encodeURIComponent(clientId)}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent('read:user user:email')}&state=${state}`;
+      authUrl = `https://github.com/login/oauth/authorize?client_id=${encodeURIComponent(clientId)}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent('read:user user:email')}&state=${encodeURIComponent(state)}`;
     } else if (provider === 'linkedin') {
-      authUrl = `https://www.linkedin.com/oauth/v2/authorization?client_id=${encodeURIComponent(clientId)}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${encodeURIComponent('openid profile email')}&state=${state}`;
+      authUrl = `https://www.linkedin.com/oauth/v2/authorization?client_id=${encodeURIComponent(clientId)}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${encodeURIComponent('openid profile email')}&state=${encodeURIComponent(state)}`;
     }
 
     return { url: authUrl, hasClientId: true };
   };
 
   const initiateOAuth = (provider: 'google' | 'linkedin' | 'github') => {
-    const state = Math.random().toString(36).substring(2) + Date.now().toString(36);
-    const redirectUri = window.location.origin;
+    const state = `${provider}_${Math.random().toString(36).substring(2)}${Date.now().toString(36)}`;
+    const redirectUri = oauthConfig.redirectUri || window.location.origin;
 
     sessionStorage.setItem('rip_oauth_provider', provider);
     sessionStorage.setItem('rip_oauth_state', state);
@@ -345,8 +382,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const openOAuthPopup = (provider: 'google' | 'linkedin' | 'github'): Promise<UserProfile> => {
     return new Promise((resolve, reject) => {
-      const state = Math.random().toString(36).substring(2) + Date.now().toString(36);
-      const redirectUri = window.location.origin;
+      const state = `${provider}_${Math.random().toString(36).substring(2)}${Date.now().toString(36)}`;
+      const redirectUri = oauthConfig.redirectUri || window.location.origin;
 
       sessionStorage.setItem('rip_oauth_provider', provider);
       sessionStorage.setItem('rip_oauth_state', state);
@@ -382,11 +419,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           window.removeEventListener('message', messageHandler);
           if (popupClosedInterval) clearInterval(popupClosedInterval);
 
-          const { code, error } = event.data;
+          const { code, error, state: responseState, provider: responseProvider } = event.data;
           if (error) {
             reject(new Error(error));
             return;
           }
+
+          const targetProvider = responseProvider || (responseState && responseState.split('_')[0]) || provider;
 
           if (code) {
             setIsLoading(true);
@@ -394,7 +433,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               const exchangeRes = await fetchWithCandidateUrls('/oauth/exchange', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ provider, code, redirectUri })
+                body: JSON.stringify({ provider: targetProvider, code, redirectUri })
               });
 
               const data = await exchangeRes.json();
@@ -427,20 +466,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
-  const oauthLogin = async (provider: 'google' | 'linkedin' | 'github', userDetails?: { email?: string; fullName?: string }) => {
-    // 1. If explicit userDetails with email is provided, perform verified direct OAuth sign-in with clean profile
-    if (userDetails?.email && userDetails.email.trim().includes('@')) {
+  const oauthLogin = async (provider: 'google' | 'linkedin' | 'github', userDetails?: { email?: string; fullName?: string; credential?: string }) => {
+    // 1. If explicit GIS credential token or userDetails with email is provided, authenticate directly
+    if (userDetails?.credential || (userDetails?.email && userDetails.email.trim().includes('@'))) {
       setIsLoading(true);
       try {
         const subpath = provider === 'google' ? '/google' : (provider === 'linkedin' ? '/linkedin' : '/oauth');
+        const payload: any = { provider };
+        if (userDetails.credential) {
+          payload.credential = userDetails.credential;
+        }
+        if (userDetails.email) {
+          payload.email = userDetails.email.trim();
+        }
+        if (userDetails.fullName) {
+          payload.fullName = userDetails.fullName.trim();
+        }
+
         const res = await fetchWithCandidateUrls(subpath, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            provider,
-            email: userDetails.email.trim(),
-            fullName: userDetails.fullName?.trim()
-          })
+          body: JSON.stringify(payload)
         });
 
         const data = await res.json();
@@ -610,6 +656,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       token,
       isLoading,
       isAuthenticated: !!user,
+      oauthConfig,
       login,
       register,
       registerWithCv,

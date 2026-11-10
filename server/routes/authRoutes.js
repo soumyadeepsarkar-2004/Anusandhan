@@ -7,14 +7,15 @@ import { hashPassword, verifyPassword } from '../utils/password.js';
 import { authenticateToken } from '../middleware/authMiddleware.js';
 import { sqliteDao } from '../db/sqliteDb.js';
 
-dotenv.config();
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config();
+  if (!process.env.JWT_SECRET) {
+    process.env.JWT_SECRET = 'anusandhan-dev-jwt-secret-2026';
+  }
+}
 
 const router = express.Router();
-const JWT_SECRET = process.env.JWT_SECRET || 'anusandhan-prod-jwt-secret-2026-secure';
-
-if (!process.env.JWT_SECRET) {
-  process.env.JWT_SECRET = JWT_SECRET;
-}
+const getJwtSecret = () => process.env.JWT_SECRET;
 
 // Multi-tenant in-memory store for active session fallback (clean start, zero demo accounts)
 const memoryUsers = new Map();
@@ -55,7 +56,7 @@ export async function saveUser(user) {
 }
 
 function createToken(payload) {
-  const secret = process.env.JWT_SECRET || JWT_SECRET;
+  const secret = process.env.JWT_SECRET;
   if (!secret) {
     throw new Error('Cannot issue JWT: JWT_SECRET environment variable is not defined.');
   }
@@ -525,9 +526,27 @@ router.post('/oauth/exchange', async (req, res) => {
  */
 router.post('/oauth', async (req, res) => {
   try {
-    const { provider, email, fullName, avatarUrl, university, fieldOfStudy } = req.body;
+    let { provider, email, fullName, avatarUrl, university, fieldOfStudy, credential, idToken } = req.body;
     if (!provider || !['google', 'linkedin', 'github'].includes(provider)) {
       return res.status(400).json({ error: 'Invalid OAuth provider. Expected "google", "linkedin", or "github".' });
+    }
+
+    // Support authentic Google Identity Services (GIS) / OpenID Connect token verification
+    if (provider === 'google' && (credential || idToken)) {
+      try {
+        const rawToken = credential || idToken;
+        const verifyRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(rawToken)}`);
+        if (verifyRes.ok) {
+          const payload = await verifyRes.json();
+          if (payload.email) {
+            email = payload.email;
+            fullName = payload.name || payload.given_name || fullName;
+            avatarUrl = payload.picture || avatarUrl;
+          }
+        }
+      } catch (tokenErr) {
+        console.warn('[GIS Tokeninfo Warning]:', tokenErr.message);
+      }
     }
 
     if (!email || typeof email !== 'string' || !email.includes('@')) {
@@ -598,7 +617,26 @@ router.post('/oauth', async (req, res) => {
  */
 router.post('/google', async (req, res) => {
   req.body.provider = 'google';
-  const { provider, email, fullName, avatarUrl, university, fieldOfStudy } = req.body;
+  let { email, fullName, avatarUrl, university, fieldOfStudy, credential, idToken } = req.body;
+
+  // Support authentic Google Identity Services (GIS) / OpenID Connect token verification
+  if (credential || idToken) {
+    try {
+      const rawToken = credential || idToken;
+      const verifyRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(rawToken)}`);
+      if (verifyRes.ok) {
+        const payload = await verifyRes.json();
+        if (payload.email) {
+          email = payload.email;
+          fullName = payload.name || payload.given_name || fullName;
+          avatarUrl = payload.picture || avatarUrl;
+        }
+      }
+    } catch (tokenErr) {
+      console.warn('[GIS Google Tokeninfo Warning]:', tokenErr.message);
+    }
+  }
+
   if (!email || typeof email !== 'string' || !email.includes('@')) {
     return res.status(400).json({ error: 'A valid email address is required for Google Sign-In.' });
   }

@@ -104,10 +104,14 @@ export const CommunityListingModal: React.FC<CommunityListingModalProps> = ({ is
           initial={{ opacity: 0, scale: 0.95, y: 15 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 15 }}
-          className="w-full max-w-2xl apple-glass rounded-3xl border border-white/20 shadow-[0_30px_90px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col relative z-10 max-h-[90vh]"
+          className="w-full max-w-2xl aceternity-glass rounded-3xl border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.48)] overflow-hidden flex flex-col relative z-10 max-h-[90vh] bg-zinc-950/85"
         >
+          {/* Ambient Glowing Orbs */}
+          <div className="ambient-orb -top-20 -left-20 w-80 h-80 bg-amber-500/15" />
+          <div className="ambient-orb -bottom-20 -right-20 w-80 h-80 bg-indigo-500/15" />
+
           {/* Top Sheen */}
-          <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-400/40 to-transparent" />
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/35 to-transparent" />
 
           {/* Header */}
           <div className="p-5 border-b border-white/10 flex items-center justify-between bg-white/[0.03]">

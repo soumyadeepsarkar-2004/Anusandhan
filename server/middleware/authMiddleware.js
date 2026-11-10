@@ -3,16 +3,15 @@ import dotenv from 'dotenv';
 
 import crypto from 'crypto';
 
-dotenv.config();
-
-const JWT_SECRET = process.env.JWT_SECRET || 'anusandhan-prod-jwt-secret-2026-secure';
-
-if (!process.env.JWT_SECRET) {
-  process.env.JWT_SECRET = JWT_SECRET;
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config();
+  if (!process.env.JWT_SECRET) {
+    process.env.JWT_SECRET = 'anusandhan-dev-jwt-secret-2026';
+  }
 }
 
 export function authenticateToken(req, res, next) {
-  const secret = process.env.JWT_SECRET || JWT_SECRET;
+  const secret = process.env.JWT_SECRET;
   if (!secret) {
     if (process.env.NODE_ENV === 'production') {
       return res.status(500).json({ error: 'Authentication service configuration error.' });

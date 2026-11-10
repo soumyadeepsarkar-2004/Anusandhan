@@ -23,7 +23,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 }) => {
   if (!isOpen) return null;
 
-  const { login, register, oauthLogin, registerWithCv } = useAuth();
+  const { login, register, oauthLogin, registerWithCv, oauthConfig } = useAuth();
   const [mode, setMode] = useState<'signin' | 'register' | 'cv_upload'>(initialMode);
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -53,25 +53,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setErrorMessage(null);
     setIsSubmitting(true);
     try {
-      const emailToUse = (email && email.trim()) ? email.trim() : (ssoEmail && ssoEmail.trim()) ? ssoEmail.trim() : undefined;
-      const nameToUse = fullName && fullName.trim() ? fullName.trim() : undefined;
-
       const clientId = provider === 'google'
-        ? (import.meta.env.VITE_GOOGLE_CLIENT_ID || (import.meta.env.GOOGLE_CLIENT_ID as string) || '')
+        ? (oauthConfig?.googleClientId || import.meta.env.VITE_GOOGLE_CLIENT_ID || (import.meta.env.GOOGLE_CLIENT_ID as string) || '')
         : provider === 'github'
-        ? (import.meta.env.VITE_GITHUB_CLIENT_ID || (import.meta.env.GITHUB_CLIENT_ID as string) || '')
-        : (import.meta.env.VITE_LINKEDIN_CLIENT_ID || (import.meta.env.LINKEDIN_CLIENT_ID as string) || '');
+        ? (oauthConfig?.githubClientId || import.meta.env.VITE_GITHUB_CLIENT_ID || (import.meta.env.GITHUB_CLIENT_ID as string) || '')
+        : (oauthConfig?.linkedinClientId || import.meta.env.VITE_LINKEDIN_CLIENT_ID || (import.meta.env.LINKEDIN_CLIENT_ID as string) || '');
 
-      // 1. If email is already provided or typed in the input, immediately authenticate directly via oauthLogin
-      if (emailToUse && emailToUse.includes('@')) {
-        await oauthLogin(provider, { email: emailToUse, fullName: nameToUse });
-        confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } });
-        onSuccess();
-        onClose();
-        return;
-      }
-
-      // 2. If client ID is configured, trigger real OAuth popup/redirect flow
+      // 1. If client ID is configured, trigger real OAuth popup/redirect flow
       if (clientId) {
         await oauthLogin(provider);
         confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } });
@@ -80,9 +68,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         return;
       }
 
-      // 3. Otherwise show our polished in-modal SSO form (NEVER native window.prompt)
+      // 2. Otherwise show our polished in-modal SSO form (NEVER native window.prompt)
       setActiveSSOProvider(provider);
-      setSsoEmail(email || '');
+      setSsoEmail('');
     } catch (err: any) {
       setErrorMessage(err.message || `Failed to authenticate via ${provider}.`);
     } finally {
