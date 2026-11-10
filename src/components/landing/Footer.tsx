@@ -168,33 +168,31 @@ const FooterComponent: React.FC<FooterProps> = ({ onOpenPrivacy, onOpenTerms }) 
 
         </div>
 
-        {/* Product Hunt Social Proof Banner */}
-        <div className="mb-8 p-4 rounded-2xl bg-white/[0.02] border border-orange-500/20 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/30 flex items-center justify-center text-orange-400 font-bold text-sm shrink-0">
+        {/* Product Hunt & Community Discovery */}
+        <div className="mb-8 p-4 rounded-xl bg-white/[0.02] border border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="flex items-center space-x-3 text-left">
+            <span className="w-8 h-8 rounded-lg bg-[#DA552F]/15 border border-[#DA552F]/30 text-[#DA552F] flex items-center justify-center font-bold text-xs shrink-0">
               P
-            </div>
+            </span>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-semibold text-zinc-200">Featured on Product Hunt</span>
-                <span className="px-2 py-0.5 text-[10px] font-mono rounded-full bg-orange-500/20 text-orange-300 font-bold border border-orange-500/30">
-                  #1 Product of the Day
-                </span>
+                <span className="text-xs font-semibold text-zinc-200">Product Hunt Community Launch</span>
+                <span className="text-[10px] font-mono text-zinc-400">· Open Source Scholar Intelligence</span>
               </div>
-              <p className="text-zinc-400 text-xs mt-0.5">
-                Voted by researchers and builders worldwide. Autonomous research internships on autopilot.
+              <p className="text-zinc-500 text-xs mt-0.5">
+                Voted by researchers and students. Autonomous internships on autopilot.
               </p>
             </div>
           </div>
 
           <a
-            href="https://www.producthunt.com/posts/anusandhan"
+            href="https://www.producthunt.com/products/anusandhan"
             target="_blank"
             rel="noreferrer"
-            className="px-4 py-2 rounded-xl bg-gradient-to-r from-orange-500/20 to-amber-500/20 hover:from-orange-500/30 hover:to-amber-500/30 border border-orange-500/40 text-orange-300 text-xs font-mono font-semibold flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap"
+            className="px-3.5 py-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 text-zinc-300 hover:text-white text-xs font-mono transition-colors flex items-center gap-1.5 shrink-0"
           >
-            <span>View on Product Hunt</span>
-            <ExternalLink className="w-3.5 h-3.5" />
+            <span>Product Hunt</span>
+            <ExternalLink className="w-3 h-3" />
           </a>
         </div>
 

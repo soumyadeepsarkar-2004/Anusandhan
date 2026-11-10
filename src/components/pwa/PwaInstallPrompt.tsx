@@ -124,7 +124,7 @@ export const PwaInstallPrompt: React.FC<PwaInstallPromptProps> = ({
                 </span>
               </div>
               <p className="text-[11px] text-zinc-400 leading-tight mt-0.5">
-                Get full offline outbox synchronization, quick launch & Android support.
+                Install as a standalone application for fast, distraction-free research access.
               </p>
             </div>
           </div>

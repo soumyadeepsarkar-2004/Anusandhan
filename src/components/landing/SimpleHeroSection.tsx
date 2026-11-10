@@ -1,7 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Search, Sparkles, ChevronDown, Award, ShieldCheck } from 'lucide-react';
-import { LiveRadarDot } from '../ui/AppleGlass';
+import { ArrowRight, Search, Sparkles, ChevronDown, Smartphone, Monitor, Apple, Globe } from 'lucide-react';
 
 interface SimpleHeroSectionProps {
   onLaunchPlatform: () => void;
@@ -32,191 +31,163 @@ const SimpleHeroSectionComponent: React.FC<SimpleHeroSectionProps> = ({
   return (
     <section 
       id="hero" 
-      className="relative w-full flex flex-col justify-between pt-32 pb-10 sm:pt-36 sm:pb-14 lg:pt-40 lg:pb-14 overflow-hidden bg-transparent select-none min-h-[90vh]"
+      className="relative w-full flex flex-col justify-between pt-28 pb-10 sm:pt-36 sm:pb-14 lg:pt-36 lg:pb-12 overflow-hidden bg-transparent select-none min-h-[85vh]"
     >
-      {/* Specular Ambient Glow */}
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[450px] bg-gradient-to-tr from-amber-500/15 via-amber-400/8 to-transparent blur-[160px] pointer-events-none -z-10" />
+      {/* Restrained Ambient Radial Sheen */}
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[360px] bg-amber-500/10 blur-[140px] pointer-events-none -z-10" />
 
-      {/* Main Centered Hero Content */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10 flex flex-col items-center w-full">
+      {/* Main Hero Container */}
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10 flex flex-col items-center w-full">
         
-        {/* Top Badges: Inclusivity & Product Hunt */}
-        <div className="flex flex-wrap items-center justify-center gap-2.5 mb-5 sm:mb-6">
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="inline-flex items-center space-x-2.5 px-4 py-1.5 rounded-full apple-glass-pill text-xs font-mono text-zinc-300 border border-white/10 shadow-sm"
-          >
-            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-            <span className="text-zinc-200 font-medium">OPEN TO ALL CURIOUS MINDS</span>
-            <span className="text-zinc-500">·</span>
-            <span className="text-amber-400">National & Global Research Access</span>
-          </motion.div>
-
-          {/* Product Hunt #1 Product of the Day Badge */}
-          <motion.a
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            href="https://www.producthunt.com/posts/anusandhan"
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-orange-500/15 to-amber-500/10 hover:from-orange-500/25 hover:to-amber-500/20 border border-orange-500/40 text-orange-300 text-xs font-mono transition-all shadow-sm group cursor-pointer"
-            title="Featured on Product Hunt — #1 Product of the Day"
-          >
-            <span className="w-4 h-4 rounded-full bg-[#DA552F] text-white font-bold text-[10px] flex items-center justify-center shadow-sm">
-              P
-            </span>
-            <span className="font-semibold text-orange-200">#1 Product of the Day</span>
-            <span className="text-zinc-500">·</span>
-            <span className="text-zinc-400 group-hover:text-white transition-colors">Product Hunt</span>
-            <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-orange-500/20 text-orange-300 font-bold border border-orange-500/30">
-              ▲ 584
-            </span>
-          </motion.a>
-        </div>
-
-        {/* Clean, Human Editorial Headline */}
-        <motion.h1
-          initial={{ opacity: 0, y: 15 }}
+        {/* Editorial Launch Badge */}
+        <motion.div
+          initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.1 }}
-          className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-serif text-zinc-100 font-medium tracking-tight leading-[1.1] max-w-5xl"
+          transition={{ duration: 0.5 }}
+          className="mb-6 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.03] border border-white/10 text-xs font-mono text-zinc-300 shadow-sm"
         >
-          Democratizing Research Opportunities{' '}
-          <span className="italic text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-300 to-amber-500">
-            for Curious Minds Everywhere.
-          </span>
+          <span className="w-2 h-2 rounded-full bg-amber-400" />
+          <span className="text-zinc-200 font-medium">Anusandhan 2.0</span>
+          <span className="text-zinc-600">/</span>
+          <span className="text-zinc-400">Autonomous Research Internship Intelligence</span>
+        </motion.div>
+
+        {/* Confident, High-Hierarchy Headline */}
+        <motion.h1
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif text-zinc-100 font-normal tracking-tight leading-[1.08] max-w-4xl"
+        >
+          Research internships grounded in active academic literature.
         </motion.h1>
 
-        {/* Informative, Clear Subtitle */}
+        {/* Clear, Measured Value Proposition */}
         <motion.p
-          initial={{ opacity: 0, y: 15 }}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.2 }}
-          className="mt-4 sm:mt-5 text-sm sm:text-base md:text-lg text-zinc-400 max-w-3xl mx-auto leading-relaxed font-sans"
+          transition={{ duration: 0.6, delay: 0.18 }}
+          className="mt-5 text-sm sm:text-base md:text-lg text-zinc-400 max-w-2xl mx-auto leading-relaxed font-sans font-light"
         >
-          Whether you study at a regional college, premier national institute, or are a self-taught builder — discover verified lab openings, diagnose profile gaps before professors auto-reject, and bridge your code into active research literature.
+          Discover verified funded lab vacancies across national institutes and global universities. Diagnose profile weaknesses before faculty review, and bridge your code into publication-grade proposals.
         </motion.p>
 
-        {/* Clear Action Buttons */}
+        {/* Intentional Primary Actions */}
         <motion.div
-          initial={{ opacity: 0, y: 15 }}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.3 }}
-          className="mt-7 sm:mt-8 flex flex-col sm:flex-row items-center justify-center gap-3.5 w-full sm:w-auto"
+          transition={{ duration: 0.6, delay: 0.25 }}
+          className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3 w-full sm:w-auto"
         >
           <button
             onClick={onLaunchPlatform}
-            className="w-full sm:w-auto min-h-[48px] px-8 py-3 rounded-2xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-zinc-950 font-semibold text-sm shadow-[0_0_25px_rgba(245,158,11,0.25)] hover:shadow-[0_0_35px_rgba(245,158,11,0.4)] transition-all cursor-pointer flex items-center justify-center space-x-2.5 active:scale-98"
+            className="w-full sm:w-auto min-h-[44px] px-7 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-zinc-950 font-medium text-sm transition-all cursor-pointer flex items-center justify-center space-x-2 active:scale-[0.99] shadow-sm"
           >
-            <span>{isAuthenticated ? `Enter Workspace (${userName || 'Scholar'})` : 'Launch Research Platform'}</span>
+            <span>{isAuthenticated ? `Enter Workspace (${userName || 'Scholar'})` : 'Launch Workspace'}</span>
             <ArrowRight className="w-4 h-4" />
           </button>
 
           <button
             onClick={onExploreLabs}
-            className="w-full sm:w-auto min-h-[48px] px-7 py-3 rounded-2xl bg-white/[0.05] hover:bg-white/[0.1] text-zinc-200 font-medium text-sm border border-white/15 backdrop-blur-md transition-all cursor-pointer flex items-center justify-center space-x-2.5"
+            className="w-full sm:w-auto min-h-[44px] px-6 py-2.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] text-zinc-200 font-medium text-sm border border-white/10 transition-all cursor-pointer flex items-center justify-center space-x-2"
           >
-            <Search className="w-4 h-4 text-amber-400" />
-            <span>Browse 500+ Open Labs & Grants</span>
+            <Search className="w-4 h-4 text-zinc-400" />
+            <span>Explore 500+ Faculty Openings</span>
           </button>
         </motion.div>
 
-        {/* Cross-Platform Device Suite Strip */}
+        {/* Cross-Platform Device Suite Strip - Clean Vector Icons */}
         <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.35 }}
-          className="mt-5 flex flex-wrap items-center justify-center gap-2 text-xs font-mono"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.32 }}
+          className="mt-6 flex flex-wrap items-center justify-center gap-1.5 text-xs font-mono"
         >
-          <span className="text-zinc-500 text-[11px] mr-1">Available on:</span>
+          <span className="text-zinc-500 text-[11px] mr-1">Platforms:</span>
           
           <button
             onClick={onOpenCrossNativeModal}
-            className="px-3 py-1.5 rounded-xl bg-white/[0.04] hover:bg-amber-500/15 border border-white/10 hover:border-amber-500/40 text-zinc-300 hover:text-amber-300 transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
+            className="px-2.5 py-1 rounded-lg bg-white/[0.03] hover:bg-white/[0.07] border border-white/10 text-zinc-300 text-[11px] transition-colors flex items-center gap-1.5 cursor-pointer"
           >
-            <span>🤖</span>
-            <span className="font-semibold">Android APK</span>
+            <Smartphone className="w-3 h-3 text-amber-400" />
+            <span>Android</span>
           </button>
 
           <button
             onClick={onOpenCrossNativeModal}
-            className="px-3 py-1.5 rounded-xl bg-white/[0.04] hover:bg-amber-500/15 border border-white/10 hover:border-amber-500/40 text-zinc-300 hover:text-amber-300 transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
+            className="px-2.5 py-1 rounded-lg bg-white/[0.03] hover:bg-white/[0.07] border border-white/10 text-zinc-300 text-[11px] transition-colors flex items-center gap-1.5 cursor-pointer"
           >
-            <span>🪟</span>
-            <span>Windows (.exe)</span>
+            <Monitor className="w-3 h-3 text-zinc-400" />
+            <span>Windows</span>
           </button>
 
           <button
             onClick={onOpenCrossNativeModal}
-            className="px-3 py-1.5 rounded-xl bg-white/[0.04] hover:bg-amber-500/15 border border-white/10 hover:border-amber-500/40 text-zinc-300 hover:text-amber-300 transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
+            className="px-2.5 py-1 rounded-lg bg-white/[0.03] hover:bg-white/[0.07] border border-white/10 text-zinc-300 text-[11px] transition-colors flex items-center gap-1.5 cursor-pointer"
           >
-            <span>🍎</span>
-            <span>macOS (.dmg)</span>
+            <Apple className="w-3 h-3 text-zinc-400" />
+            <span>macOS</span>
           </button>
 
           <button
             onClick={onOpenCrossNativeModal}
-            className="px-3 py-1.5 rounded-xl bg-white/[0.04] hover:bg-amber-500/15 border border-white/10 hover:border-amber-500/40 text-zinc-300 hover:text-amber-300 transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
+            className="px-2.5 py-1 rounded-lg bg-white/[0.03] hover:bg-white/[0.07] border border-white/10 text-zinc-300 text-[11px] transition-colors flex items-center gap-1.5 cursor-pointer"
           >
-            <span>⚡</span>
+            <Globe className="w-3 h-3 text-zinc-400" />
             <span>Web PWA</span>
           </button>
         </motion.div>
 
-        {/* Metric Highlights Bar - Placed comfortably in laptop full-screen flow */}
+        {/* Metric Highlights Strip - Clean Architectural Cards */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.35 }}
+          transition={{ duration: 0.7, delay: 0.38 }}
           className="w-full mt-10 sm:mt-12"
         >
-          <div className="p-4 sm:p-5 rounded-3xl glass-panel grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 text-left shadow-2xl relative overflow-hidden">
-            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-amber-300/30 to-transparent pointer-events-none" />
+          <div className="p-4 sm:p-5 rounded-2xl bg-white/[0.02] border border-white/10 grid grid-cols-2 md:grid-cols-4 gap-4 text-left shadow-lg">
             <div className="space-y-1">
-              <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-500">Universal Coverage</span>
-              <div className="text-base sm:text-lg font-serif text-zinc-100 font-medium">National & Global</div>
-              <p className="text-xs text-zinc-400 leading-snug">IISc, IITs, TIFR, CERN, MIT, Max Planck</p>
+              <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-500">Coverage</span>
+              <div className="text-base font-serif text-zinc-100 font-medium">National & Global</div>
+              <p className="text-xs text-zinc-400 leading-snug">IISc, IITs, CERN, MIT, Max Planck</p>
             </div>
 
             <div className="space-y-1">
-              <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-500">Automated Audit</span>
-              <div className="text-base sm:text-lg font-serif text-amber-400 font-medium">Gap Analysis</div>
-              <p className="text-xs text-zinc-400 leading-snug">Detects why cold emails fail before you send</p>
+              <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-500">Diagnostic</span>
+              <div className="text-base font-serif text-zinc-100 font-medium">Readiness Score</div>
+              <p className="text-xs text-zinc-400 leading-snug">Identifies rejection triggers before submission</p>
             </div>
 
             <div className="space-y-1">
-              <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-500">Precision Outreach</span>
-              <div className="text-base sm:text-lg font-serif text-emerald-400 font-medium">146 Words</div>
-              <p className="text-xs text-zinc-400 leading-snug">Literature-grounded proof-of-work pitches</p>
+              <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-500">Outreach</span>
+              <div className="text-base font-serif text-zinc-100 font-medium">146-Word Pitches</div>
+              <p className="text-xs text-zinc-400 leading-snug">Empirically calibrated academic formatting</p>
             </div>
 
             <div className="space-y-1">
-              <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-500">Ethics & Compliance</span>
-              <div className="text-base sm:text-lg font-serif text-zinc-100 font-medium">Zero Spam</div>
-              <p className="text-xs text-zinc-400 leading-snug">Mandatory human review + 7-day pacing</p>
+              <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-500">Compliance</span>
+              <div className="text-base font-serif text-zinc-100 font-medium">Zero Spam</div>
+              <p className="text-xs text-zinc-400 leading-snug">Mandatory human review and 7-day pacing</p>
             </div>
           </div>
         </motion.div>
 
-        {/* Dedicated Bottom Scroll Indicator - Positioned after metrics at the section fold */}
+        {/* Scroll Indicator */}
         <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.45 }}
           onClick={scrollToOpportunities}
-          className="mt-6 sm:mt-8 inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-zinc-900/70 hover:bg-zinc-800 border border-white/10 text-zinc-400 hover:text-amber-300 transition-all cursor-pointer group shadow-sm"
+          className="mt-6 inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-zinc-500 hover:text-zinc-300 transition-colors cursor-pointer text-xs font-mono"
         >
-          <span className="text-xs font-mono tracking-wider uppercase">Explore Verified Labs</span>
-          <ChevronDown className="w-3.5 h-3.5 group-hover:translate-y-0.5 transition-transform text-amber-400" />
+          <span>Explore openings</span>
+          <ChevronDown className="w-3.5 h-3.5 text-zinc-400" />
         </motion.div>
 
       </div>
-
     </section>
   );
 };
 
 export const SimpleHeroSection = React.memo(SimpleHeroSectionComponent);
+export default SimpleHeroSection;

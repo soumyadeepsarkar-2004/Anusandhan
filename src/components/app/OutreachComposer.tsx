@@ -101,7 +101,7 @@ export const OutreachComposer: React.FC<OutreachComposerProps> = ({
         professor_email: draft.professorEmail,
         human_confirmed: humanConfirmed
       });
-      setQueueMessage('Offline Mode Active: Saved to Local Outbox. Will auto-dispatch with 4–12 min jitter when network reconnects.');
+      setQueueMessage('Saved to drafts. Will automatically dispatch when reconnected.');
       onSendDraft(draft.id);
       setIsSubmitting(false);
       return;
@@ -115,14 +115,14 @@ export const OutreachComposer: React.FC<OutreachComposerProps> = ({
       });
 
       if (result) {
-        setQueueMessage(`Queued with ${Math.round(result.jitter_delay_seconds / 60)} min jitter delay. Remaining daily quota: ${result.daily_quota_remaining}.`);
+        setQueueMessage(`Outreach scheduled for delivery. Daily quota remaining: ${result.daily_quota_remaining}.`);
       } else {
         await OfflineSyncEngine.enqueueOfflineAction('QUEUE_OUTREACH', {
           draft_id: draft.id,
           professor_email: draft.professorEmail,
           human_confirmed: humanConfirmed
         });
-        setQueueMessage('Queued in resilient offline outbox. Will auto-flush upon reconnection.');
+        setQueueMessage('Saved to local drafts. Will dispatch automatically once online.');
       }
     } catch (e) {
       console.warn('Queued locally:', e);
@@ -131,7 +131,7 @@ export const OutreachComposer: React.FC<OutreachComposerProps> = ({
         professor_email: draft.professorEmail,
         human_confirmed: humanConfirmed
       });
-      setQueueMessage('Queued in offline outbox. Will auto-flush when online.');
+      setQueueMessage('Saved to local drafts. Will dispatch automatically once online.');
     }
 
     onSendDraft(draft.id);

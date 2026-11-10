@@ -16,7 +16,6 @@ import {
   Smartphone
 } from 'lucide-react';
 import { StudentProfile } from '../../types';
-import { MacOSDock } from '../ui/MacOSDock';
 import { WORKSPACE_TABS } from '../../data/navigationConfig';
 import { AudioWaveformVisualizer } from '../ui/AppleGlass';
 import { PullChainBulb } from '../ui/PullChainBulb';
@@ -67,9 +66,9 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
   const [isTokenModalOpen, setIsTokenModalOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[var(--canvas-bg)] text-[var(--text-primary)] flex flex-col pb-32 relative transition-colors duration-300">
+    <div className="min-h-screen bg-[var(--canvas-bg)] text-[var(--text-primary)] flex flex-col pb-16 relative transition-colors duration-300">
       
-      {/* Top Application Header with Apple Glass */}
+      {/* Top Application Header */}
       <header className="sticky top-0 z-30 w-full border-b border-[var(--border-subtle)] bg-[var(--surface-bg)]/80 backdrop-blur-3xl shadow-sm relative transition-colors duration-300">
         {/* Specular Top Sheen */}
         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-400/40 to-transparent" />
@@ -302,21 +301,11 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
         </div>
       </footer>
 
-      {/* Mobile Bottom Navigation Taskbar (Synchronized across all 8 tabs) */}
+      {/* Mobile Bottom Navigation Taskbar */}
       <MobileBottomNav
         currentTab={currentTab}
         onTabChange={onTabChange}
         onOpenVoiceModal={onOpenVoiceModal}
-        followUpDueCount={followUpDueCount}
-      />
-
-      {/* Complete, Consistent & Collapsible Floating Taskbar Dock for Desktop */}
-      <MacOSDock
-        currentTab={currentTab}
-        onTabChange={onTabChange}
-        onOpenVoiceModal={onOpenVoiceModal}
-        onOpenPricingModal={onOpenPricingModal}
-        onOpenCommandPalette={onOpenCommandPalette}
         followUpDueCount={followUpDueCount}
       />
 
