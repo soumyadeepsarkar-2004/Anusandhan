@@ -169,12 +169,24 @@ export function processVoiceQuery(query: string, student: StudentProfile, engine
     q.includes('my details') ||
     q.includes('meri details')
   ) {
-    const studentDomains = student.targetDomains?.join(', ') || 'AI & Distributed Systems';
-    const topSkills = student.skills?.slice(0, 5).join(', ') || 'Python, PyTorch, Research Writing';
+    const isProfileBlank = !student.fullName && student.cgpa === 0 && student.skills.length === 0;
+    if (isProfileBlank) {
+      return {
+        spokenText: lang === 'Hinglish'
+          ? 'Aapka scholar profile abhi clean state mein hai. Kripya apna CV upload karein ya intake diagnostic complete karein, taaki hum aapke actual research credentials synchronize kar sakein.'
+          : 'Your scholar profile is currently uninitialized. Please upload your academic CV or complete the intake diagnostic so we can synchronize your actual research credentials.',
+        detectedLanguage: lang,
+        suggestedAction: 'navigate_profile',
+        modelUsed: activeModelDisplay
+      };
+    }
+
+    const studentDomains = student.targetDomains?.length ? student.targetDomains.join(', ') : 'Not selected';
+    const topSkills = student.skills?.length ? student.skills.slice(0, 5).join(', ') : 'None listed';
     return {
       spokenText: lang === 'Hinglish'
-        ? `Aap ${student.fullName || 'Scholar'} hain, studying at ${student.university || 'Premier Institute'}, ${student.degreeLevel || 'Undergraduate Researcher'} (Year ${student.currentYear || '3rd Year'}). Aapka CGPA ${student.cgpa || 8.5}/10.0 hai. Target domains: ${studentDomains}. Top skills: ${topSkills}. Aapka Research Readiness Score abhi ${student.rrsScore || 85}/100 hai (${student.rrsTier || 'Senior Scholar'}). Main aapke har action aur application ko aapke is verified profile ke sath synchronize rakhta hoon.`
-        : `You are ${student.fullName || 'Scholar'} from ${student.university || 'State / Central University'}, enrolled in ${student.degreeLevel || 'B.Tech / B.S.'} (${student.currentYear || '3rd Year'}). Your academic standing is ${student.cgpa || 8.5}/10.0 CGPA. Target domains: ${studentDomains}. Key skills: ${topSkills}. Your Research Readiness Score is ${student.rrsScore || 85}/100 (${student.rrsTier || 'Senior Scholar'}). All platform workflows strictly synchronize with your verified profile footprint.`,
+        ? `Aap ${student.fullName || 'Scholar'} hain${student.university ? `, affiliated with ${student.university}` : ''}. Aapka CGPA ${student.cgpa > 0 ? student.cgpa : 'not entered'}/10.0 hai. Target domains: ${studentDomains}. Top skills: ${topSkills}. Aapka Research Readiness Score abhi ${student.rrsScore}/100 hai (${student.rrsTier}). Main aapke har action aur application ko aapke is profile ke sath synchronize rakhta hoon.`
+        : `You are ${student.fullName || 'Scholar'}${student.university ? ` from ${student.university}` : ''}, enrolled in ${student.degreeLevel || 'B.Tech / B.S.'}. Your academic standing is ${student.cgpa > 0 ? `${student.cgpa}/10.0 CGPA` : 'not specified'}. Target domains: ${studentDomains}. Key skills: ${topSkills}. Your Research Readiness Score is ${student.rrsScore}/100 (${student.rrsTier}). All platform workflows strictly synchronize with your verified profile footprint.`,
       detectedLanguage: lang,
       suggestedAction: 'navigate_profile',
       modelUsed: activeModelDisplay

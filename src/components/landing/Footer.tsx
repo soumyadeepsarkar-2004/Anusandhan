@@ -9,9 +9,10 @@ import { useTheme } from '../../context/ThemeContext';
 interface FooterProps {
   onOpenPrivacy?: () => void;
   onOpenTerms?: () => void;
+  onOpenCommunityListings?: () => void;
 }
 
-const FooterComponent: React.FC<FooterProps> = ({ onOpenPrivacy, onOpenTerms }) => {
+const FooterComponent: React.FC<FooterProps> = ({ onOpenPrivacy, onOpenTerms, onOpenCommunityListings }) => {
   const [showPrivacyLocal, setShowPrivacyLocal] = useState(false);
   const [showTermsLocal, setShowTermsLocal] = useState(false);
   const { isDark } = useTheme();
@@ -168,32 +169,76 @@ const FooterComponent: React.FC<FooterProps> = ({ onOpenPrivacy, onOpenTerms }) 
 
         </div>
 
-        {/* Product Hunt & Community Discovery */}
-        <div className="mb-8 p-4 rounded-xl bg-white/[0.02] border border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="flex items-center space-x-3 text-left">
-            <span className="w-8 h-8 rounded-lg bg-[#DA552F]/15 border border-[#DA552F]/30 text-[#DA552F] flex items-center justify-center font-bold text-xs shrink-0">
+        {/* Product Hunt & Social Media Platforms Directory */}
+        <div className="mb-8 p-5 rounded-2xl bg-white/[0.02] border border-white/10 flex flex-col lg:flex-row items-center justify-between gap-4">
+          <div className="flex items-center space-x-3 text-left w-full lg:w-auto">
+            <span className="w-9 h-9 rounded-xl bg-[#DA552F]/15 border border-[#DA552F]/30 text-[#DA552F] flex items-center justify-center font-bold text-sm shrink-0">
               P
             </span>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold text-zinc-200">Product Hunt Community Launch</span>
-                <span className="text-[10px] font-mono text-zinc-400">· Open Source Scholar Intelligence</span>
+                <span className="text-xs font-semibold text-zinc-200">Product Hunt & Community Listings</span>
+                <span className="text-[10px] font-mono text-amber-400/90 px-1.5 py-0.5 rounded bg-amber-500/10 border border-amber-500/20">
+                  Featured
+                </span>
               </div>
-              <p className="text-zinc-500 text-xs mt-0.5">
-                Voted by researchers and students. Autonomous internships on autopilot.
+              <p className="text-zinc-400 text-xs mt-0.5 max-w-xl">
+                Anusandhan is listed across major developer & academic platforms. Upvote on Product Hunt, star on GitHub, or follow our LinkedIn organization.
               </p>
             </div>
           </div>
 
-          <a
-            href="https://www.producthunt.com/products/anusandhan"
-            target="_blank"
-            rel="noreferrer"
-            className="px-3.5 py-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 text-zinc-300 hover:text-white text-xs font-mono transition-colors flex items-center gap-1.5 shrink-0"
-          >
-            <span>Product Hunt</span>
-            <ExternalLink className="w-3 h-3" />
-          </a>
+          <div className="flex flex-wrap items-center gap-2 w-full lg:w-auto justify-start lg:justify-end shrink-0">
+            <a
+              href="https://www.producthunt.com/products/anusandhan"
+              target="_blank"
+              rel="noreferrer"
+              className="px-3 py-1.5 rounded-xl bg-[#DA552F]/10 hover:bg-[#DA552F]/20 border border-[#DA552F]/30 text-zinc-200 hover:text-white text-xs font-mono transition-colors flex items-center gap-1.5"
+            >
+              <span>Product Hunt</span>
+              <ExternalLink className="w-3 h-3 text-[#DA552F]" />
+            </a>
+
+            <a
+              href="https://github.com/soumyadeepsarkar-2004/Anusandhan"
+              target="_blank"
+              rel="noreferrer"
+              className="px-3 py-1.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 text-zinc-300 hover:text-white text-xs font-mono transition-colors flex items-center gap-1.5"
+            >
+              <span>GitHub</span>
+              <ExternalLink className="w-3 h-3 text-zinc-400" />
+            </a>
+
+            <a
+              href="https://www.linkedin.com/company/anusandhan-ai"
+              target="_blank"
+              rel="noreferrer"
+              className="px-3 py-1.5 rounded-xl bg-[#0A66C2]/10 hover:bg-[#0A66C2]/20 border border-[#0A66C2]/30 text-zinc-300 hover:text-white text-xs font-mono transition-colors flex items-center gap-1.5"
+            >
+              <span>LinkedIn</span>
+              <ExternalLink className="w-3 h-3 text-[#0A66C2]" />
+            </a>
+
+            <a
+              href="https://x.com/anusandhan_ai"
+              target="_blank"
+              rel="noreferrer"
+              className="px-3 py-1.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 text-zinc-300 hover:text-white text-xs font-mono transition-colors flex items-center gap-1.5"
+            >
+              <span>X / Twitter</span>
+              <ExternalLink className="w-3 h-3 text-zinc-400" />
+            </a>
+
+            {onOpenCommunityListings && (
+              <button
+                onClick={onOpenCommunityListings}
+                className="px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 text-xs font-mono transition-colors flex items-center gap-1 cursor-pointer"
+              >
+                <span>All Listings</span>
+                <Sparkles className="w-3 h-3" />
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Bottom Bar Strip - High Contrast, Theme-Adaptive Interactive Action Badges */}

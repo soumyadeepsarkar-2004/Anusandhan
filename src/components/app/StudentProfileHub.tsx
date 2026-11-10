@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { StudentProfile, UserApiKeys } from '../../types';
 import { calculateRRS } from '../../services/rrsCalculator';
+import { parseResumeText } from '../../services/resumeParser';
 import { 
   Award, CheckCircle, Globe, Sparkles, Upload, FileText, Check, 
   Key, ShieldCheck, Scale, Eye, EyeOff, Save, Cpu, Zap, Mail, 
@@ -33,9 +34,10 @@ export const StudentProfileHub: React.FC<StudentProfileHubProps> = ({
   const [showTermsModal, setShowTermsModal] = useState(false);
 
   // BYOK API Keys State
+  const keysStorageKey = student.email ? `rip_user_api_keys_${student.email}` : 'rip_user_api_keys';
   const [apiKeys, setApiKeys] = useState<UserApiKeys>(() => {
     try {
-      const saved = localStorage.getItem('rip_user_api_keys');
+      const saved = localStorage.getItem(keysStorageKey);
       return saved ? JSON.parse(saved) : (student.userApiKeys || {});
     } catch {
       return student.userApiKeys || {};
@@ -51,7 +53,7 @@ export const StudentProfileHub: React.FC<StudentProfileHubProps> = ({
 
   const handleSaveApiKeys = () => {
     try {
-      localStorage.setItem('rip_user_api_keys', JSON.stringify(apiKeys));
+      localStorage.setItem(keysStorageKey, JSON.stringify(apiKeys));
       const updated: StudentProfile = {
         ...student,
         userApiKeys: apiKeys
@@ -87,13 +89,31 @@ export const StudentProfileHub: React.FC<StudentProfileHubProps> = ({
 
     setIsUploading(true);
     try {
-      const parsed = await ApiClient.uploadCV(file);
+      let parsed: any = null;
+      try {
+        parsed = await ApiClient.uploadCV(file);
+      } catch (err) {
+        console.warn('Backend PDF upload notice, trying client parser:', err);
+      }
+
+      if (!parsed) {
+        const text = await file.text();
+        const localParsed = parseResumeText(text);
+        parsed = {
+          extracted_name: localParsed.fullName,
+          detected_university: localParsed.university,
+          detected_cgpa: localParsed.cgpa,
+          extracted_skills: localParsed.skills,
+          detected_domains: localParsed.targetDomains
+        };
+      }
+
       if (parsed) {
         const updated = {
           ...student,
           fullName: parsed.extracted_name || student.fullName,
           university: parsed.detected_university || student.university,
-          cgpa: parsed.detected_cgpa || student.cgpa,
+          cgpa: (parsed.detected_cgpa !== undefined && parsed.detected_cgpa > 0) ? parsed.detected_cgpa : student.cgpa,
           skills: parsed.extracted_skills?.length ? parsed.extracted_skills : student.skills,
           targetDomains: parsed.detected_domains?.length ? parsed.detected_domains : student.targetDomains
         };
@@ -105,6 +125,7 @@ export const StudentProfileHub: React.FC<StudentProfileHubProps> = ({
 
         onUpdateProfile(updated);
         setUploadSuccess(true);
+        confetti({ particleCount: 40, spread: 60 });
         setTimeout(() => setUploadSuccess(false), 3000);
       }
     } catch (err) {
@@ -134,10 +155,10 @@ export const StudentProfileHub: React.FC<StudentProfileHubProps> = ({
             <span>Research Readiness Score (RRS™)</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-serif font-semibold text-zinc-100">
-            {student.fullName}
+            {student.fullName || 'Scholar (Profile Pending)'}
           </h2>
           <p className="text-xs sm:text-sm text-zinc-400 font-sans max-w-lg">
-            {student.university} · {student.degreeLevel} (Year {student.currentYear}) · CGPA: <span className="text-amber-400 font-mono font-semibold">{student.cgpa}</span>
+            {student.university ? `${student.university} · ${student.degreeLevel} ${student.currentYear ? `(${student.currentYear})` : ''}` : 'University not yet specified'} · CGPA: <span className="text-amber-400 font-mono font-semibold">{student.cgpa > 0 ? student.cgpa : 'Pending'}</span>
           </p>
         </div>
 
@@ -145,7 +166,7 @@ export const StudentProfileHub: React.FC<StudentProfileHubProps> = ({
         <div className="flex items-center space-x-4 bg-white/[0.03] p-4 rounded-2xl border border-white/10 backdrop-blur-md shrink-0">
           <div className="text-right">
             <span className="text-xs font-mono text-zinc-400 uppercase tracking-wider block">Audited Tier</span>
-            <span className="text-sm font-semibold text-amber-400 block mt-0.5">{student.rrsTier}</span>
+            <span className="text-sm font-semibold text-amber-400 block mt-0.5">{student.rrsTier || 'Developing'}</span>
           </div>
           <div className="w-16 h-16 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex flex-col items-center justify-center shadow-inner">
             <span className="text-2xl font-serif font-bold text-amber-400">{student.rrsScore}</span>
@@ -161,8 +182,8 @@ export const StudentProfileHub: React.FC<StudentProfileHubProps> = ({
             <Upload className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-zinc-100">Re-Upload Academic CV / Resume</h3>
-            <p className="text-xs text-zinc-400">PDF semantic parser automatically updates CGPA, skills, research publications & RRS™ score.</p>
+            <h3 className="text-sm font-semibold text-zinc-100">Upload or Refresh Academic CV / Resume</h3>
+            <p className="text-xs text-zinc-400">PDF semantic parser automatically extracts your verified CGPA, skills, research publications & calculates RRS™ score.</p>
           </div>
         </div>
 
@@ -192,22 +213,30 @@ export const StudentProfileHub: React.FC<StudentProfileHubProps> = ({
           <div>
             <span className="text-xs font-mono text-zinc-400 uppercase tracking-wider block mb-2">Target Academic Faculties:</span>
             <div className="flex flex-wrap gap-2">
-              {student.targetDomains.map((d, i) => (
-                <span key={i} className="px-3 py-1 rounded-xl bg-white/[0.04] border border-white/10 text-xs font-medium text-amber-300 shadow-sm">
-                  {d}
-                </span>
-              ))}
+              {student.targetDomains.length > 0 ? (
+                student.targetDomains.map((d, i) => (
+                  <span key={i} className="px-3 py-1 rounded-xl bg-white/[0.04] border border-white/10 text-xs font-medium text-amber-300 shadow-sm">
+                    {d}
+                  </span>
+                ))
+              ) : (
+                <span className="text-xs text-zinc-500 italic">No research domains selected yet. Upload your CV or complete intake diagnostic to configure.</span>
+              )}
             </div>
           </div>
 
           <div className="pt-2">
             <span className="text-xs font-mono text-zinc-400 uppercase tracking-wider block mb-2">Verified Technical Skills:</span>
             <div className="flex flex-wrap gap-2">
-              {student.skills.map((s, i) => (
-                <span key={i} className="px-2.5 py-1 rounded-lg bg-zinc-800/80 border border-white/10 text-xs text-zinc-200 font-mono">
-                  {s}
-                </span>
-              ))}
+              {student.skills.length > 0 ? (
+                student.skills.map((s, i) => (
+                  <span key={i} className="px-2.5 py-1 rounded-lg bg-zinc-800/80 border border-white/10 text-xs text-zinc-200 font-mono">
+                    {s}
+                  </span>
+                ))
+              ) : (
+                <span className="text-xs text-zinc-500 italic">No skills added yet. Upload your CV to extract technical competencies.</span>
+              )}
             </div>
           </div>
         </div>

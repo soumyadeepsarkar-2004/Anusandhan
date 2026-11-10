@@ -9,6 +9,7 @@ interface SimpleHeroSectionProps {
   isAuthenticated: boolean;
   userName?: string;
   onOpenCrossNativeModal?: () => void;
+  onOpenCommunityListings?: () => void;
 }
 
 const SimpleHeroSectionComponent: React.FC<SimpleHeroSectionProps> = ({
@@ -17,7 +18,8 @@ const SimpleHeroSectionComponent: React.FC<SimpleHeroSectionProps> = ({
   onOpenAuth,
   isAuthenticated,
   userName,
-  onOpenCrossNativeModal
+  onOpenCrossNativeModal,
+  onOpenCommunityListings
 }) => {
   const scrollToOpportunities = () => {
     const el = document.getElementById('opportunities');
@@ -39,17 +41,36 @@ const SimpleHeroSectionComponent: React.FC<SimpleHeroSectionProps> = ({
       {/* Main Hero Container */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10 flex flex-col items-center w-full">
         
-        {/* Editorial Launch Badge */}
+        {/* Editorial Launch & Platform Listing Banner */}
         <motion.div
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="mb-6 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.03] border border-white/10 text-xs font-mono text-zinc-300 shadow-sm"
+          className="mb-6 flex flex-wrap items-center justify-center gap-2"
         >
-          <span className="w-2 h-2 rounded-full bg-amber-400" />
-          <span className="text-zinc-200 font-medium">Anusandhan 2.0</span>
-          <span className="text-zinc-600">/</span>
-          <span className="text-zinc-400">Autonomous Research Internship Intelligence</span>
+          <a
+            href="https://www.producthunt.com/products/anusandhan"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#DA552F]/15 hover:bg-[#DA552F]/25 border border-[#DA552F]/30 hover:border-[#DA552F]/60 text-xs font-mono text-zinc-200 transition-all shadow-sm cursor-pointer group"
+          >
+            <span className="w-4 h-4 rounded-full bg-[#DA552F] text-white flex items-center justify-center font-bold text-[10px]">
+              P
+            </span>
+            <span className="font-sans font-medium text-zinc-200 group-hover:text-white">Featured on Product Hunt</span>
+            <span className="text-zinc-500">·</span>
+            <span className="text-amber-400 font-sans text-[11px] group-hover:underline">Upvote & Review →</span>
+          </a>
+
+          {onOpenCommunityListings && (
+            <button
+              onClick={onOpenCommunityListings}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.04] hover:bg-white/[0.08] border border-white/12 hover:border-amber-400/40 text-xs font-mono text-zinc-300 hover:text-white transition-all shadow-sm cursor-pointer"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+              <span className="font-sans">All Listings & Communities</span>
+            </button>
+          )}
         </motion.div>
 
         {/* Confident, High-Hierarchy Headline */}

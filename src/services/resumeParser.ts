@@ -6,17 +6,18 @@ export const INITIAL_STUDENT_STATE: StudentProfile = {
   email: '',
   university: '',
   degreeLevel: 'B.Tech / B.S.',
-  currentYear: '3rd Year (Class of 2027)',
+  currentYear: '',
   cgpa: 0,
-  targetDomains: ['Artificial Intelligence & ML'],
-  targetCountries: ['India', 'Germany', 'Switzerland', 'United States', 'Canada'],
+  targetDomains: [],
+  targetCountries: [],
   skills: [],
   linkedAccounts: {
     githubUrl: '',
     googleScholarUrl: '',
     orcidId: '',
     huggingFaceUrl: '',
-    arxivAuthorId: ''
+    arxivAuthorId: '',
+    linkedinUrl: ''
   },
   featuredProject: {
     title: '',
@@ -25,7 +26,7 @@ export const INITIAL_STUDENT_STATE: StudentProfile = {
     repoUrl: ''
   },
   rrsScore: 0,
-  rrsTier: 'Explorer',
+  rrsTier: 'Developing',
   rrsPillars: {
     codeExecution: 0,
     researchMethodology: 0,
@@ -34,7 +35,7 @@ export const INITIAL_STUDENT_STATE: StudentProfile = {
     professionalism: 0
   },
   badges: INITIAL_BADGES,
-  creditsRemaining: 10,
+  creditsRemaining: 0,
   dailyOutreachCount: 0
 };
 
@@ -133,7 +134,7 @@ export function parseResumeText(rawText: string): Partial<StudentProfile> {
   });
 
   // 7. Extract GPA pattern
-  let detectedGpa = 8.5;
+  let detectedGpa: number | undefined = undefined;
   const gpaMatch = rawText.match(/(?:cgpa|gpa|cpi)\s*[:=]?\s*([0-9]\.[0-9]{1,2})/i);
   if (gpaMatch && gpaMatch[1]) {
     detectedGpa = parseFloat(gpaMatch[1]);
@@ -147,8 +148,8 @@ export function parseResumeText(rawText: string): Partial<StudentProfile> {
     fullName: detectedName || undefined,
     email: detectedEmail || undefined,
     university: detectedUniversity || undefined,
-    targetDomains: detectedDomains.length > 0 ? detectedDomains : ['Artificial Intelligence & ML'],
-    skills: extractedSkills.length > 0 ? extractedSkills : ['Python', 'PyTorch', 'Git', 'LaTeX'],
+    targetDomains: detectedDomains,
+    skills: extractedSkills,
     cgpa: detectedGpa,
     linkedAccounts: {
       githubUrl: githubMatch ? `https://github.com/${githubMatch[1]}` : '',

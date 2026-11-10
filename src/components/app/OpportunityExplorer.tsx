@@ -77,6 +77,10 @@ export const OpportunityExplorer: React.FC<OpportunityExplorerProps> = ({
   };
 
   useEffect(() => {
+    setLiveProfessors(professors);
+  }, [professors]);
+
+  useEffect(() => {
     let isMounted = true;
     setIsLoading(true);
     
@@ -123,7 +127,7 @@ export const OpportunityExplorer: React.FC<OpportunityExplorerProps> = ({
                 expiryYear: bp.active_grants[0].end_year || 2028
               } : undefined)
             },
-            matchScore: bp.match_compatibility_score || bp.matchScore || 92,
+            matchScore: bp.match_compatibility_score || bp.matchScore || (student?.targetDomains?.includes(bp.domain) ? 85 : 55),
             isAcceptingStudents: bp.accepting_interns ?? bp.isAcceptingStudents ?? true,
             isLiveScraped: bp.isLiveScraped || false,
             source: bp.source || 'Verified Faculty Core'
@@ -197,7 +201,7 @@ export const OpportunityExplorer: React.FC<OpportunityExplorerProps> = ({
                 expiryYear: bp.active_grants[0].end_year || 2028
               } : undefined)
             },
-            matchScore: bp.match_compatibility_score || bp.matchScore || 92,
+            matchScore: bp.match_compatibility_score || bp.matchScore || (student?.targetDomains?.includes(bp.domain) ? 85 : 55),
             isAcceptingStudents: bp.accepting_interns ?? bp.isAcceptingStudents ?? true,
             isLiveScraped: bp.isLiveScraped || false,
             source: bp.source || 'Verified Faculty Core'

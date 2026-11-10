@@ -60,6 +60,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   register: (data: RegisterData) => Promise<void>;
   registerWithCv: (cvData: any, password?: string) => Promise<void>;
+  initiateOAuth: (provider: 'google' | 'linkedin' | 'github') => void;
   oauthLogin: (provider: 'google' | 'linkedin' | 'github', userDetails?: { email?: string; fullName?: string }) => Promise<void>;
   claimDailyReward: () => Promise<DailyClaimResult>;
   claimDailyStreak: () => Promise<DailyClaimResult>;
@@ -117,25 +118,63 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Restore authenticated session on mount
   useEffect(() => {
     const restoreSession = async () => {
+      // 1. Process URL OAuth callback parameters if returning from social sign-in redirect
+      if (typeof window !== 'undefined' && window.location.search) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+        const oauthError = urlParams.get('error') || urlParams.get('error_description');
+
+        if (oauthError) {
+          console.warn('[OAuth Provider Error]:', oauthError);
+          window.history.replaceState({}, document.title, window.location.pathname);
+        } else if (code) {
+          const provider = (sessionStorage.getItem('rip_oauth_provider') || 'google') as 'google' | 'linkedin' | 'github';
+          const redirectUri = sessionStorage.getItem('rip_oauth_redirect_uri') || window.location.origin;
+
+          // Clear URL parameters cleanly
+          window.history.replaceState({}, document.title, window.location.pathname);
+          sessionStorage.removeItem('rip_oauth_provider');
+          sessionStorage.removeItem('rip_oauth_state');
+          sessionStorage.removeItem('rip_oauth_redirect_uri');
+
+          try {
+            const exchangeRes = await fetchWithCandidateUrls('/oauth/exchange', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ provider, code, redirectUri })
+            });
+
+            if (exchangeRes.ok) {
+              const data = await exchangeRes.json();
+              if (data.token && data.user) {
+                localStorage.setItem('rip_auth_token', data.token);
+                localStorage.setItem('rip_user_profile', JSON.stringify(data.user));
+                setUser(data.user);
+                setToken(data.token);
+                setIsLoading(false);
+                return;
+              }
+            }
+          } catch (exchangeErr) {
+            console.error('[OAuth Token Exchange Failed]:', exchangeErr);
+          }
+        }
+      }
+
       const storedToken = localStorage.getItem('rip_auth_token');
       if (!storedToken) {
         setIsLoading(false);
         return;
       }
 
-      // Check if storedToken is a resilient offline token
+      // Purge any legacy mock tokens
       if (storedToken.startsWith('mock_oauth_')) {
-        const storedUser = localStorage.getItem('rip_user_profile');
-        if (storedUser) {
-          try {
-            setUser(JSON.parse(storedUser));
-            setToken(storedToken);
-            setIsLoading(false);
-            return;
-          } catch {
-            // continue
-          }
-        }
+        localStorage.removeItem('rip_auth_token');
+        localStorage.removeItem('rip_user_profile');
+        setToken(null);
+        setUser(null);
+        setIsLoading(false);
+        return;
       }
 
       try {
@@ -247,112 +286,72 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const oauthLogin = async (provider: 'google' | 'linkedin' | 'github', userDetails?: { email?: string; fullName?: string }) => {
-    setIsLoading(true);
-    try {
-      const subpath = provider === 'google' ? '/google' : (provider === 'linkedin' ? '/linkedin' : '/oauth');
-      let data: any = null;
+  const initiateOAuth = (provider: 'google' | 'linkedin' | 'github') => {
+    const clientId = provider === 'google'
+      ? (import.meta.env.VITE_GOOGLE_CLIENT_ID || (import.meta.env.GOOGLE_CLIENT_ID as string) || '')
+      : provider === 'github'
+      ? (import.meta.env.VITE_GITHUB_CLIENT_ID || (import.meta.env.GITHUB_CLIENT_ID as string) || '')
+      : (import.meta.env.VITE_LINKEDIN_CLIENT_ID || (import.meta.env.LINKEDIN_CLIENT_ID as string) || '');
 
+    if (!clientId) {
+      throw new Error(`Real ${provider.charAt(0).toUpperCase() + provider.slice(1)} OAuth requires VITE_${provider.toUpperCase()}_CLIENT_ID in your .env. Please enter your email address to sign in directly.`);
+    }
+
+    const state = Math.random().toString(36).substring(2) + Date.now().toString(36);
+    const redirectUri = window.location.origin;
+
+    sessionStorage.setItem('rip_oauth_provider', provider);
+    sessionStorage.setItem('rip_oauth_state', state);
+    sessionStorage.setItem('rip_oauth_redirect_uri', redirectUri);
+
+    let authUrl = '';
+    if (provider === 'google') {
+      authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${encodeURIComponent(clientId)}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${encodeURIComponent('openid email profile')}&prompt=select_account&state=${state}`;
+    } else if (provider === 'github') {
+      authUrl = `https://github.com/login/oauth/authorize?client_id=${encodeURIComponent(clientId)}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent('read:user user:email')}&state=${state}`;
+    } else if (provider === 'linkedin') {
+      authUrl = `https://www.linkedin.com/oauth/v2/authorization?client_id=${encodeURIComponent(clientId)}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${encodeURIComponent('openid profile email')}&state=${state}`;
+    }
+
+    window.location.href = authUrl;
+  };
+
+  const oauthLogin = async (provider: 'google' | 'linkedin' | 'github', userDetails?: { email?: string; fullName?: string }) => {
+    // 1. If explicit userDetails with email is provided, perform verified direct OAuth sign-in with clean profile
+    if (userDetails?.email && userDetails.email.trim().includes('@')) {
+      setIsLoading(true);
       try {
+        const subpath = provider === 'google' ? '/google' : (provider === 'linkedin' ? '/linkedin' : '/oauth');
         const res = await fetchWithCandidateUrls(subpath, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             provider,
-            email: userDetails?.email,
-            fullName: userDetails?.fullName
+            email: userDetails.email.trim(),
+            fullName: userDetails.fullName?.trim()
           })
         });
 
-        if (res && res.ok) {
-          const contentType = res.headers.get('content-type') || '';
-          if (contentType.includes('application/json')) {
-            data = await res.json();
-          }
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.error || `Authentication failed via ${provider}.`);
         }
-      } catch (networkErr) {
-        console.warn(`[OAuth ${provider} Network Warning]:`, networkErr);
-      }
 
-      // If remote succeeded with valid token and user
-      if (data && data.token && data.user) {
         localStorage.setItem('rip_auth_token', data.token);
         localStorage.setItem('rip_user_profile', JSON.stringify(data.user));
         setToken(data.token);
         setUser(data.user);
         return;
+      } catch (err: any) {
+        console.error(`[OAuth ${provider} Error]:`, err);
+        throw err;
+      } finally {
+        setIsLoading(false);
       }
-
-      // Guaranteed resilient verified scholar session fallback
-      // Ensures user can ALWAYS sign in instantly with Google, LinkedIn, or GitHub with zero errors
-      const providerDisplayName = provider === 'google' ? 'Google' : provider === 'linkedin' ? 'LinkedIn' : 'GitHub';
-      const fallbackUser: UserProfile = {
-        id: `usr_${provider}_${Date.now().toString(36)}`,
-        email: userDetails?.email || `scholar.${provider}@anusandhan.ai`,
-        fullName: userDetails?.fullName || `${providerDisplayName} Verified Scholar`,
-        university: 'State / Central Research University',
-        degreeLevel: 'Undergraduate Researcher',
-        cgpa: 9.0,
-        targetDomains: ['Artificial Intelligence & ML'],
-        skills: ['Python', 'PyTorch', 'Git', 'Data Structures'],
-        rrsScore: 88,
-        rrsTier: 'Strong Candidate',
-        role: 'student',
-        creditsRemaining: 25,
-        tokensBalance: 10,
-        loginStreak: 1,
-        xpPoints: 150,
-        dailyRewardClaimedToday: false,
-        scholarBadges: [`${providerDisplayName} Verified`, 'Early Scholar'],
-        oauthProvider: provider,
-        avatarUrl: provider === 'github'
-          ? 'https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png'
-          : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
-        isVerified: true,
-        linkedAccounts: {
-          googleScholarUrl: `https://scholar.google.com/citations?user=${provider}_scholar`
-        }
-      };
-
-      const fallbackToken = `mock_oauth_${provider}_${Date.now()}`;
-      localStorage.setItem('rip_auth_token', fallbackToken);
-      localStorage.setItem('rip_user_profile', JSON.stringify(fallbackUser));
-      setToken(fallbackToken);
-      setUser(fallbackUser);
-    } catch (err: any) {
-      console.warn(`[OAuth ${provider} Fallback Activated]:`, err);
-      const providerDisplayName = provider === 'google' ? 'Google' : provider === 'linkedin' ? 'LinkedIn' : 'GitHub';
-      const fallbackUser: UserProfile = {
-        id: `usr_${provider}_${Date.now().toString(36)}`,
-        email: userDetails?.email || `scholar.${provider}@anusandhan.ai`,
-        fullName: userDetails?.fullName || `${providerDisplayName} Verified Scholar`,
-        university: 'State / Central Research University',
-        degreeLevel: 'Undergraduate Researcher',
-        cgpa: 9.0,
-        targetDomains: ['Artificial Intelligence & ML'],
-        skills: ['Python', 'PyTorch', 'Git'],
-        rrsScore: 88,
-        rrsTier: 'Strong Candidate',
-        role: 'student',
-        creditsRemaining: 25,
-        tokensBalance: 10,
-        loginStreak: 1,
-        xpPoints: 150,
-        dailyRewardClaimedToday: false,
-        scholarBadges: [`${providerDisplayName} Verified`, 'Early Scholar'],
-        oauthProvider: provider,
-        avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
-        isVerified: true,
-        linkedAccounts: {}
-      };
-      const fallbackToken = `mock_oauth_${provider}_${Date.now()}`;
-      localStorage.setItem('rip_auth_token', fallbackToken);
-      localStorage.setItem('rip_user_profile', JSON.stringify(fallbackUser));
-      setToken(fallbackToken);
-      setUser(fallbackUser);
-    } finally {
-      setIsLoading(false);
     }
+
+    // 2. Otherwise initiate real browser OAuth redirect with provider
+    initiateOAuth(provider);
   };
 
   const claimDailyReward = async (): Promise<DailyClaimResult> => {
@@ -471,12 +470,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = () => {
     localStorage.removeItem('rip_auth_token');
+    localStorage.removeItem('rip_user_profile');
+    sessionStorage.removeItem('rip_oauth_provider');
+    sessionStorage.removeItem('rip_oauth_state');
+    sessionStorage.removeItem('rip_oauth_redirect_uri');
     setToken(null);
     setUser(null);
   };
 
   const updateUser = (updated: Partial<UserProfile>) => {
-    setUser(prev => prev ? { ...prev, ...updated } : null);
+    setUser(prev => {
+      if (!prev) return null;
+      const next = { ...prev, ...updated };
+      try {
+        localStorage.setItem('rip_user_profile', JSON.stringify(next));
+      } catch {}
+      return next;
+    });
   };
 
   return (
@@ -488,6 +498,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       login,
       register,
       registerWithCv,
+      initiateOAuth,
       oauthLogin,
       claimDailyReward,
       claimDailyStreak: claimDailyReward,

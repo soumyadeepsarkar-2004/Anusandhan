@@ -49,7 +49,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
       const updated = {
         ...formData,
         ...parsed,
-        fullName: file.name.replace(/\.[^/.]+$/, '').replace(/_/g, ' ') || formData.fullName,
+        fullName: parsed.fullName || file.name.replace(/\.[^/.]+$/, '').replace(/_/g, ' ') || formData.fullName,
       };
 
       const { totalScore, tier, pillars, updatedBadges } = calculateRRS(updated);

@@ -133,7 +133,7 @@ export interface StudentProfile {
 
   // Gamified Research Readiness Score (0 - 100)
   rrsScore: number;
-  rrsTier: 'Explorer' | 'Scholar Apprentice' | 'Junior Researcher' | 'Lab-Ready Fellow' | 'Distinguished Candidate';
+  rrsTier: 'Developing' | 'Explorer' | 'Scholar Apprentice' | 'Junior Researcher' | 'Lab-Ready Fellow' | 'Distinguished Candidate';
   rrsPillars: {
     codeExecution: number;      // max 25
     researchMethodology: number;// max 25

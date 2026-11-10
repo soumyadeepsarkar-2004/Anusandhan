@@ -56,19 +56,45 @@ export const AutonomousPortalModal: React.FC<AutonomousPortalModalProps> = ({
         if (res && res.success) {
           setAgentData(res);
         } else {
-          // Dynamic fallback
+          // Dynamic fallback based on authenticated scholar profile
+          const cgpaPassed = (student.cgpa || 0) >= 7.5;
+          const rrsPassed = (student.rrsScore || 0) >= 70;
+          const domainMatched = student.targetDomains.length > 0;
+          const uniEntered = Boolean(student.university && student.university.trim());
+          const isEligible = cgpaPassed && (rrsPassed || student.rrsScore >= 55);
+
           setAgentData({
             eligibility: {
-              isEligible: (student.cgpa || 8.5) >= 7.5,
-              compatibilityScore: 94,
+              isEligible,
+              compatibilityScore: Math.min(99, Math.max(50, Math.round((student.rrsScore || 50) * 0.6 + (student.cgpa > 0 ? (student.cgpa / 10) * 40 : 25)))),
               criteriaEvaluated: [
-                { criterion: 'Academic Standing (CGPA)', required: '>= 7.5 / 10.0', studentValue: `${student.cgpa || 8.5} / 10.0`, passed: true },
-                { criterion: 'Disciplinary Alignment', required: fellowshipDomain, studentValue: student.targetDomains[0] || 'AI & Distributed Systems', passed: true },
-                { criterion: 'Institutional Footprint', required: 'Accredited Higher Education Institution', studentValue: student.university, passed: true },
-                { criterion: 'Research Readiness Score', required: '>= 70 (Tier 2+)', studentValue: `${student.rrsScore || 85} (${student.rrsTier || 'Senior Scholar'})`, passed: true }
+                {
+                  criterion: 'Academic Standing (CGPA)',
+                  required: '>= 7.5 / 10.0',
+                  studentValue: student.cgpa > 0 ? `${student.cgpa} / 10.0` : 'Not specified',
+                  passed: cgpaPassed
+                },
+                {
+                  criterion: 'Disciplinary Alignment',
+                  required: fellowshipDomain,
+                  studentValue: student.targetDomains[0] || 'Domain pending calibration',
+                  passed: domainMatched
+                },
+                {
+                  criterion: 'Institutional Footprint',
+                  required: 'Accredited Higher Education Institution',
+                  studentValue: student.university || 'Affiliation not specified',
+                  passed: uniEntered
+                },
+                {
+                  criterion: 'Research Readiness Score',
+                  required: '>= 70 (Tier 2+)',
+                  studentValue: `${student.rrsScore}/100 (${student.rrsTier})`,
+                  passed: rrsPassed
+                }
               ]
             },
-            tailored_sop: `To the Selection Committee,\n${fellowship.name} (${fellowship.hostInstitutions})\n\nI am formally applying for the ${fellowship.name}. As a scholar at ${student.university} working in ${student.targetDomains[0] || 'Machine Learning & Frontier Computing'}, my research focuses on empirical methodologies with reproducible benchmarks.\n\nHaving analyzed recent program highlights at ${fellowship.hostInstitutions}, my background in ${student.skills.slice(0, 3).join(', ')} directly aligns with your upcoming summer initiatives. I am eager to contribute to your ongoing investigations.\n\nRespectfully,\n${student.fullName}\n${student.university} · RRS: ${student.rrsScore}/100`,
+            tailored_sop: `To the Selection Committee,\n${fellowship.name} (${fellowship.hostInstitutions})\n\nI am formally applying for the ${fellowship.name}.${student.university ? ` As a scholar at ${student.university}` : ''}${student.targetDomains[0] ? ` working in ${student.targetDomains[0]}` : ''}, my research focuses on empirical methodologies with reproducible benchmarks.\n\nHaving analyzed recent program highlights at ${fellowship.hostInstitutions}, my background in ${student.skills.length > 0 ? student.skills.slice(0, 3).join(', ') : 'foundational research methods'} aligns with your upcoming summer initiatives. I am eager to contribute to your ongoing investigations.\n\nRespectfully,\n${student.fullName || 'Scholar'}\n${student.university ? `${student.university} · ` : ''}RRS: ${student.rrsScore}/100 (${student.rrsTier})`,
             portal_url: fellowship.applicationPortalUrl || fellowship.officialUrl
           });
         }

@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { X, Lock, Mail, User, School, ArrowRight, Eye, EyeOff, ShieldCheck, Upload, FileText, CheckCircle2, AlertTriangle, Sparkles } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { AnusandhanLogo } from '../common/AnusandhanLogo';
-import { parseResumeText } from '../../services/resumeParser';
+import { parseResumeText, INITIAL_STUDENT_STATE } from '../../services/resumeParser';
+import { calculateRRS } from '../../services/rrsCalculator';
 import confetti from 'canvas-confetti';
 import { PrivacyPolicyModal } from '../legal/PrivacyPolicyModal';
 import { TermsOfServiceModal } from '../legal/TermsOfServiceModal';
@@ -35,8 +36,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [university, setUniversity] = useState('');
-  const [fieldOfStudy, setFieldOfStudy] = useState('Artificial Intelligence & ML');
-  const [cgpa, setCgpa] = useState('8.5');
+  const [fieldOfStudy, setFieldOfStudy] = useState('');
+  const [cgpa, setCgpa] = useState('');
 
   // CV Fast-Onboarding State
   const [cvFile, setCvFile] = useState<File | null>(null);
@@ -48,17 +49,32 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setErrorMessage(null);
     setIsSubmitting(true);
     try {
-      const emailToUse = (email && email.trim()) ? email.trim() : undefined;
+      let emailToUse = (email && email.trim()) ? email.trim() : undefined;
       const nameToUse = fullName && fullName.trim() ? fullName.trim() : undefined;
+
+      const clientId = provider === 'google'
+        ? (import.meta.env.VITE_GOOGLE_CLIENT_ID || (import.meta.env.GOOGLE_CLIENT_ID as string) || '')
+        : provider === 'github'
+        ? (import.meta.env.VITE_GITHUB_CLIENT_ID || (import.meta.env.GITHUB_CLIENT_ID as string) || '')
+        : (import.meta.env.VITE_LINKEDIN_CLIENT_ID || (import.meta.env.LINKEDIN_CLIENT_ID as string) || '');
+
+      if (!emailToUse && !clientId) {
+        const entered = window.prompt(`Enter your verified ${provider.charAt(0).toUpperCase() + provider.slice(1)} account email address:`);
+        if (!entered || !entered.includes('@')) {
+          setErrorMessage(`A valid email address is required to sign in with ${provider.charAt(0).toUpperCase() + provider.slice(1)}.`);
+          setIsSubmitting(false);
+          return;
+        }
+        emailToUse = entered.trim();
+        setEmail(emailToUse);
+      }
+
       await oauthLogin(provider, { email: emailToUse, fullName: nameToUse });
       confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } });
       onSuccess();
       onClose();
     } catch (err: any) {
-      console.warn(`[OAuth ${provider} error caught, proceeding]:`, err);
-      confetti({ particleCount: 40, spread: 50, origin: { y: 0.6 } });
-      onSuccess();
-      onClose();
+      setErrorMessage(err.message || `Failed to authenticate via ${provider}. Please enter your email above to continue.`);
     } finally {
       setIsSubmitting(false);
     }
@@ -93,12 +109,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             const extracted = {
               fullName: data.extracted_name || file.name.replace(/\.[^/.]+$/, '').replace(/_/g, ' '),
               email: data.extracted_email || '',
-              university: data.detected_university || 'State / Central University',
-              cgpa: data.detected_cgpa || 8.5,
-              skills: data.extracted_skills?.length ? data.extracted_skills : ['Python', 'Research Methodology'],
-              targetDomains: data.detected_domains?.length ? data.detected_domains : ['Artificial Intelligence & ML'],
-              rrsScore: data.rrs_breakdown?.total_score || 85,
-              rrsTier: data.rrs_breakdown?.readiness_tier || 'Strong Candidate'
+              university: data.detected_university || '',
+              cgpa: data.detected_cgpa || 0,
+              skills: Array.isArray(data.extracted_skills) ? data.extracted_skills : [],
+              targetDomains: Array.isArray(data.detected_domains) ? data.detected_domains : [],
+              rrsScore: data.rrs_breakdown?.total_score || 0,
+              rrsTier: data.rrs_breakdown?.readiness_tier || 'Developing'
             };
             setCvParsedData(extracted);
             if (extracted.email) setEmail(extracted.email);
@@ -122,15 +138,30 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       const text = await file.text();
       const parsed = parseResumeText(text);
 
+      const rrsCalc = calculateRRS({
+        ...INITIAL_STUDENT_STATE,
+        fullName: parsed.fullName || file.name.replace(/\.[^/.]+$/, '').replace(/_/g, ' '),
+        email: parsed.email || '',
+        university: parsed.university || '',
+        cgpa: parsed.cgpa || 0,
+        skills: parsed.skills || [],
+        targetDomains: parsed.targetDomains || [],
+        linkedAccounts: parsed.linkedAccounts ? {
+          ...INITIAL_STUDENT_STATE.linkedAccounts,
+          ...parsed.linkedAccounts
+        } : INITIAL_STUDENT_STATE.linkedAccounts
+      });
+
       const candidateData = {
         fullName: parsed.fullName || file.name.replace(/\.[^/.]+$/, '').replace(/_/g, ' '),
         email: parsed.email || '',
-        university: parsed.university || 'State / Central University',
-        cgpa: parsed.cgpa || 8.5,
-        skills: parsed.skills || ['Python', 'PyTorch'],
-        targetDomains: parsed.targetDomains || ['Artificial Intelligence & ML'],
-        rrsScore: 86,
-        rrsTier: 'Strong Candidate'
+        university: parsed.university || '',
+        cgpa: parsed.cgpa || 0,
+        skills: parsed.skills || [],
+        targetDomains: parsed.targetDomains || [],
+        rrsScore: rrsCalc.totalScore,
+        rrsTier: rrsCalc.tier,
+        linkedAccounts: parsed.linkedAccounts || {}
       };
 
       setCvParsedData(candidateData);
@@ -178,9 +209,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           email,
           password,
           fullName,
-          university: university || 'State / Regional University',
-          fieldOfStudy,
-          cgpa: parseFloat(cgpa) || 8.5
+          university: university ? university.trim() : '',
+          fieldOfStudy: fieldOfStudy || undefined,
+          cgpa: cgpa ? (parseFloat(cgpa) || 0) : 0
         });
       }
 
@@ -493,11 +524,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                         <input
                           type="number"
                           step="0.01"
-                          min="5"
+                          min="0"
                           max="10"
                           value={cgpa}
                           onChange={(e) => setCgpa(e.target.value)}
-                          placeholder="e.g. 8.85"
+                          placeholder="e.g. 8.85 (leave blank if pending)"
                           className="min-h-[42px] w-full px-3 py-1.5 rounded-xl bg-white/[0.04] backdrop-blur-md border border-white/12 focus:border-amber-400/70 focus:bg-white/[0.07] text-xs text-zinc-100 placeholder-zinc-500 font-mono transition-colors"
                         />
                       </div>
@@ -509,6 +540,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                           onChange={(e) => setFieldOfStudy(e.target.value)}
                           className="min-h-[42px] w-full px-3 py-1.5 rounded-xl bg-zinc-900 border border-white/12 focus:border-amber-400/70 text-xs text-zinc-100 cursor-pointer transition-colors"
                         >
+                          <option value="">Select target domain (optional)...</option>
                           <option value="Artificial Intelligence & ML">AI & Machine Learning</option>
                           <option value="Robotics & Autonomous Systems">Robotics & Autonomous Systems</option>
                           <option value="Computational Biology & Genomics">Computational Biology & Genomics</option>

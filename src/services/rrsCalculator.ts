@@ -7,6 +7,23 @@ export function calculateRRS(profile: StudentProfile): {
   pillars: StudentProfile['rrsPillars'];
   updatedBadges: RRSBadge[];
 } {
+  // If profile is in initial clean/blank state, maintain 0 baseline
+  const isBlank = !profile.fullName && profile.cgpa === 0 && profile.skills.length === 0 && profile.targetDomains.length === 0;
+  if (isBlank) {
+    return {
+      totalScore: 0,
+      tier: 'Developing',
+      pillars: {
+        codeExecution: 0,
+        researchMethodology: 0,
+        academicFoundations: 0,
+        labTooling: 0,
+        professionalism: 0
+      },
+      updatedBadges: INITIAL_BADGES
+    };
+  }
+
   let codeExecution = 12; // base
   let researchMethodology = 10;
   let academicFoundations = 10;
@@ -61,11 +78,12 @@ export function calculateRRS(profile: StudentProfile): {
 
   const totalScore = codeExecution + researchMethodology + academicFoundations + labTooling + professionalism;
 
-  let tier: StudentProfile['rrsTier'] = 'Explorer';
+  let tier: StudentProfile['rrsTier'] = 'Developing';
   if (totalScore >= 90) tier = 'Distinguished Candidate';
   else if (totalScore >= 75) tier = 'Lab-Ready Fellow';
   else if (totalScore >= 55) tier = 'Junior Researcher';
   else if (totalScore >= 35) tier = 'Scholar Apprentice';
+  else if (totalScore > 0) tier = 'Explorer';
 
   // Update badges
   const updatedBadges = INITIAL_BADGES.map(badge => {

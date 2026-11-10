@@ -160,13 +160,30 @@ export const IntakeDiagnosticFlow: React.FC<IntakeDiagnosticFlowProps> = ({
         console.warn('FastAPI direct upload failed, using local browser fallback parser:', err);
       }
 
+      if (!parsed) {
+        try {
+          const text = await file.text();
+          const localParsed = parseResumeText(text);
+          parsed = {
+            extracted_name: localParsed.fullName,
+            extracted_email: localParsed.email,
+            detected_university: localParsed.university,
+            detected_cgpa: localParsed.cgpa,
+            extracted_skills: localParsed.skills,
+            detected_domains: localParsed.targetDomains
+          };
+        } catch (localErr) {
+          console.warn('Local parser notice:', localErr);
+        }
+      }
+
       // Clean candidate name & university from file or parser
       const cleanFileName = file.name.replace(/\.[^/.]+$/, '').replace(/[_-]/g, ' ');
-      const extractedName = (parsed && parsed.extracted_name) ? parsed.extracted_name : cleanFileName;
-      const detectedUni = (parsed && parsed.detected_university) ? parsed.detected_university : (currentStudent.university || 'Regional / State University');
-      const detectedCgpa = (parsed && parsed.detected_cgpa) ? parsed.detected_cgpa : (currentStudent.cgpa || 8.5);
-      const detectedSkills = (parsed && parsed.extracted_skills?.length) ? parsed.extracted_skills : ['Python', 'PyTorch', 'Git', 'CUDA'];
-      const detectedDomains = (parsed && parsed.detected_domains?.length) ? (parsed.detected_domains as ResearchDomain[]) : (currentStudent.targetDomains || ['Artificial Intelligence & ML']);
+      const extractedName = (parsed && parsed.extracted_name) ? parsed.extracted_name : (currentStudent.fullName || cleanFileName);
+      const detectedUni = (parsed && parsed.detected_university) ? parsed.detected_university : (currentStudent.university || '');
+      const detectedCgpa = (parsed && parsed.detected_cgpa !== undefined) ? parsed.detected_cgpa : (currentStudent.cgpa || 0);
+      const detectedSkills = (parsed && parsed.extracted_skills?.length) ? parsed.extracted_skills : (currentStudent.skills || []);
+      const detectedDomains = (parsed && parsed.detected_domains?.length) ? (parsed.detected_domains as ResearchDomain[]) : (currentStudent.targetDomains || []);
 
       const updated: StudentProfile = {
         ...currentStudent,
@@ -177,10 +194,10 @@ export const IntakeDiagnosticFlow: React.FC<IntakeDiagnosticFlowProps> = ({
         skills: detectedSkills,
         targetDomains: detectedDomains,
         featuredProject: {
-          title: (parsed && parsed.extracted_projects?.[0]?.title) || 'Research & Benchmark Project',
-          description: (parsed && parsed.extracted_projects?.[0]?.description) || 'Developed and benchmarked algorithmic implementations under scalable workloads.',
+          title: (parsed && parsed.extracted_projects?.[0]?.title) || (currentStudent.featuredProject?.title || ''),
+          description: (parsed && parsed.extracted_projects?.[0]?.description) || (currentStudent.featuredProject?.description || ''),
           techStack: detectedSkills.slice(0, 3),
-          repoUrl: (parsed && parsed.extracted_projects?.[0]?.github_or_paper_url) || ''
+          repoUrl: (parsed && parsed.extracted_projects?.[0]?.github_or_paper_url) || (currentStudent.featuredProject?.repoUrl || '')
         }
       };
 
@@ -213,22 +230,22 @@ export const IntakeDiagnosticFlow: React.FC<IntakeDiagnosticFlowProps> = ({
     const skillsArray = skillsRaw.split(',').map(s => s.trim()).filter(Boolean);
     const updated: StudentProfile = {
       ...currentStudent,
-      fullName: fullName.trim() || currentStudent.fullName || 'Research Scholar',
-      email: email.trim() || currentStudent.email || '',
-      university: university.trim() || currentStudent.university || 'Academic University',
+      fullName: fullName.trim() || currentStudent.fullName,
+      email: email.trim() || currentStudent.email,
+      university: university.trim() || currentStudent.university,
       degreeLevel: degreeLevel,
-      cgpa: parseFloat(cgpa) || currentStudent.cgpa || 8.5,
-      targetDomains: [domain],
-      skills: skillsArray.length ? skillsArray : ['Python', 'PyTorch', 'Git'],
+      cgpa: cgpa ? (parseFloat(cgpa) || 0) : currentStudent.cgpa,
+      targetDomains: domain ? [domain] : currentStudent.targetDomains,
+      skills: skillsArray.length ? skillsArray : currentStudent.skills,
       linkedAccounts: {
         ...currentStudent.linkedAccounts,
         githubUrl: githubUrl.trim()
       },
       featuredProject: {
-        title: projectTitle.trim() || 'Laboratory Technical Project',
-        description: projectDesc.trim() || 'Author of reproduction benchmarks and scalable implementations.',
+        title: projectTitle.trim() || currentStudent.featuredProject?.title || '',
+        description: projectDesc.trim() || currentStudent.featuredProject?.description || '',
         techStack: skillsArray.slice(0, 3),
-        repoUrl: githubUrl.trim()
+        repoUrl: githubUrl.trim() || currentStudent.featuredProject?.repoUrl || ''
       }
     };
 

@@ -38,6 +38,8 @@ import { useTheme } from '../../context/ThemeContext';
 import { AnusandhanLogo } from '../common/AnusandhanLogo';
 import { processVoiceQuery, speakText, OpportunityLinkItem } from '../../services/voiceAgentService';
 import { ApiClient } from '../../services/apiClient';
+import { parseResumeText } from '../../services/resumeParser';
+import { calculateRRS } from '../../services/rrsCalculator';
 import { AppleGlassCard, AudioWaveformVisualizer, LiveRadarDot } from '../ui/AppleGlass';
 
 interface AutonomousAssistantWidgetProps {
@@ -645,13 +647,38 @@ export const AutonomousAssistantWidget: React.FC<AutonomousAssistantWidgetProps>
         speakText(feedbackText, voiceEngine, () => setIsSpeaking(false));
       }
     } catch (err) {
-      console.warn('CV upload parsing error:', err);
-      const fallbackScore = Math.max(student.rrsScore, 86);
-      onUpdateStudent(prev => ({ ...prev, rrsScore: fallbackScore }));
+      console.warn('FastAPI microservice offline, running client fallback parser:', err);
+      let calculatedScore = student.rrsScore;
+      let calculatedTier = student.rrsTier;
+      try {
+        const text = await file.text();
+        const localParsed = parseResumeText(text);
+        const updated = {
+          ...student,
+          fullName: localParsed.fullName || student.fullName,
+          university: localParsed.university || student.university,
+          cgpa: localParsed.cgpa !== undefined ? localParsed.cgpa : student.cgpa,
+          skills: localParsed.skills?.length ? localParsed.skills : student.skills,
+          targetDomains: localParsed.targetDomains?.length ? localParsed.targetDomains : student.targetDomains
+        };
+        const rrsResult = calculateRRS(updated);
+        calculatedScore = rrsResult.totalScore;
+        calculatedTier = rrsResult.tier;
+        onUpdateStudent(() => ({
+          ...updated,
+          rrsScore: rrsResult.totalScore,
+          rrsTier: rrsResult.tier,
+          rrsPillars: rrsResult.pillars,
+          badges: rrsResult.updatedBadges
+        }));
+      } catch (clientParseErr) {
+        console.warn('Local parser warning:', clientParseErr);
+      }
+
       const fallbackMsg: VoiceMessage = {
         id: `a-upload-fallback-${Date.now()}`,
         sender: 'agent',
-        text: `CV "${file.name}" analyzed via local parser. Research Readiness Score calibrated to ${fallbackScore}/100. Strong foundation verified. Link your GitHub and ORCID in Profile Hub to boost your score!`,
+        text: `CV "${file.name}" analyzed via local parser. Research Readiness Score calculated to ${calculatedScore}/100 (${calculatedTier}). Your actual research credentials are now synchronized.`,
         language: 'English',
         timestamp: 'Just now'
       };

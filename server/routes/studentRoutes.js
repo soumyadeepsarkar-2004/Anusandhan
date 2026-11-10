@@ -13,22 +13,22 @@ const memoryStudents = new Map();
 
 const getDefaultStudent = (id = 'student_active') => ({
   id,
-  fullName: 'Scholar',
+  fullName: '',
   email: '',
-  university: 'Regional / State University',
+  university: '',
   degreeLevel: 'B.Tech / B.S.',
-  graduationYear: 2027,
-  cgpa: 8.5,
-  targetDomains: ['Artificial Intelligence & ML'],
-  skills: ['Python', 'PyTorch'],
-  rrsScore: 75,
-  rrsTier: 'Junior Researcher',
+  graduationYear: new Date().getFullYear() + 1,
+  cgpa: 0,
+  targetDomains: [],
+  skills: [],
+  rrsScore: 0,
+  rrsTier: 'Developing',
   rrsPillars: {
-    codeExecution: 18,
-    researchMethodology: 18,
-    academicFoundations: 16,
-    labTooling: 12,
-    professionalism: 11
+    codeExecution: 0,
+    researchMethodology: 0,
+    academicFoundations: 0,
+    labTooling: 0,
+    professionalism: 0
   },
   linkedAccounts: {
     githubUrl: '',
@@ -37,7 +37,7 @@ const getDefaultStudent = (id = 'student_active') => ({
     huggingFaceUrl: ''
   },
   dailyOutreachCount: 0,
-  creditsRemaining: 10
+  creditsRemaining: 0
 });
 
 router.get('/me', authenticateToken, async (req, res) => {

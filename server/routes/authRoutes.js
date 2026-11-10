@@ -16,82 +16,8 @@ if (!process.env.JWT_SECRET) {
   process.env.JWT_SECRET = JWT_SECRET;
 }
 
-// Resilient in-memory store for instant fallback if MongoDB is not locally running
+// Multi-tenant in-memory store for active session fallback (clean start, zero demo accounts)
 const memoryUsers = new Map();
-
-// Seed standard verified scholar accounts for instant evaluation & demo sign-in
-async function seedDefaultUsers() {
-  try {
-    const hash = await hashPassword('scholar123');
-    const demoScholars = [
-      {
-        id: 'usr_aarav_sharma',
-        _id: 'usr_aarav_sharma',
-        email: 'aarav.sharma@iisc.ac.in',
-        passwordHash: hash,
-        fullName: 'Aarav Sharma',
-        university: 'Indian Institute of Science (IISc) Bangalore',
-        degreeLevel: 'B.Tech / Undergraduate',
-        cgpa: 9.4,
-        targetDomains: ['Artificial Intelligence & ML'],
-        skills: ['PyTorch', 'CUDA', 'Distributed Attention', 'C++'],
-        rrsScore: 94,
-        rrsTier: 'Elite Candidate',
-        role: 'student',
-        creditsRemaining: 24,
-        tokensBalance: 14,
-        loginStreak: 4,
-        xpPoints: 340,
-        dailyRewardClaimedToday: false,
-        scholarBadges: ['Early Scholar', 'Consistent Researcher', 'Literature Grounded'],
-        isVerified: true,
-        isInstitutionalVerified: true,
-        institutionalEmail: 'aarav.sharma@iisc.ac.in',
-        linkedAccounts: {
-          githubUrl: 'https://github.com/aarav-sharma-ml'
-        },
-        createdAt: new Date()
-      },
-      {
-        id: 'usr_demo_scholar',
-        _id: 'usr_demo_scholar',
-        email: 'scholar@anusandhan.ai',
-        passwordHash: hash,
-        fullName: 'Scholar Demo',
-        university: 'Indian Institute of Technology (IIT) Bombay',
-        degreeLevel: 'Undergraduate Researcher',
-        cgpa: 9.1,
-        targetDomains: ['Artificial Intelligence & ML', 'Robotics & Autonomous Systems'],
-        skills: ['Python', 'PyTorch', 'ROS2', 'LaTeX'],
-        rrsScore: 91,
-        rrsTier: 'Elite Candidate',
-        role: 'student',
-        creditsRemaining: 30,
-        tokensBalance: 22,
-        loginStreak: 6,
-        xpPoints: 480,
-        dailyRewardClaimedToday: false,
-        scholarBadges: ['Early Scholar', 'Grant Hunter', 'Streak Master'],
-        isVerified: true,
-        isInstitutionalVerified: true,
-        institutionalEmail: 'scholar@anusandhan.ai',
-        linkedAccounts: {
-          githubUrl: 'https://github.com/anusandhan-scholar'
-        },
-        createdAt: new Date()
-      }
-    ];
-
-    for (const s of demoScholars) {
-      memoryUsers.set(s.email, s);
-      await sqliteDao.upsertUser(s).catch(() => {});
-    }
-    console.log('[Auth] Demo scholars seeded and persisted in SQLite database.');
-  } catch (err) {
-    console.warn('Failed to seed demo scholars:', err.message);
-  }
-}
-seedDefaultUsers();
 
 export async function findUserByEmail(email) {
   if (!email) return null;
@@ -183,18 +109,18 @@ router.post('/register', async (req, res) => {
       email: normalizedEmail,
       passwordHash: hashedPassword,
       fullName: fullName.trim(),
-      university: university || 'State / Regional University',
-      degreeLevel: degreeLevel || 'Undergraduate Student',
-      cgpa: parseFloat(cgpa) || 8.2,
-      targetDomains: fieldOfStudy ? [fieldOfStudy] : ['Artificial Intelligence & ML'],
-      skills: ['Python', 'Data Structures', 'Research Methodology'],
-      rrsScore: 72,
-      rrsTier: 'Competitive Candidate',
+      university: university ? university.trim() : '',
+      degreeLevel: degreeLevel || 'B.Tech / B.S.',
+      cgpa: parseFloat(cgpa) || 0,
+      targetDomains: fieldOfStudy ? [fieldOfStudy] : [],
+      skills: [],
+      rrsScore: 0,
+      rrsTier: 'Developing',
       role: 'student',
       creditsRemaining: 10,
       tokensBalance: 5,
       loginStreak: 1,
-      xpPoints: 100,
+      xpPoints: 50,
       dailyRewardClaimedToday: false,
       isVerified: false,
       isInstitutionalVerified: false,
@@ -382,8 +308,207 @@ router.post('/verify-institutional-email', authenticateToken, async (req, res) =
 });
 
 /**
+ * POST /api/auth/oauth/exchange
+ * Exchanges OAuth authorization code with provider for real access token and user profile.
+ */
+router.post('/oauth/exchange', async (req, res) => {
+  try {
+    const { provider, code, redirectUri } = req.body;
+    if (!provider || !code) {
+      return res.status(400).json({ error: 'OAuth provider and authorization code are required.' });
+    }
+
+    let userEmail = '';
+    let userFullName = '';
+    let userAvatar = '';
+    let linkedUrl = '';
+
+    if (provider === 'google') {
+      const clientId = process.env.GOOGLE_CLIENT_ID || process.env.VITE_GOOGLE_CLIENT_ID;
+      const clientSecret = process.env.GOOGLE_CLIENT_SECRET || process.env.VITE_GOOGLE_CLIENT_SECRET;
+      if (!clientId || !clientSecret) {
+        return res.status(500).json({ error: 'Google OAuth credentials not configured on the server. Please set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET in .env.' });
+      }
+
+      const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          code,
+          client_id: clientId,
+          client_secret: clientSecret,
+          redirect_uri: redirectUri || 'http://localhost:5000/oauth/callback',
+          grant_type: 'authorization_code'
+        })
+      });
+
+      const tokenData = await tokenRes.json();
+      if (!tokenRes.ok || !tokenData.access_token) {
+        return res.status(400).json({ error: tokenData.error_description || 'Failed to exchange Google OAuth code.' });
+      }
+
+      const userRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+        headers: { Authorization: `Bearer ${tokenData.access_token}` }
+      });
+      const profile = await userRes.json();
+      userEmail = profile.email;
+      userFullName = profile.name || profile.given_name || '';
+      userAvatar = profile.picture || '';
+      linkedUrl = `https://scholar.google.com/citations?user=${userFullName.toLowerCase().replace(/\s+/g, '')}`;
+
+    } else if (provider === 'github') {
+      const clientId = process.env.GITHUB_CLIENT_ID || process.env.VITE_GITHUB_CLIENT_ID;
+      const clientSecret = process.env.GITHUB_CLIENT_SECRET || process.env.VITE_GITHUB_CLIENT_SECRET;
+      if (!clientId || !clientSecret) {
+        return res.status(500).json({ error: 'GitHub OAuth credentials not configured on the server. Please set GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET in .env.' });
+      }
+
+      const tokenRes = await fetch('https://github.com/login/oauth/access_token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          client_id: clientId,
+          client_secret: clientSecret,
+          code,
+          redirect_uri: redirectUri
+        })
+      });
+
+      const tokenData = await tokenRes.json();
+      if (!tokenRes.ok || !tokenData.access_token) {
+        return res.status(400).json({ error: tokenData.error_description || 'Failed to exchange GitHub OAuth code.' });
+      }
+
+      const userRes = await fetch('https://api.github.com/user', {
+        headers: {
+          Authorization: `Bearer ${tokenData.access_token}`,
+          'User-Agent': 'Anusandhan-Scholar-Engine'
+        }
+      });
+      const profile = await userRes.json();
+      userFullName = profile.name || profile.login;
+      userAvatar = profile.avatar_url || '';
+      linkedUrl = profile.html_url || `https://github.com/${profile.login}`;
+
+      if (profile.email) {
+        userEmail = profile.email;
+      } else {
+        const emailRes = await fetch('https://api.github.com/user/emails', {
+          headers: {
+            Authorization: `Bearer ${tokenData.access_token}`,
+            'User-Agent': 'Anusandhan-Scholar-Engine'
+          }
+        });
+        const emails = await emailRes.json();
+        if (Array.isArray(emails)) {
+          const primary = emails.find(e => e.primary && e.verified) || emails[0];
+          userEmail = primary?.email || `${profile.login}@users.noreply.github.com`;
+        }
+      }
+
+    } else if (provider === 'linkedin') {
+      const clientId = process.env.LINKEDIN_CLIENT_ID || process.env.VITE_LINKEDIN_CLIENT_ID;
+      const clientSecret = process.env.LINKEDIN_CLIENT_SECRET || process.env.VITE_LINKEDIN_CLIENT_SECRET;
+      if (!clientId || !clientSecret) {
+        return res.status(500).json({ error: 'LinkedIn OAuth credentials not configured on the server. Please set LINKEDIN_CLIENT_ID and LINKEDIN_CLIENT_SECRET in .env.' });
+      }
+
+      const tokenRes = await fetch('https://www.linkedin.com/oauth/v2/accessToken', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          grant_type: 'authorization_code',
+          code,
+          client_id: clientId,
+          client_secret: clientSecret,
+          redirect_uri: redirectUri
+        })
+      });
+
+      const tokenData = await tokenRes.json();
+      if (!tokenRes.ok || !tokenData.access_token) {
+        return res.status(400).json({ error: tokenData.error_description || 'Failed to exchange LinkedIn OAuth code.' });
+      }
+
+      const userRes = await fetch('https://api.linkedin.com/v2/userinfo', {
+        headers: { Authorization: `Bearer ${tokenData.access_token}` }
+      });
+      const profile = await userRes.json();
+      userEmail = profile.email;
+      userFullName = profile.name || `${profile.given_name || ''} ${profile.family_name || ''}`.trim();
+      userAvatar = profile.picture || '';
+      linkedUrl = `https://linkedin.com/in/${userFullName.toLowerCase().replace(/\s+/g, '-')}`;
+    }
+
+    if (!userEmail) {
+      return res.status(400).json({ error: `Could not retrieve verified email address from ${provider}.` });
+    }
+
+    const normalizedEmail = userEmail.toLowerCase().trim();
+    let user = await findUserByEmail(normalizedEmail);
+
+    if (!user) {
+      user = {
+        id: `usr_${provider}_${Date.now().toString(36)}`,
+        _id: `usr_${provider}_${Date.now().toString(36)}`,
+        email: normalizedEmail,
+        fullName: userFullName || 'Verified Scholar',
+        university: '',
+        degreeLevel: 'B.Tech / B.S.',
+        cgpa: 0,
+        targetDomains: [],
+        skills: [],
+        rrsScore: 0,
+        rrsTier: 'Developing',
+        role: 'student',
+        creditsRemaining: 10,
+        tokensBalance: 5,
+        loginStreak: 1,
+        xpPoints: 50,
+        dailyRewardClaimedToday: false,
+        scholarBadges: [`${provider.charAt(0).toUpperCase() + provider.slice(1)} Verified`, 'Early Scholar'],
+        oauthProvider: provider,
+        avatarUrl: userAvatar,
+        isVerified: true,
+        linkedAccounts: {
+          [provider === 'google' ? 'googleScholarUrl' : (provider === 'github' ? 'githubUrl' : 'linkedinUrl')]: linkedUrl
+        },
+        createdAt: new Date()
+      };
+    } else {
+      user.oauthProvider = provider;
+      if (userFullName && !user.fullName) user.fullName = userFullName;
+      if (userAvatar && !user.avatarUrl) user.avatarUrl = userAvatar;
+    }
+
+    await saveUser(user);
+
+    const token = createToken({
+      id: user.id || user._id,
+      email: normalizedEmail,
+      fullName: user.fullName,
+      role: user.role || 'student'
+    });
+
+    res.json({
+      success: true,
+      provider,
+      message: `Signed in successfully via ${provider.charAt(0).toUpperCase() + provider.slice(1)}`,
+      token,
+      user: sanitizeUser(user)
+    });
+  } catch (err) {
+    console.error('[OAuth Exchange Error]:', err);
+    res.status(500).json({ error: 'OAuth code exchange failed: ' + err.message });
+  }
+});
+
+/**
  * POST /api/auth/oauth
- * Universal OAuth login / registration supporting Google and LinkedIn
+ * Universal OAuth login / registration supporting Google, GitHub, and LinkedIn with verified identities
  */
 router.post('/oauth', async (req, res) => {
   try {
@@ -392,12 +517,12 @@ router.post('/oauth', async (req, res) => {
       return res.status(400).json({ error: 'Invalid OAuth provider. Expected "google", "linkedin", or "github".' });
     }
 
-    const normalizedEmail = (email && typeof email === 'string' && email.trim()) 
-      ? email.toLowerCase().trim() 
-      : `scholar.${provider}@anusandhan.ai`;
-    const effectiveName = fullName?.trim() || (email 
-      ? normalizedEmail.split('@')[0].replace(/[._\-]/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) 
-      : `${provider.charAt(0).toUpperCase() + provider.slice(1)} Verified Scholar`);
+    if (!email || typeof email !== 'string' || !email.includes('@')) {
+      return res.status(400).json({ error: 'A valid email address is required for OAuth sign-in.' });
+    }
+
+    const normalizedEmail = email.toLowerCase().trim();
+    const effectiveName = fullName?.trim() || normalizedEmail.split('@')[0].replace(/[._\-]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 
     let user = await findUserByEmail(normalizedEmail);
     if (!user) {
@@ -406,22 +531,22 @@ router.post('/oauth', async (req, res) => {
         _id: `usr_${provider}_${Date.now().toString(36)}`,
         email: normalizedEmail,
         fullName: effectiveName,
-        university: university || 'Recognized Higher Education Institute',
-        degreeLevel: 'Undergraduate Researcher',
-        cgpa: 9.0,
-        targetDomains: fieldOfStudy ? [fieldOfStudy] : ['Artificial Intelligence & ML'],
-        skills: ['Python', 'PyTorch', 'Git', 'Data Analysis'],
-        rrsScore: 88,
-        rrsTier: 'Strong Candidate',
+        university: university ? university.trim() : '',
+        degreeLevel: 'B.Tech / B.S.',
+        cgpa: 0,
+        targetDomains: fieldOfStudy ? [fieldOfStudy] : [],
+        skills: [],
+        rrsScore: 0,
+        rrsTier: 'Developing',
         role: 'student',
-        creditsRemaining: 20,
-        tokensBalance: 10,
+        creditsRemaining: 10,
+        tokensBalance: 5,
         loginStreak: 1,
-        xpPoints: 150,
+        xpPoints: 50,
         dailyRewardClaimedToday: false,
         scholarBadges: [`${provider.charAt(0).toUpperCase() + provider.slice(1)} Verified`, 'Early Scholar'],
         oauthProvider: provider,
-        avatarUrl: avatarUrl || (provider === 'github' ? 'https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png' : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'),
+        avatarUrl: avatarUrl || '',
         isVerified: true,
         linkedAccounts: {
           [provider === 'google' ? 'googleScholarUrl' : (provider === 'github' ? 'githubUrl' : 'linkedinUrl')]: `https://${provider}.com/${effectiveName.toLowerCase().replace(/\s+/g, '-')}`
@@ -431,6 +556,7 @@ router.post('/oauth', async (req, res) => {
     } else {
       user.oauthProvider = provider;
       if (fullName && !user.fullName) user.fullName = effectiveName;
+      if (avatarUrl && !user.avatarUrl) user.avatarUrl = avatarUrl;
     }
 
     await saveUser(user);
@@ -455,18 +581,19 @@ router.post('/oauth', async (req, res) => {
 
 /**
  * POST /api/auth/google
- * Dedicated Google Sign-In endpoint with verified identity handling
+ * Dedicated Google Sign-In endpoint
  */
 router.post('/google', async (req, res) => {
-  try {
-    const { email, fullName, avatarUrl, university, fieldOfStudy } = req.body;
-    const normalizedEmail = (email && typeof email === 'string' && email.trim()) 
-      ? email.toLowerCase().trim() 
-      : 'scholar.google@anusandhan.ai';
-    const effectiveName = fullName?.trim() || (email 
-      ? normalizedEmail.split('@')[0].replace(/[._\-]/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) 
-      : 'Google Verified Scholar');
+  req.body.provider = 'google';
+  const { provider, email, fullName, avatarUrl, university, fieldOfStudy } = req.body;
+  if (!email || typeof email !== 'string' || !email.includes('@')) {
+    return res.status(400).json({ error: 'A valid email address is required for Google Sign-In.' });
+  }
 
+  const normalizedEmail = email.toLowerCase().trim();
+  const effectiveName = fullName?.trim() || normalizedEmail.split('@')[0].replace(/[._\-]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+
+  try {
     let user = await findUserByEmail(normalizedEmail);
     if (!user) {
       user = {
@@ -474,22 +601,22 @@ router.post('/google', async (req, res) => {
         _id: `usr_google_${Date.now().toString(36)}`,
         email: normalizedEmail,
         fullName: effectiveName,
-        university: university || 'State / Central University',
-        degreeLevel: 'Undergraduate Researcher',
-        cgpa: 9.0,
-        targetDomains: fieldOfStudy ? [fieldOfStudy] : ['Artificial Intelligence & ML'],
-        skills: ['Python', 'PyTorch', 'Git', 'Data Structures'],
-        rrsScore: 88,
-        rrsTier: 'Strong Candidate',
+        university: university ? university.trim() : '',
+        degreeLevel: 'B.Tech / B.S.',
+        cgpa: 0,
+        targetDomains: fieldOfStudy ? [fieldOfStudy] : [],
+        skills: [],
+        rrsScore: 0,
+        rrsTier: 'Developing',
         role: 'student',
-        creditsRemaining: 25,
-        tokensBalance: 10,
+        creditsRemaining: 10,
+        tokensBalance: 5,
         loginStreak: 1,
-        xpPoints: 150,
+        xpPoints: 50,
         dailyRewardClaimedToday: false,
         scholarBadges: ['Google Verified', 'Early Scholar'],
         oauthProvider: 'google',
-        avatarUrl: avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
+        avatarUrl: avatarUrl || '',
         isVerified: true,
         linkedAccounts: { googleScholarUrl: `https://scholar.google.com/citations?user=${effectiveName.toLowerCase().replace(/\s+/g, '')}` },
         createdAt: new Date()
@@ -497,6 +624,7 @@ router.post('/google', async (req, res) => {
     } else {
       user.oauthProvider = 'google';
       if (fullName && !user.fullName) user.fullName = effectiveName;
+      if (avatarUrl && !user.avatarUrl) user.avatarUrl = avatarUrl;
     }
 
     await saveUser(user);
@@ -622,8 +750,12 @@ router.post('/linkedin', async (req, res) => {
   req.body.provider = 'linkedin';
   try {
     const { email, fullName, avatarUrl, university, fieldOfStudy } = req.body;
-    const normalizedEmail = (email || 'scholar.linkedin@alumni.edu').toLowerCase().trim();
-    const effectiveName = fullName || 'LinkedIn Scholar';
+    if (!email || typeof email !== 'string' || !email.includes('@')) {
+      return res.status(400).json({ error: 'A valid email address is required for LinkedIn Sign-In.' });
+    }
+
+    const normalizedEmail = email.toLowerCase().trim();
+    const effectiveName = fullName?.trim() || normalizedEmail.split('@')[0].replace(/[._\-]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 
     let user = await findUserByEmail(normalizedEmail);
     if (!user) {
@@ -632,28 +764,30 @@ router.post('/linkedin', async (req, res) => {
         _id: `usr_linkedin_${Date.now().toString(36)}`,
         email: normalizedEmail,
         fullName: effectiveName,
-        university: university || 'Indian Institute of Technology (IIT) Delhi',
-        degreeLevel: 'Undergraduate Researcher',
-        cgpa: 9.2,
-        targetDomains: fieldOfStudy ? [fieldOfStudy] : ['Artificial Intelligence & ML'],
-        skills: ['Python', 'Distributed Computing', 'Algorithms'],
-        rrsScore: 90,
-        rrsTier: 'Elite Candidate',
+        university: university ? university.trim() : '',
+        degreeLevel: 'B.Tech / B.S.',
+        cgpa: 0,
+        targetDomains: fieldOfStudy ? [fieldOfStudy] : [],
+        skills: [],
+        rrsScore: 0,
+        rrsTier: 'Developing',
         role: 'student',
-        creditsRemaining: 30,
-        tokensBalance: 15,
+        creditsRemaining: 10,
+        tokensBalance: 5,
         loginStreak: 1,
-        xpPoints: 200,
+        xpPoints: 50,
         dailyRewardClaimedToday: false,
         scholarBadges: ['LinkedIn Verified', 'Early Scholar'],
         oauthProvider: 'linkedin',
-        avatarUrl: avatarUrl || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
+        avatarUrl: avatarUrl || '',
         isVerified: true,
         linkedAccounts: { linkedinUrl: `https://linkedin.com/in/${effectiveName.toLowerCase().replace(/\s+/g, '-')}` },
         createdAt: new Date()
       };
     } else {
       user.oauthProvider = 'linkedin';
+      if (fullName && !user.fullName) user.fullName = effectiveName;
+      if (avatarUrl && !user.avatarUrl) user.avatarUrl = avatarUrl;
     }
 
     await saveUser(user);

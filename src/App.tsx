@@ -49,6 +49,7 @@ import { PrivacyPolicyModal } from './components/legal/PrivacyPolicyModal';
 import { TermsOfServiceModal } from './components/legal/TermsOfServiceModal';
 import { CrossNativeAppModal } from './components/pwa/CrossNativeAppModal';
 import { PwaInstallPrompt } from './components/pwa/PwaInstallPrompt';
+import { CommunityListingModal } from './components/landing/CommunityListingModal';
 
 const SuspenseSkeleton: React.FC = () => (
   <div className="w-full min-h-[300px] flex items-center justify-center p-8">
@@ -60,7 +61,7 @@ const SuspenseSkeleton: React.FC = () => (
 );
 
 const AppContent: React.FC = () => {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, updateUser } = useAuth();
 
   // Navigation View: 'landing' | 'intake' | 'app'
   const [view, setView] = useState<'landing' | 'intake' | 'app'>('landing');
@@ -156,6 +157,7 @@ const AppContent: React.FC = () => {
   const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState<boolean>(false);
   const [isTermsModalOpen, setIsTermsModalOpen] = useState<boolean>(false);
   const [isCrossNativeModalOpen, setIsCrossNativeModalOpen] = useState<boolean>(false);
+  const [isCommunityListingOpen, setIsCommunityListingOpen] = useState<boolean>(false);
   const [pwaTriggerFn, setPwaTriggerFn] = useState<(() => void) | null>(null);
   const [canInstallPwa, setCanInstallPwa] = useState<boolean>(false);
 
@@ -171,26 +173,65 @@ const AppContent: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Student Profile State
-  const [student, setStudent] = useState<StudentProfile>(INITIAL_STUDENT_STATE);
+  // Student Profile State — strictly initialized without demo data, loaded from user-specific local storage
+  const [student, setStudent] = useState<StudentProfile>(() => {
+    try {
+      const activeUserStr = localStorage.getItem('rip_user_profile');
+      const activeUser = activeUserStr ? JSON.parse(activeUserStr) : null;
+      const userKey = activeUser ? `rip_student_profile_${activeUser.id || activeUser.email}` : 'rip_student_profile_guest';
+      const saved = localStorage.getItem(userKey);
+      if (saved) return JSON.parse(saved);
+    } catch {}
+    return INITIAL_STUDENT_STATE;
+  });
 
   // Synchronize authenticated user with student state
   useEffect(() => {
     if (user) {
-      setStudent(prev => ({
-        ...prev,
-        fullName: user.fullName || prev.fullName,
-        email: user.email || prev.email,
-        university: user.university || prev.university,
-        degreeLevel: (user.degreeLevel as StudentProfile['degreeLevel']) || prev.degreeLevel,
-        cgpa: user.cgpa || prev.cgpa,
-        targetDomains: (user.targetDomains && user.targetDomains.length > 0) ? (user.targetDomains as any) : prev.targetDomains,
-        rrsScore: user.rrsScore || prev.rrsScore,
-        rrsTier: (user.rrsTier as StudentProfile['rrsTier']) || prev.rrsTier,
-        creditsRemaining: user.creditsRemaining !== undefined ? user.creditsRemaining : prev.creditsRemaining
-      }));
+      const userKey = `rip_student_profile_${user.id || user.email}`;
+      let baseStudent = INITIAL_STUDENT_STATE;
+      try {
+        const saved = localStorage.getItem(userKey);
+        if (saved) {
+          baseStudent = JSON.parse(saved);
+        }
+      } catch {}
+
+      const merged: StudentProfile = {
+        ...baseStudent,
+        fullName: user.fullName || baseStudent.fullName,
+        email: user.email || baseStudent.email,
+        university: user.university || baseStudent.university,
+        degreeLevel: (user.degreeLevel as StudentProfile['degreeLevel']) || baseStudent.degreeLevel,
+        cgpa: user.cgpa !== undefined ? user.cgpa : baseStudent.cgpa,
+        targetDomains: (user.targetDomains && user.targetDomains.length > 0) ? (user.targetDomains as any) : baseStudent.targetDomains,
+        skills: (user.skills && user.skills.length > 0) ? user.skills : baseStudent.skills,
+        rrsScore: user.rrsScore !== undefined ? user.rrsScore : baseStudent.rrsScore,
+        rrsTier: (user.rrsTier as StudentProfile['rrsTier']) || baseStudent.rrsTier,
+        creditsRemaining: user.creditsRemaining !== undefined ? user.creditsRemaining : baseStudent.creditsRemaining,
+        linkedAccounts: {
+          ...baseStudent.linkedAccounts,
+          ...(user.linkedAccounts || {})
+        }
+      };
+
+      setStudent(merged);
+      try {
+        localStorage.setItem(userKey, JSON.stringify(merged));
+      } catch {}
+    } else {
+      setStudent(INITIAL_STUDENT_STATE);
     }
   }, [user]);
+
+  // Whenever student profile changes, re-rank faculty matches and save to user-scoped storage
+  useEffect(() => {
+    const userKey = user ? `rip_student_profile_${user.id || user.email}` : 'rip_student_profile_guest';
+    try {
+      localStorage.setItem(userKey, JSON.stringify(student));
+    } catch {}
+    setLiveFaculty(matchProfessorsForStudent(student));
+  }, [student, user]);
 
   // Data Collections with Real-Time 24/7 Scraping & Ingestion Synchronization
   const [liveFaculty, setLiveFaculty] = useState<Professor[]>(() => matchProfessorsForStudent(student));
@@ -250,20 +291,37 @@ const AppContent: React.FC = () => {
     return () => clearInterval(updateTimer);
   }, []);
 
-  // Persistent student outreach pipeline (saved in localStorage, clean start with zero demo items)
+  // Persistent student outreach pipeline (saved in localStorage, scoped per user with clean start)
   const [drafts, setDrafts] = useState<OutreachDraft[]>(() => {
     try {
-      const saved = localStorage.getItem('rip_student_drafts');
+      const activeUserStr = localStorage.getItem('rip_user_profile');
+      const activeUser = activeUserStr ? JSON.parse(activeUserStr) : null;
+      const userDraftsKey = activeUser ? `rip_student_drafts_${activeUser.id || activeUser.email}` : 'rip_student_drafts_guest';
+      const saved = localStorage.getItem(userDraftsKey);
       if (saved) return JSON.parse(saved);
     } catch {}
     return [];
   });
 
+  // Re-load drafts whenever authenticated user changes
   useEffect(() => {
+    const userDraftsKey = user ? `rip_student_drafts_${user.id || user.email}` : 'rip_student_drafts_guest';
     try {
-      localStorage.setItem('rip_student_drafts', JSON.stringify(drafts));
+      const saved = localStorage.getItem(userDraftsKey);
+      if (saved) {
+        setDrafts(JSON.parse(saved));
+        return;
+      }
     } catch {}
-  }, [drafts]);
+    setDrafts([]);
+  }, [user]);
+
+  useEffect(() => {
+    const userDraftsKey = user ? `rip_student_drafts_${user.id || user.email}` : 'rip_student_drafts_guest';
+    try {
+      localStorage.setItem(userDraftsKey, JSON.stringify(drafts));
+    } catch {}
+  }, [drafts, user]);
 
   const [activeDraft, setActiveDraft] = useState<OutreachDraft | null>(() => {
     return drafts.length > 0 ? drafts[0] : null;
@@ -427,6 +485,7 @@ const AppContent: React.FC = () => {
             onOpenPrivacyModal={() => setIsPrivacyModalOpen(true)}
             onOpenTermsModal={() => setIsTermsModalOpen(true)}
             onOpenCrossNativeModal={() => setIsCrossNativeModalOpen(true)}
+            onOpenCommunityListings={() => setIsCommunityListingOpen(true)}
             creditsRemaining={student.creditsRemaining}
           />
 
@@ -447,6 +506,7 @@ const AppContent: React.FC = () => {
               isAuthenticated={isAuthenticated}
               userName={user?.fullName || student.fullName}
               onOpenCrossNativeModal={() => setIsCrossNativeModalOpen(true)}
+              onOpenCommunityListings={() => setIsCommunityListingOpen(true)}
             />
 
             <OpportunitiesSection
@@ -487,6 +547,7 @@ const AppContent: React.FC = () => {
           <Footer
             onOpenPrivacy={() => setIsPrivacyModalOpen(true)}
             onOpenTerms={() => setIsTermsModalOpen(true)}
+            onOpenCommunityListings={() => setIsCommunityListingOpen(true)}
           />
         </div>
       )}
@@ -519,7 +580,19 @@ const AppContent: React.FC = () => {
                 currentStudent={student}
                 onCompleteIntake={(updatedStudent) => {
                   setStudent(updatedStudent);
+                  if (user) {
+                    updateUser({
+                      fullName: updatedStudent.fullName,
+                      university: updatedStudent.university,
+                      cgpa: updatedStudent.cgpa,
+                      targetDomains: updatedStudent.targetDomains,
+                      skills: updatedStudent.skills,
+                      rrsScore: updatedStudent.rrsScore,
+                      rrsTier: updatedStudent.rrsTier
+                    });
+                  }
                   const matched = matchProfessorsForStudent(updatedStudent);
+                  setLiveFaculty(matched);
                   if (matched.length > 0) {
                     const newDrafts = matched.slice(0, 3).map(p => generateColdEmail(p, updatedStudent));
                     setDrafts(newDrafts);
@@ -649,7 +722,20 @@ const AppContent: React.FC = () => {
               <Suspense fallback={<SuspenseSkeleton />}>
                 <StudentProfileHub
                   student={student}
-                  onUpdateProfile={setStudent}
+                  onUpdateProfile={(updated) => {
+                    setStudent(updated);
+                    if (user) {
+                      updateUser({
+                        fullName: updated.fullName,
+                        university: updated.university,
+                        cgpa: updated.cgpa,
+                        targetDomains: updated.targetDomains,
+                        skills: updated.skills,
+                        rrsScore: updated.rrsScore,
+                        rrsTier: updated.rrsTier
+                      });
+                    }
+                  }}
                   onOpenVoiceModal={() => setIsVoiceModalOpen(true)}
                 />
               </Suspense>
@@ -822,6 +908,12 @@ const AppContent: React.FC = () => {
       <CrossNativeAppModal
         isOpen={isCrossNativeModalOpen}
         onClose={() => setIsCrossNativeModalOpen(false)}
+      />
+
+      {/* Product Hunt & Social Media Platforms Listing Modal */}
+      <CommunityListingModal
+        isOpen={isCommunityListingOpen}
+        onClose={() => setIsCommunityListingOpen(false)}
       />
 
     </div>

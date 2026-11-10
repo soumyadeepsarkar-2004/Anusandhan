@@ -119,8 +119,8 @@ export const ScholarMetricsShowcase: React.FC = () => {
 
               <div className="flex items-baseline justify-between mb-2">
                 <div>
-                  <h3 className="text-lg sm:text-xl font-semibold text-zinc-100">{student.fullName}</h3>
-                  <p className="text-xs text-zinc-400 mt-0.5">{student.university}</p>
+                  <h3 className="text-lg sm:text-xl font-semibold text-zinc-100">{student.fullName || 'Scholar Candidate'}</h3>
+                  <p className="text-xs text-zinc-400 mt-0.5">{student.university || 'Institutional Profile Pending'}</p>
                 </div>
                 <div className="text-right">
                   <div className="text-2xl sm:text-3xl font-semibold text-zinc-100 font-mono">{student.rrsScore}<span className="text-sm text-zinc-500 font-normal">/100</span></div>
@@ -152,7 +152,7 @@ export const ScholarMetricsShowcase: React.FC = () => {
 
                 <div>
                   <div className="flex justify-between text-xs text-zinc-300 font-medium mb-1">
-                    <span>Academic Foundations (CGPA 9.12)</span>
+                    <span>Academic Foundations {student.cgpa > 0 ? `(CGPA ${student.cgpa})` : '(CGPA)'}</span>
                     <span className="font-mono text-emerald-400">{student.rrsPillars.academicFoundations} / 20</span>
                   </div>
                   <div className="w-full h-2 rounded-full bg-zinc-800 overflow-hidden">

@@ -195,14 +195,14 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
                     title="Edit Profile & Re-parse CV"
                   >
                     <div className="w-8 h-8 rounded-full bg-amber-500/15 text-amber-500 font-mono font-bold text-xs flex items-center justify-center border border-amber-500/30 shadow-inner">
-                      {(user?.fullName || student.fullName).charAt(0)}
+                      {(user?.fullName || student.fullName || 'S').charAt(0).toUpperCase()}
                     </div>
                     <div className="hidden xl:flex flex-col text-left">
                       <span className="text-xs font-medium max-w-[110px] truncate text-[var(--text-primary)]">
-                        {user?.fullName || student.fullName}
+                        {user?.fullName || student.fullName || 'Scholar'}
                       </span>
                       <span className="text-[10px] font-mono text-[var(--text-muted)]">
-                        Scholar · RRS {user?.rrsScore || student.rrsScore || 94}
+                        Scholar · RRS {user?.rrsScore !== undefined ? user.rrsScore : (student.rrsScore !== undefined ? student.rrsScore : 0)}
                       </span>
                     </div>
                   </button>
