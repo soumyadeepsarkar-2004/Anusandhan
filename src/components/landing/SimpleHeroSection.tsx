@@ -49,19 +49,30 @@ const SimpleHeroSectionComponent: React.FC<SimpleHeroSectionProps> = ({
           transition={{ duration: 0.5 }}
           className="mb-6 flex flex-wrap items-center justify-center gap-2"
         >
-          <a
-            href="https://www.producthunt.com/products/anusandhan"
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#DA552F]/15 hover:bg-[#DA552F]/25 border border-[#DA552F]/30 hover:border-[#DA552F]/60 text-xs font-mono text-zinc-200 transition-all shadow-sm cursor-pointer group backdrop-blur-xl"
-          >
-            <span className="w-4 h-4 rounded-full bg-[#DA552F] text-white flex items-center justify-center font-bold text-[10px]">
-              P
-            </span>
-            <span className="font-sans font-medium text-zinc-200 group-hover:text-white">Featured on Product Hunt</span>
-            <span className="text-zinc-500">·</span>
-            <span className="text-amber-400 font-sans text-[11px] group-hover:underline">Upvote & Review →</span>
-          </a>
+          {onOpenCommunityListings ? (
+            <button
+              onClick={onOpenCommunityListings}
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#DA552F]/15 hover:bg-[#DA552F]/25 border border-[#DA552F]/30 hover:border-[#DA552F]/60 text-xs font-mono text-zinc-200 transition-all shadow-sm cursor-pointer group backdrop-blur-xl"
+            >
+              <span className="w-4 h-4 rounded-full bg-[#DA552F] text-white flex items-center justify-center font-bold text-[10px]">
+                P
+              </span>
+              <span className="font-sans font-medium text-zinc-200 group-hover:text-white">Product Hunt & Community Hub</span>
+              <span className="text-zinc-500">·</span>
+              <span className="text-amber-400 font-sans text-[11px] group-hover:underline">Launch Kit & Hub →</span>
+            </button>
+          ) : (
+            <a
+              href="https://github.com/soumyadeepsarkar-2004/Anusandhan/releases/tag/v1.0.0"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.04] hover:bg-white/[0.08] border border-white/12 text-xs font-mono text-zinc-200 transition-all shadow-sm cursor-pointer group backdrop-blur-xl"
+            >
+              <span className="font-sans font-medium text-zinc-200 group-hover:text-white">v1.0.0 Open Source Release</span>
+              <span className="text-zinc-500">·</span>
+              <span className="text-amber-400 font-sans text-[11px] group-hover:underline">GitHub →</span>
+            </a>
+          )}
 
           {onOpenCommunityListings && (
             <button

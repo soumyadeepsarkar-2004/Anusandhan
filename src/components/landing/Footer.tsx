@@ -177,27 +177,37 @@ const FooterComponent: React.FC<FooterProps> = ({ onOpenPrivacy, onOpenTerms, on
             </span>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold text-zinc-200">Product Hunt & Community Listings</span>
+                <span className="text-xs font-semibold text-zinc-200">Product Hunt & Community Hub</span>
                 <span className="text-[10px] font-mono text-amber-400/90 px-1.5 py-0.5 rounded bg-amber-500/10 border border-amber-500/20">
-                  Featured
+                  Verified Hub
                 </span>
               </div>
               <p className="text-zinc-400 text-xs mt-0.5 max-w-xl">
-                Anusandhan is listed across major developer & academic platforms. Upvote on Product Hunt, star on GitHub, or follow our LinkedIn organization.
+                Anusandhan is open-source. Star on GitHub, explore official VitePress documentation, or check our Product Hunt launch kit.
               </p>
             </div>
           </div>
 
           <div className="flex flex-wrap items-center gap-2 w-full lg:w-auto justify-start lg:justify-end shrink-0">
-            <a
-              href="https://www.producthunt.com/products/anusandhan"
-              target="_blank"
-              rel="noreferrer"
-              className="px-3 py-1.5 rounded-xl bg-[#DA552F]/10 hover:bg-[#DA552F]/20 border border-[#DA552F]/30 text-zinc-200 hover:text-white text-xs font-mono transition-colors flex items-center gap-1.5"
-            >
-              <span>Product Hunt</span>
-              <ExternalLink className="w-3 h-3 text-[#DA552F]" />
-            </a>
+            {onOpenCommunityListings ? (
+              <button
+                onClick={onOpenCommunityListings}
+                className="px-3 py-1.5 rounded-xl bg-[#DA552F]/10 hover:bg-[#DA552F]/20 border border-[#DA552F]/30 text-zinc-200 hover:text-white text-xs font-mono transition-colors flex items-center gap-1.5 cursor-pointer"
+              >
+                <span>Product Hunt</span>
+                <span className="text-[10px] px-1 py-0.5 rounded bg-[#DA552F]/20 text-[#DA552F]">Launch Kit</span>
+              </button>
+            ) : (
+              <a
+                href="https://www.producthunt.com/posts/new"
+                target="_blank"
+                rel="noreferrer"
+                className="px-3 py-1.5 rounded-xl bg-[#DA552F]/10 hover:bg-[#DA552F]/20 border border-[#DA552F]/30 text-zinc-200 hover:text-white text-xs font-mono transition-colors flex items-center gap-1.5"
+              >
+                <span>Product Hunt</span>
+                <ExternalLink className="w-3 h-3 text-[#DA552F]" />
+              </a>
+            )}
 
             <a
               href="https://github.com/soumyadeepsarkar-2004/Anusandhan"

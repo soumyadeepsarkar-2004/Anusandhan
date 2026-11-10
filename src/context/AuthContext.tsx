@@ -374,7 +374,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const { url: authUrl, hasClientId } = getOAuthUrl(provider, redirectUri, state);
     if (!hasClientId || !authUrl) {
-      throw new Error(`Real ${provider.charAt(0).toUpperCase() + provider.slice(1)} OAuth requires VITE_${provider.toUpperCase()}_CLIENT_ID in your .env. Please enter your email address to sign in directly.`);
+      throw new Error(`${provider.charAt(0).toUpperCase() + provider.slice(1)} OAuth requires VITE_${provider.toUpperCase()}_CLIENT_ID in your .env or platform secrets. In the meantime, sign in or register with your email & password or onboard with your CV.`);
     }
 
     window.location.href = authUrl;
@@ -391,7 +391,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       const { url: authUrl, hasClientId } = getOAuthUrl(provider, redirectUri, state);
       if (!hasClientId || !authUrl) {
-        reject(new Error(`OAuth credentials (VITE_${provider.toUpperCase()}_CLIENT_ID) are not configured.`));
+        reject(new Error(`${provider.charAt(0).toUpperCase() + provider.slice(1)} OAuth requires VITE_${provider.toUpperCase()}_CLIENT_ID in your environment. You can sign in or register with email & password, or onboard with your CV.`));
         return;
       }
 

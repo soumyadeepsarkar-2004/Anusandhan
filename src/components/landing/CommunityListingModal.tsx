@@ -15,36 +15,23 @@ export const CommunityListingModal: React.FC<CommunityListingModalProps> = ({ is
     {
       platform: 'GitHub',
       badge: '100% Open Source',
+      status: 'live',
       color: '#ffffff',
       icon: (
         <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
           <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
         </svg>
       ),
-      title: 'GitHub Codebase & Releases',
-      description: 'MIT licensed repository with complete architecture documentation, test suites, and native installers.',
+      title: 'GitHub Codebase & Repository',
+      description: 'MIT licensed repository with complete architecture documentation, microservices, and test suites.',
       ctaText: 'View on GitHub',
       url: 'https://github.com/soumyadeepsarkar-2004/Anusandhan',
-      tag: 'soumyadeepsarkar-2004/Anusandhan'
-    },
-    {
-      platform: 'Product Hunt',
-      badge: 'Featured Product',
-      color: '#DA552F',
-      icon: (
-        <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
-          <path d="M13.6 8.4h-3.4v4.3h3.4c1.2 0 2.1-1 2.1-2.1s-1-2.2-2.1-2.2zm-1.6-8.4C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.6 0 12 0zm1.6 15.6h-5v-10h5c2.7 0 4.9 2.2 4.9 4.9s-2.2 5.1-4.9 5.1z" />
-        </svg>
-      ),
-      title: 'Anusandhan on Product Hunt',
-      description: 'Autonomous research internship discovery & literature-grounded outreach engine.',
-      ctaText: 'View Product Hunt Post',
-      url: 'https://www.producthunt.com/products/anusandhan',
-      tag: 'Product Listing'
+      tag: 'Live & Active'
     },
     {
       platform: 'Documentation',
       badge: 'Official Docs',
+      status: 'live',
       color: '#F59E0B',
       icon: (
         <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
@@ -55,11 +42,28 @@ export const CommunityListingModal: React.FC<CommunityListingModalProps> = ({ is
       description: 'Comprehensive guides on academic scrapers, RRS radar scoring, and ethical human-in-the-loop email pacing.',
       ctaText: 'Read Documentation',
       url: 'https://soumyadeepsarkar-2004.github.io/Anusandhan/',
-      tag: 'Live Documentation'
+      tag: 'Live & Deployed'
+    },
+    {
+      platform: 'Releases',
+      badge: 'Git Tagged',
+      status: 'live',
+      color: '#10B981',
+      icon: (
+        <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+          <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+        </svg>
+      ),
+      title: 'Official v1.0.0 Release Tag',
+      description: 'Source code distribution, architecture tags, and milestone commit verified on GitHub.',
+      ctaText: 'View v1.0.0 Tag',
+      url: 'https://github.com/soumyadeepsarkar-2004/Anusandhan/releases/tag/v1.0.0',
+      tag: 'v1.0.0 Live'
     },
     {
       platform: 'X / Twitter',
       badge: 'Creator Updates',
+      status: 'live',
       color: '#1DA1F2',
       icon: (
         <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
@@ -70,22 +74,23 @@ export const CommunityListingModal: React.FC<CommunityListingModalProps> = ({ is
       description: 'Follow creator updates, research fellowship alerts, and release announcements directly on X.',
       ctaText: 'Follow @sarkar58153',
       url: 'https://x.com/sarkar58153',
-      tag: '@sarkar58153'
+      tag: 'Live Account'
     },
     {
-      platform: 'Releases',
-      badge: 'Multi-Platform',
-      color: '#10B981',
+      platform: 'Product Hunt',
+      badge: 'Launch Kit Ready',
+      status: 'pending',
+      color: '#DA552F',
       icon: (
         <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
-          <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+          <path d="M13.6 8.4h-3.4v4.3h3.4c1.2 0 2.1-1 2.1-2.1s-1-2.2-2.1-2.2zm-1.6-8.4C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.6 0 12 0zm1.6 15.6h-5v-10h5c2.7 0 4.9 2.2 4.9 4.9s-2.2 5.1-4.9 5.1z" />
         </svg>
       ),
-      title: 'Cross-Native Builds & Binaries',
-      description: 'Download signed Android APK, macOS DMG, and Windows setup binaries from the official releases page.',
-      ctaText: 'Explore Releases',
-      url: 'https://github.com/soumyadeepsarkar-2004/Anusandhan/releases',
-      tag: 'v1.0.0 Stable'
+      title: 'Product Hunt Submission Kit',
+      description: 'Launch assets, tagline, and maker comment prepared. Direct link to create and publish your post on Product Hunt.',
+      ctaText: 'Submit on Product Hunt',
+      url: 'https://www.producthunt.com/posts/new',
+      tag: 'Ready to Submit'
     }
   ];
 
@@ -121,13 +126,13 @@ export const CommunityListingModal: React.FC<CommunityListingModalProps> = ({ is
               <AnusandhanLogo size="sm" showText={false} />
               <div>
                 <h3 className="text-lg font-serif font-medium text-zinc-100 flex items-center gap-2">
-                  <span>Product Hunt & Social Platform Listings</span>
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400">
-                    Live
+                  <span>Community, Documentation & Releases</span>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
+                    Verified
                   </span>
                 </h3>
                 <p className="text-xs text-zinc-400">
-                  Verified listings, community discussions, and open-source packages
+                  Open-source codebase, official documentation, GitHub releases, and community links
                 </p>
               </div>
             </div>
@@ -163,7 +168,11 @@ export const CommunityListingModal: React.FC<CommunityListingModalProps> = ({ is
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
                       <h4 className="text-sm font-semibold text-zinc-100">{item.title}</h4>
-                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-white/5 text-zinc-400">
+                      <span className={`text-[10px] font-mono px-2 py-0.5 rounded-md border ${
+                        item.status === 'live'
+                          ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
+                          : 'bg-amber-500/10 border-amber-500/30 text-amber-400'
+                      }`}>
                         {item.tag}
                       </span>
                     </div>
