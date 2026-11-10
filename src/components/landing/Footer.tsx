@@ -168,6 +168,36 @@ const FooterComponent: React.FC<FooterProps> = ({ onOpenPrivacy, onOpenTerms }) 
 
         </div>
 
+        {/* Product Hunt Social Proof Banner */}
+        <div className="mb-8 p-4 rounded-2xl bg-white/[0.02] border border-orange-500/20 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/30 flex items-center justify-center text-orange-400 font-bold text-sm shrink-0">
+              P
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-semibold text-zinc-200">Featured on Product Hunt</span>
+                <span className="px-2 py-0.5 text-[10px] font-mono rounded-full bg-orange-500/20 text-orange-300 font-bold border border-orange-500/30">
+                  #1 Product of the Day
+                </span>
+              </div>
+              <p className="text-zinc-400 text-xs mt-0.5">
+                Voted by researchers and builders worldwide. Autonomous research internships on autopilot.
+              </p>
+            </div>
+          </div>
+
+          <a
+            href="https://www.producthunt.com/posts/anusandhan"
+            target="_blank"
+            rel="noreferrer"
+            className="px-4 py-2 rounded-xl bg-gradient-to-r from-orange-500/20 to-amber-500/20 hover:from-orange-500/30 hover:to-amber-500/30 border border-orange-500/40 text-orange-300 text-xs font-mono font-semibold flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap"
+          >
+            <span>View on Product Hunt</span>
+            <ExternalLink className="w-3.5 h-3.5" />
+          </a>
+        </div>
+
         {/* Bottom Bar Strip - High Contrast, Theme-Adaptive Interactive Action Badges */}
         <div className="pt-6 border-t border-[var(--border-subtle)] flex flex-col md:flex-row items-center justify-between text-xs font-mono gap-4">
           <div className="text-[var(--text-secondary)] text-center md:text-left text-[11px]">

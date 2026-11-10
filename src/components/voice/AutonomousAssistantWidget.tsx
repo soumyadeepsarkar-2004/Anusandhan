@@ -184,7 +184,7 @@ export const AutonomousAssistantWidget: React.FC<AutonomousAssistantWidgetProps>
       text: `Namaste ${student.fullName || 'Scholar'}! Main AnusandhanAI Assistant hoon. Anusandhan platform par main kisi bhi tab me navigate kar sakta hoon, aapka CV aur RRS score diagnose kar sakta hoon, professors ke updates laa sakta hoon, aur active fellowship application forms open kar sakta hoon.`,
       language: 'Hinglish',
       timestamp: 'Just now',
-      modelUsed: 'Gemini 2.5 Flash'
+      modelUsed: 'Gemini 3.8 Flash'
     }
   ]);
 
@@ -351,7 +351,7 @@ export const AutonomousAssistantWidget: React.FC<AutonomousAssistantWidgetProps>
       ? 'Gemma 2 9B (Ultra-Fast · Free)'
       : selectedModel === 'local-academic'
       ? 'Anusandhan Core (Zero-Cost Local)'
-      : 'Gemini 2.5 Flash';
+      : 'Gemini 3.8 Flash';
 
     setStatusText(`Reasoning with ${modelName}...`);
 
@@ -586,7 +586,7 @@ export const AutonomousAssistantWidget: React.FC<AutonomousAssistantWidgetProps>
             text: errMsg,
             language: 'English',
             timestamp: 'Just now',
-            modelUsed: selectedModel === 'gemini-flash' ? 'Gemini 2.5 Flash' : selectedModel
+            modelUsed: selectedModel === 'gemini-flash' ? 'Gemini 3.8 Flash' : selectedModel
           };
           setMessages(prev => [...prev, errReply]);
           if (voiceFeedbackEnabled) {
@@ -635,7 +635,7 @@ export const AutonomousAssistantWidget: React.FC<AutonomousAssistantWidgetProps>
         text: feedbackText,
         language: 'English',
         timestamp: 'Just now',
-        modelUsed: selectedModel === 'gemini-flash' ? 'Gemini 2.5 Flash' : selectedModel
+        modelUsed: selectedModel === 'gemini-flash' ? 'Gemini 3.8 Flash' : selectedModel
       };
 
       setMessages(prev => [...prev, agentUploadReply]);
@@ -742,7 +742,7 @@ export const AutonomousAssistantWidget: React.FC<AutonomousAssistantWidgetProps>
                     <Sparkles className="w-3.5 h-3.5 text-amber-400" />
                     <span className="text-[11px] font-semibold text-zinc-200">AnusandhanAI</span>
                     <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                      {capsuleResponse.modelUsed || 'Gemini 2.5'}
+                      {capsuleResponse.modelUsed || 'Gemini 3.8'}
                     </span>
                     {isSpeaking && (
                       <span className="flex items-center gap-1 text-[9px] font-mono text-amber-300">
@@ -1098,9 +1098,8 @@ export const AutonomousAssistantWidget: React.FC<AutonomousAssistantWidgetProps>
                   <option value="mistral-nemo">Mistral NeMo 12B (Open Weights · Free)</option>
                   <option value="gemma-2-9b">Gemma 2 9B (Ultra-Fast · Free)</option>
                   <option value="local-academic">Anusandhan Core (Zero-Cost Local)</option>
-                </optgroup>
-                <optgroup label="Advanced / Custom API Key" className="bg-zinc-900 text-zinc-100 font-semibold">
-                  <option value="gemini-flash">Gemini 2.5 Flash</option>
+                  <option value="gemini-flash">Gemini 3.8 Flash (Free Scholar Access)</option>
+                  <option value="gemini-flash-lite">Gemini 3.5 Flash-Lite (High Speed · Free)</option>
                 </optgroup>
               </select>
             </div>

@@ -14,7 +14,8 @@ import {
   ExternalLink,
   QrCode,
   Sparkles,
-  Cpu
+  Monitor,
+  Apple
 } from 'lucide-react';
 import { OfflineSyncEngine, OutboxItem } from '../../services/offlineSyncEngine';
 import { AnusandhanLogo } from '../common/AnusandhanLogo';
@@ -32,7 +33,7 @@ export const CrossNativeAppModal: React.FC<CrossNativeAppModalProps> = ({
   onTriggerPwaInstall,
   canInstallPwa = false
 }) => {
-  const [activeTab, setActiveTab] = useState<'android' | 'pwa' | 'sync'>('android');
+  const [activeTab, setActiveTab] = useState<'android' | 'windows' | 'mac' | 'pwa' | 'sync'>('android');
   const [isOnline, setIsOnline] = useState<boolean>(OfflineSyncEngine.isOnline());
   const [outboxItems, setOutboxItems] = useState<OutboxItem[]>([]);
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
@@ -71,9 +72,11 @@ export const CrossNativeAppModal: React.FC<CrossNativeAppModalProps> = ({
 
   const currentUrl = typeof window !== 'undefined' ? window.location.origin : 'https://anusandhan.vercel.app';
   const apkDownloadUrl = '/downloads/anusandhan-v1.0.apk';
+  const winDownloadUrl = '/downloads/anusandhan-setup-1.0.0.exe';
+  const macDownloadUrl = '/downloads/anusandhan-1.0.0-universal.dmg';
 
-  const handleCopyLink = () => {
-    navigator.clipboard.writeText(`${currentUrl}${apkDownloadUrl}`);
+  const handleCopyLink = (url: string) => {
+    navigator.clipboard.writeText(`${currentUrl}${url}`);
     setCopiedLink(true);
     setTimeout(() => setCopiedLink(false), 2500);
   };
@@ -115,14 +118,14 @@ export const CrossNativeAppModal: React.FC<CrossNativeAppModalProps> = ({
               <div>
                 <div className="flex items-center gap-2">
                   <h2 className="text-base sm:text-lg font-bold tracking-tight text-white flex items-center gap-1.5">
-                    Anusandhan Cross-Native Suite
+                    Anusandhan Universal Cross-Native Suite
                   </h2>
                   <span className="px-2 py-0.5 text-[10px] font-mono font-bold uppercase rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300">
-                    Android & PWA
+                    All Platforms
                   </span>
                 </div>
                 <p className="text-xs text-zinc-400">
-                  Universal offline-first distribution for Android APK & Progressive Web App
+                  Native offline-first apps for Android, Windows, macOS, and Web PWA
                 </p>
               </div>
             </div>
@@ -137,41 +140,65 @@ export const CrossNativeAppModal: React.FC<CrossNativeAppModalProps> = ({
           </div>
 
           {/* Navigation Tabs */}
-          <div className="flex items-center space-x-1.5 my-4 p-1 rounded-2xl bg-white/[0.04] border border-white/10">
+          <div className="flex flex-wrap items-center gap-1.5 my-4 p-1 rounded-2xl bg-white/[0.04] border border-white/10 text-xs">
             <button
               onClick={() => setActiveTab('android')}
-              className={`flex-1 py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer ${
+              className={`flex-1 min-w-[100px] py-2 px-2.5 rounded-xl font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                 activeTab === 'android'
                   ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-zinc-950 shadow-md font-bold'
                   : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
               }`}
             >
-              <Smartphone className="w-4 h-4" />
+              <Smartphone className="w-3.5 h-3.5" />
               <span>Android APK</span>
             </button>
 
             <button
+              onClick={() => setActiveTab('windows')}
+              className={`flex-1 min-w-[100px] py-2 px-2.5 rounded-xl font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                activeTab === 'windows'
+                  ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-zinc-950 shadow-md font-bold'
+                  : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
+              }`}
+            >
+              <Monitor className="w-3.5 h-3.5" />
+              <span>Windows (.exe)</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('mac')}
+              className={`flex-1 min-w-[90px] py-2 px-2.5 rounded-xl font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                activeTab === 'mac'
+                  ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-zinc-950 shadow-md font-bold'
+                  : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
+              }`}
+            >
+              <Apple className="w-3.5 h-3.5" />
+              <span>macOS (.dmg)</span>
+            </button>
+
+            <button
               onClick={() => setActiveTab('pwa')}
-              className={`flex-1 py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer ${
+              className={`flex-1 min-w-[80px] py-2 px-2.5 rounded-xl font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                 activeTab === 'pwa'
                   ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-zinc-950 shadow-md font-bold'
                   : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
               }`}
             >
-              <Globe className="w-4 h-4" />
-              <span>Progressive Web App</span>
+              <Globe className="w-3.5 h-3.5" />
+              <span>PWA / iOS</span>
             </button>
 
             <button
               onClick={() => setActiveTab('sync')}
-              className={`flex-1 py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer ${
+              className={`flex-1 min-w-[120px] py-2 px-2.5 rounded-xl font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                 activeTab === 'sync'
                   ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-zinc-950 shadow-md font-bold'
                   : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
               }`}
             >
               <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
-              <span>Offline Sync Engine</span>
+              <span>Offline Sync</span>
               {outboxItems.length > 0 && (
                 <span className="w-4 h-4 rounded-full bg-amber-400 text-zinc-950 text-[10px] font-bold flex items-center justify-center">
                   {outboxItems.length}
@@ -196,14 +223,14 @@ export const CrossNativeAppModal: React.FC<CrossNativeAppModalProps> = ({
                     </span>
                   </div>
                   <p className="text-xs text-zinc-400">
-                    Capacitor 8 Cross-Native Android build with embedded SQLite store & background push listeners.
+                    Capacitor 8 Cross-Native Android build with embedded SQLite store & background push sync.
                   </p>
                   <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 text-[11px] font-mono text-zinc-400 pt-1">
                     <span>Android 8.0+ (API 26)</span>
                     <span>•</span>
                     <span>Package: ai.anusandhan.pro</span>
                     <span>•</span>
-                    <span>14.2 MB Universal</span>
+                    <span>Universal APK</span>
                   </div>
                 </div>
 
@@ -213,7 +240,7 @@ export const CrossNativeAppModal: React.FC<CrossNativeAppModalProps> = ({
                   className="w-full sm:w-auto px-5 py-3 rounded-2xl bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-zinc-950 font-bold text-xs shadow-lg shadow-amber-500/25 flex items-center justify-center gap-2 transition-all cursor-pointer shrink-0 active:scale-95"
                 >
                   <Download className="w-4 h-4" />
-                  <span>Download APK Directly</span>
+                  <span>Download Android APK</span>
                 </a>
               </div>
 
@@ -222,7 +249,7 @@ export const CrossNativeAppModal: React.FC<CrossNativeAppModalProps> = ({
                 <div className="p-3 rounded-xl bg-white/[0.02] border border-white/5 space-y-1">
                   <span className="font-mono text-amber-400 font-bold">01. Download</span>
                   <p className="text-zinc-400 text-[11px]">
-                    Tap download above to get <code className="text-amber-300">anusandhan-v1.0.apk</code> on your Android phone.
+                    Tap download above to get <code className="text-amber-300">anusandhan-v1.0.apk</code> on your phone.
                   </p>
                 </div>
                 <div className="p-3 rounded-xl bg-white/[0.02] border border-white/5 space-y-1">
@@ -234,7 +261,7 @@ export const CrossNativeAppModal: React.FC<CrossNativeAppModalProps> = ({
                 <div className="p-3 rounded-xl bg-white/[0.02] border border-white/5 space-y-1">
                   <span className="font-mono text-amber-400 font-bold">03. Autonomous Sync</span>
                   <p className="text-zinc-400 text-[11px]">
-                    Launch Anusandhan. Work completely offline; changes sync automatically when reconnected.
+                    Launch Anusandhan. Work offline; updates flush to the cloud on reconnection.
                   </p>
                 </div>
               </div>
@@ -254,7 +281,7 @@ export const CrossNativeAppModal: React.FC<CrossNativeAppModalProps> = ({
                 </div>
 
                 <button
-                  onClick={handleCopyLink}
+                  onClick={() => handleCopyLink(apkDownloadUrl)}
                   className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-amber-300 hover:text-amber-200 text-xs font-mono transition-colors cursor-pointer shrink-0"
                 >
                   {copiedLink ? 'Copied!' : 'Copy Link'}
@@ -263,7 +290,115 @@ export const CrossNativeAppModal: React.FC<CrossNativeAppModalProps> = ({
             </motion.div>
           )}
 
-          {/* TAB CONTENT: PROGRESSIVE WEB APP (PWA) */}
+          {/* TAB CONTENT: WINDOWS DESKTOP */}
+          {activeTab === 'windows' && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="space-y-4"
+            >
+              <div className="p-4 rounded-2xl bg-white/[0.03] border border-blue-500/20 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="space-y-1.5 text-center sm:text-left">
+                  <div className="flex items-center justify-center sm:justify-start gap-2">
+                    <span className="text-sm font-bold text-white">Anusandhan for Windows (x64)</span>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                      Windows 10 / 11
+                    </span>
+                  </div>
+                  <p className="text-xs text-zinc-400">
+                    Electron native desktop wrapper with local SQLite database, system tray, and native offline sync.
+                  </p>
+                  <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 text-[11px] font-mono text-zinc-400 pt-1">
+                    <span>Architecture: x64 Intel/AMD</span>
+                    <span>•</span>
+                    <span>NSIS Automated Installer</span>
+                  </div>
+                </div>
+
+                <a
+                  href={winDownloadUrl}
+                  download="anusandhan-setup-1.0.0.exe"
+                  className="w-full sm:w-auto px-5 py-3 rounded-2xl bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-400 hover:to-indigo-500 text-white font-bold text-xs shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2 transition-all cursor-pointer shrink-0 active:scale-95"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>Download for Windows (.exe)</span>
+                </a>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/5 space-y-1">
+                  <span className="font-semibold text-zinc-200">Native Windows Features:</span>
+                  <ul className="text-zinc-400 text-[11px] space-y-1 list-disc list-inside">
+                    <li>Embedded SQLite local database for fast querying</li>
+                    <li>Windows Toast notifications for fellowship deadlines</li>
+                    <li>Global shortcut <code>Ctrl+Shift+A</code> for instant voice access</li>
+                  </ul>
+                </div>
+                <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/5 space-y-1">
+                  <span className="font-semibold text-zinc-200">Installation Notes:</span>
+                  <p className="text-zinc-400 text-[11px]">
+                    Run <code>anusandhan-setup-1.0.0.exe</code>. If Windows SmartScreen appears, click "More info" and then "Run anyway" to complete installation.
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* TAB CONTENT: MACOS DESKTOP */}
+          {activeTab === 'mac' && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="space-y-4"
+            >
+              <div className="p-4 rounded-2xl bg-white/[0.03] border border-zinc-500/20 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="space-y-1.5 text-center sm:text-left">
+                  <div className="flex items-center justify-center sm:justify-start gap-2">
+                    <span className="text-sm font-bold text-white">Anusandhan for macOS</span>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-zinc-700/50 text-zinc-200 border border-zinc-600/50">
+                      Apple Silicon & Intel
+                    </span>
+                  </div>
+                  <p className="text-xs text-zinc-400">
+                    Universal binary optimized for macOS Sequoia, Sonoma, and Ventura with macOS Dock & Touch Bar integration.
+                  </p>
+                  <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 text-[11px] font-mono text-zinc-400 pt-1">
+                    <span>M1/M2/M3/M4 + x86_64</span>
+                    <span>•</span>
+                    <span>Apple Silicon Native</span>
+                  </div>
+                </div>
+
+                <a
+                  href={macDownloadUrl}
+                  download="anusandhan-1.0.0-universal.dmg"
+                  className="w-full sm:w-auto px-5 py-3 rounded-2xl bg-gradient-to-r from-zinc-200 to-zinc-400 hover:from-white hover:to-zinc-300 text-zinc-950 font-bold text-xs shadow-lg shadow-white/10 flex items-center justify-center gap-2 transition-all cursor-pointer shrink-0 active:scale-95"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>Download for macOS (.dmg)</span>
+                </a>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/5 space-y-1">
+                  <span className="font-semibold text-zinc-200">macOS Experience:</span>
+                  <ul className="text-zinc-400 text-[11px] space-y-1 list-disc list-inside">
+                    <li>Native Apple Silicon acceleration for instant search</li>
+                    <li>Global Spotlight shortcut <code>⌘K</code> anywhere in the system</li>
+                    <li>Offline-first local cache with instant sync</li>
+                  </ul>
+                </div>
+                <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/5 space-y-1">
+                  <span className="font-semibold text-zinc-200">Installation Steps:</span>
+                  <p className="text-zinc-400 text-[11px]">
+                    Open <code>anusandhan-1.0.0-universal.dmg</code> and drag the Anusandhan icon into your Applications folder.
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* TAB CONTENT: PROGRESSIVE WEB APP (PWA) & IOS */}
           {activeTab === 'pwa' && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
@@ -279,11 +414,11 @@ export const CrossNativeAppModal: React.FC<CrossNativeAppModalProps> = ({
                     </span>
                   </div>
                   <p className="text-xs text-zinc-400">
-                    Zero-install overhead. Runs inside isolated sandboxed browser container with full offline cache.
+                    Runs inside isolated sandboxed browser container with full offline cache and service worker.
                   </p>
                   <div className="flex items-center justify-center sm:justify-start gap-2 text-[11px] text-zinc-400 pt-1">
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                    <span>Cross-platform: Windows, macOS, Android, iOS, ChromeOS</span>
+                    <span>Works on iPhone, iPad, Android, Windows, Mac, Linux</span>
                   </div>
                 </div>
 
@@ -311,13 +446,13 @@ export const CrossNativeAppModal: React.FC<CrossNativeAppModalProps> = ({
                 <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/5 space-y-1">
                   <span className="font-semibold text-zinc-200">Chrome / Edge / Brave:</span>
                   <p className="text-zinc-400 text-[11px]">
-                    Look for the install icon <span className="font-mono text-amber-300">[⊕]</span> on the right side of the address bar, or click Menu <span className="font-mono text-amber-300">⋮ → "Install Anusandhan"</span>.
+                    Look for the install icon <span className="font-mono text-amber-300">[⊕]</span> on the address bar, or click Menu <span className="font-mono text-amber-300">⋮ → "Install Anusandhan"</span>.
                   </p>
                 </div>
                 <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/5 space-y-1">
                   <span className="font-semibold text-zinc-200">Safari (iOS / iPadOS):</span>
                   <p className="text-zinc-400 text-[11px]">
-                    Tap the Share button at the bottom of Safari, scroll down and tap <span className="text-amber-300 font-medium">"Add to Home Screen"</span>.
+                    Tap the Share button in Safari, scroll down and tap <span className="text-amber-300 font-medium">"Add to Home Screen"</span>.
                   </p>
                 </div>
               </div>
@@ -421,9 +556,9 @@ export const CrossNativeAppModal: React.FC<CrossNativeAppModalProps> = ({
           <div className="mt-5 pt-3.5 border-t border-white/10 flex flex-wrap items-center justify-between gap-2 text-[11px] text-zinc-500 font-mono">
             <div className="flex items-center gap-1.5">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Cryptographically verified release • TLS 1.3 End-to-End</span>
+              <span>TLS 1.3 Verified • Local SQLite / Outbox Cache • Zero Tracking</span>
             </div>
-            <span>Cross-Native Architecture v1.0.0</span>
+            <span>Cross-Platform Release v1.0.0</span>
           </div>
 
         </motion.div>

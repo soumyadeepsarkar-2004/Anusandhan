@@ -1,0 +1,9 @@
+{
+  "appName": "Anusandhan",
+  "platform": "Windows Desktop (x64)",
+  "version": "1.0.0",
+  "architecture": "x64 (Windows 10/11)",
+  "offlineSupport": true,
+  "embeddedStorage": "SQLite Local Store",
+  "timestamp": "2026-11-10T14:34:28.324Z"
+}

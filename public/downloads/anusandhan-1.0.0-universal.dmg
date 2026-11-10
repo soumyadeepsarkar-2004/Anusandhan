@@ -1,0 +1,9 @@
+{
+  "appName": "Anusandhan",
+  "platform": "macOS Desktop (Universal)",
+  "version": "1.0.0",
+  "architecture": "Apple Silicon (M1/M2/M3) & Intel x64",
+  "offlineSupport": true,
+  "embeddedStorage": "SQLite Local Store",
+  "timestamp": "2026-11-10T14:34:28.335Z"
+}

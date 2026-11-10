@@ -510,6 +510,7 @@ const AppContent: React.FC = () => {
               }}
               isAuthenticated={isAuthenticated}
               userName={user?.fullName || student.fullName}
+              onOpenCrossNativeModal={() => setIsCrossNativeModalOpen(true)}
             />
 
             <OpportunitiesSection

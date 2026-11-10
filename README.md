@@ -10,6 +10,16 @@
 </p>
 
 <p align="center">
+  <a href="https://www.producthunt.com/posts/anusandhan" target="_blank">
+    <img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=945281&theme=dark" alt="Anusandhan - Autonomous Research Internships | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" />
+  </a>
+  &nbsp;&nbsp;
+  <a href="https://www.producthunt.com/posts/anusandhan" target="_blank">
+    <img src="https://api.producthunt.com/widgets/embed-image/v1/top-post-badge.svg?post_id=945281&theme=dark&period=daily" alt="Anusandhan - #1 Product of the Day on Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" />
+  </a>
+</p>
+
+<p align="center">
   <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-amber.svg" alt="License: MIT" /></a>
   <a href="https://github.com"><img src="https://img.shields.io/badge/Build-Passing-emerald.svg" alt="Build Status" /></a>
   <a href="https://vitejs.dev"><img src="https://img.shields.io/badge/Frontend-Vite%205%20%7C%20React%2018%20%7C%20TypeScript-646CFF.svg" alt="Vite" /></a>
@@ -31,6 +41,15 @@
 - 🚀 **Live Production Platform**: [https://anusandhan.vercel.app](https://anusandhan.vercel.app)
 - 📚 **VitePress Documentation (GitHub Pages)**: [https://soumyadeepsarkar-2004.github.io/Anusandhan/](https://soumyadeepsarkar-2004.github.io/Anusandhan/)
 - 📦 **GitHub Repository**: [https://github.com/soumyadeepsarkar-2004/Anusandhan](https://github.com/soumyadeepsarkar-2004/Anusandhan)
+
+### 📱 Universal Cross-Platform App Downloads
+
+| Platform | Format / Architecture | Status | Direct Download Link |
+| :--- | :--- | :--- | :--- |
+| **Android** | Universal APK (Capacitor 8) | Production Release | [Download APK (`anusandhan-v1.0.apk`)](https://anusandhan.vercel.app/downloads/anusandhan-v1.0.apk) |
+| **Windows** | x64 Installer (Electron 45) | Production Release | [Download Windows Setup (`.exe`)](https://anusandhan.vercel.app/downloads/anusandhan-setup-1.0.0.exe) |
+| **macOS** | Universal DMG (Apple Silicon & Intel) | Production Release | [Download macOS DMG (`.dmg`)](https://anusandhan.vercel.app/downloads/anusandhan-1.0.0-universal.dmg) |
+| **Web & iOS** | Progressive Web App (PWA) | Production Live | [Launch Web PWA](https://anusandhan.vercel.app) |
 
 ---
 
@@ -73,6 +92,14 @@ Anusandhan goes beyond standard computer science scrapers by actively indexing a
 
 ### 6. 7-Day Polite Follow-Up Engine
 - Automated tracking preventing double-emailing while pacing academic follow-ups ethically at 7 to 10 days.
+
+### 7. Universal Free & Accessible AI Foundation Models
+Anusandhan eliminates financial barriers to research access by integrating high-performance, cost-free foundation models out of the box:
+- **Gemini 3.8 Flash & Gemini 3.5 Flash-Lite**: High-throughput multimodal parsing, citation grounding, and multilingual speech understanding.
+- **DeepSeek-R1 (Open Reasoning)**: Verifiable chain-of-thought gap analysis and profile diagnostics.
+- **Qwen 2.5 Coder 32B**: Deep code analysis, reproducible repository scanning, and benchmark synthesis.
+- **Llama 3.3 70B & Mistral NeMo**: Academic discourse calibration and polite email drafting.
+- **Anusandhan Core (Zero-Cost Local)**: Deterministic, privacy-first offline heuristic engine for offline operation.
 
 ---
 

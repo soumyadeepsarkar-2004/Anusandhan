@@ -33,7 +33,7 @@ export interface OpportunityLinkItem {
 
 export interface AgentResponse {
   spokenText: string;
-  detectedLanguage: 'Hinglish' | 'Hindi' | 'English';
+  detectedLanguage: 'Hinglish' | 'Hindi' | 'English' | 'Bengali';
   suggestedAction?: PlatformAction | string;
   opportunityLinks?: OpportunityLinkItem[];
   modelUsed?: string;
@@ -70,17 +70,29 @@ export function processVoiceQuery(query: string, student: StudentProfile, engine
     'mistral-nemo': 'Mistral NeMo 12B (Open Weights · Free)',
     'gemma-2-9b': 'Gemma 2 9B (Ultra-Fast · Free)',
     'local-academic': 'Anusandhan Core (Zero-Cost Local)',
-    'gemini-flash': 'Gemini 2.5 Flash'
+    'gemini-flash': 'Gemini 3.8 Flash (Free Scholar Tier)',
+    'gemini-flash-lite': 'Gemini 3.5 Flash-Lite (High Speed · Free)'
   };
   const activeModelDisplay = modelNames[model] || 'AnusandhanAI';
 
   // 1. Language detection & Explicit Language Commands
+  const isBengali = /আমি|আমার|তুমি|তোমার|ভাই|শোন|করব|বানাব|ঠিক|কেমন|আছ|কোথায়|কি|হবে|আছে|বেশ|হাঁ/i.test(q) || /bengali|bangla/i.test(q);
   const isHinglish = /bhai|kya|mera|meri|kaise|batao|kuch|hai|wala|wali|aur|kitna|kab|kaun|chahiye|dikhao|le|chal|bana/i.test(q);
   const isPureHindi = /नमस्ते|इंटर्नशिप|शोध|आवेदन|छात्रवृत्ति|प्रणाम|सहायता/i.test(q);
 
-  let lang: 'Hinglish' | 'Hindi' | 'English' = 'English';
-  if (isPureHindi) lang = 'Hindi';
+  let lang: 'Hinglish' | 'Hindi' | 'English' | 'Bengali' = 'English';
+  if (isBengali) lang = 'Bengali';
+  else if (isPureHindi) lang = 'Hindi';
   else if (isHinglish) lang = 'Hinglish';
+
+  // Explicit Language Switching Requests
+  if (q.includes('bengali me bolo') || q.includes('banglay bolo') || q.includes('bangla') || q.includes('bengali please') || q === 'bengali') {
+    return {
+      spokenText: `হ্যাঁ ভাই! বাংলা মোড সক্রিয় হয়ে গেছে, পরিচালিত বাই ${activeModelDisplay}। আমি অনুসন্ধান প্ল্যাটফর্মের সমস্ত সুযোগ, ফেলোশিপ ও রিসার্চ প্রসেস সম্পূর্ণ হ্যান্ডেল করতে পারি। আজ কি বিষয়ে কাজ করতে চান?`,
+      detectedLanguage: 'Bengali',
+      modelUsed: activeModelDisplay
+    };
+  }
 
   // Explicit Language Switching Requests
   if (q.includes('speak in english') || q.includes('talk in english') || q.includes('english me bolo') || q.includes('english please') || q === 'english') {

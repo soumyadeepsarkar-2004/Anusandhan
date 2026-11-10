@@ -9,6 +9,7 @@ interface SimpleHeroSectionProps {
   onOpenAuth: () => void;
   isAuthenticated: boolean;
   userName?: string;
+  onOpenCrossNativeModal?: () => void;
 }
 
 const SimpleHeroSectionComponent: React.FC<SimpleHeroSectionProps> = ({
@@ -16,7 +17,8 @@ const SimpleHeroSectionComponent: React.FC<SimpleHeroSectionProps> = ({
   onExploreLabs,
   onOpenAuth,
   isAuthenticated,
-  userName
+  userName,
+  onOpenCrossNativeModal
 }) => {
   const scrollToOpportunities = () => {
     const el = document.getElementById('opportunities');
@@ -38,18 +40,42 @@ const SimpleHeroSectionComponent: React.FC<SimpleHeroSectionProps> = ({
       {/* Main Centered Hero Content */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10 flex flex-col items-center w-full">
         
-        {/* Universal Inclusivity Pill */}
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="inline-flex items-center space-x-2.5 px-4 py-1.5 rounded-full apple-glass-pill text-xs font-mono text-zinc-300 mb-5 sm:mb-6 border border-white/10 shadow-sm"
-        >
-          <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-          <span className="text-zinc-200 font-medium">OPEN TO ALL CURIOUS MINDS</span>
-          <span className="text-zinc-500">·</span>
-          <span className="text-amber-400">National & Global Research Access</span>
-        </motion.div>
+        {/* Top Badges: Inclusivity & Product Hunt */}
+        <div className="flex flex-wrap items-center justify-center gap-2.5 mb-5 sm:mb-6">
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="inline-flex items-center space-x-2.5 px-4 py-1.5 rounded-full apple-glass-pill text-xs font-mono text-zinc-300 border border-white/10 shadow-sm"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+            <span className="text-zinc-200 font-medium">OPEN TO ALL CURIOUS MINDS</span>
+            <span className="text-zinc-500">·</span>
+            <span className="text-amber-400">National & Global Research Access</span>
+          </motion.div>
+
+          {/* Product Hunt #1 Product of the Day Badge */}
+          <motion.a
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            href="https://www.producthunt.com/posts/anusandhan"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-orange-500/15 to-amber-500/10 hover:from-orange-500/25 hover:to-amber-500/20 border border-orange-500/40 text-orange-300 text-xs font-mono transition-all shadow-sm group cursor-pointer"
+            title="Featured on Product Hunt — #1 Product of the Day"
+          >
+            <span className="w-4 h-4 rounded-full bg-[#DA552F] text-white font-bold text-[10px] flex items-center justify-center shadow-sm">
+              P
+            </span>
+            <span className="font-semibold text-orange-200">#1 Product of the Day</span>
+            <span className="text-zinc-500">·</span>
+            <span className="text-zinc-400 group-hover:text-white transition-colors">Product Hunt</span>
+            <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-orange-500/20 text-orange-300 font-bold border border-orange-500/30">
+              ▲ 584
+            </span>
+          </motion.a>
+        </div>
 
         {/* Clean, Human Editorial Headline */}
         <motion.h1
@@ -95,6 +121,48 @@ const SimpleHeroSectionComponent: React.FC<SimpleHeroSectionProps> = ({
           >
             <Search className="w-4 h-4 text-amber-400" />
             <span>Browse 500+ Open Labs & Grants</span>
+          </button>
+        </motion.div>
+
+        {/* Cross-Platform Device Suite Strip */}
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.35 }}
+          className="mt-5 flex flex-wrap items-center justify-center gap-2 text-xs font-mono"
+        >
+          <span className="text-zinc-500 text-[11px] mr-1">Available on:</span>
+          
+          <button
+            onClick={onOpenCrossNativeModal}
+            className="px-3 py-1.5 rounded-xl bg-white/[0.04] hover:bg-amber-500/15 border border-white/10 hover:border-amber-500/40 text-zinc-300 hover:text-amber-300 transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
+          >
+            <span>🤖</span>
+            <span className="font-semibold">Android APK</span>
+          </button>
+
+          <button
+            onClick={onOpenCrossNativeModal}
+            className="px-3 py-1.5 rounded-xl bg-white/[0.04] hover:bg-amber-500/15 border border-white/10 hover:border-amber-500/40 text-zinc-300 hover:text-amber-300 transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
+          >
+            <span>🪟</span>
+            <span>Windows (.exe)</span>
+          </button>
+
+          <button
+            onClick={onOpenCrossNativeModal}
+            className="px-3 py-1.5 rounded-xl bg-white/[0.04] hover:bg-amber-500/15 border border-white/10 hover:border-amber-500/40 text-zinc-300 hover:text-amber-300 transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
+          >
+            <span>🍎</span>
+            <span>macOS (.dmg)</span>
+          </button>
+
+          <button
+            onClick={onOpenCrossNativeModal}
+            className="px-3 py-1.5 rounded-xl bg-white/[0.04] hover:bg-amber-500/15 border border-white/10 hover:border-amber-500/40 text-zinc-300 hover:text-amber-300 transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
+          >
+            <span>⚡</span>
+            <span>Web PWA</span>
           </button>
         </motion.div>
 

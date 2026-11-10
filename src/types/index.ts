@@ -181,13 +181,14 @@ export type AgentModelId =
   | 'mistral-nemo'
   | 'gemma-2-9b'
   | 'local-academic'
-  | 'gemini-flash';
+  | 'gemini-flash'
+  | 'gemini-flash-lite';
 
 export interface VoiceMessage {
   id: string;
   sender: 'user' | 'agent';
   text: string;
-  language: 'Hinglish' | 'Hindi' | 'English';
+  language: 'Hinglish' | 'Hindi' | 'English' | 'Bengali';
   timestamp: string;
   audioPlaying?: boolean;
   action?: string;

@@ -54,6 +54,16 @@ test.after(async () => {
   if (server) {
     await new Promise((resolve) => server.close(resolve));
   }
+  try {
+    const mongoose = await import('mongoose');
+    if (mongoose.default && mongoose.default.connection) {
+      await mongoose.default.disconnect();
+    }
+  } catch {}
+  // Guarantee clean process termination for CI/CD test runners
+  setTimeout(() => {
+    process.exit(0);
+  }, 300);
 });
 
 test('Express Gateway Health Check returns operational status', async () => {
