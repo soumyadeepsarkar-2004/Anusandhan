@@ -744,7 +744,7 @@ router.post('/claim-daily-reward', authenticateToken, async (req, res) => {
       totalTokens: user.tokensBalance,
       xpAwarded,
       user: sanitizeUser(user),
-      message: `🎉 Claimed ${creditsAwarded} free credits and ${totalTokensAwarded} 🪙 Shodh Tokens! Streak: ${currentStreak} days.`
+      message: `🎉 Claimed ${creditsAwarded} free credits and ${totalTokensAwarded} 🪙 Research Coins (RC)! Streak: ${currentStreak} days.`
     });
   } catch (err) {
     res.status(500).json({ error: 'Failed to claim daily reward: ' + err.message });
@@ -770,7 +770,7 @@ router.post('/redeem-tokens', authenticateToken, async (req, res) => {
 
     if ((user.tokensBalance || 0) < tokenCost) {
       return res.status(400).json({
-        error: `Insufficient Shodh Tokens. You have ${user.tokensBalance || 0} tokens, but ${tokenCost} are required. Maintain your daily streak to earn more!`
+        error: `Insufficient Research Coins. You have ${user.tokensBalance || 0} RC, but ${tokenCost} RC are required. Maintain your daily research streak to earn more!`
       });
     }
 
@@ -790,7 +790,7 @@ router.post('/redeem-tokens', authenticateToken, async (req, res) => {
       creditsRemaining: user.creditsRemaining,
       isPro: true,
       user: sanitizeUser(user),
-      message: `🌟 Successfully unlocked ${planId} with ${tokenCost} Shodh Tokens! +${creditsToAdd || 50} credits added.`
+      message: `🌟 Successfully unlocked ${planId} with ${tokenCost} Research Coins (RC)! +${creditsToAdd || 50} credits added.`
     });
   } catch (err) {
     res.status(500).json({ error: 'Failed to redeem tokens: ' + err.message });

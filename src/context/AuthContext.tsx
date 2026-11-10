@@ -363,7 +363,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         creditsAwarded: 0,
         tokensAwarded: 0,
         newStreak: 0,
-        message: 'Please sign in or create an account to claim daily Shodh tokens.'
+        message: 'Please sign in or create an account to claim daily Research Coins (রিসার্চ কয়েন).'
       };
     }
 
@@ -453,7 +453,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Offline fallback deduction
     if ((user?.tokensBalance || 0) < tokenCost) {
-      throw new Error(`Insufficient Shodh Tokens. You have ${user?.tokensBalance || 0}, but need ${tokenCost}.`);
+      throw new Error(`Insufficient Research Coins. You have ${user?.tokensBalance || 0} RC, but need ${tokenCost} RC.`);
     }
 
     setUser(prev => prev ? {
@@ -465,7 +465,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     return {
       success: true,
-      message: `🌟 Successfully unlocked ${planId} with ${tokenCost} Shodh Tokens! +${creditsToAdd} credits added.`
+      message: `🌟 Successfully unlocked ${planId} with ${tokenCost} Research Coins (RC)! +${creditsToAdd} credits added.`
     };
   };
 

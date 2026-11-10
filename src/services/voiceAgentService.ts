@@ -138,12 +138,12 @@ export function processVoiceQuery(query: string, student: StudentProfile, engine
     };
   }
 
-  // Token Rewards & Payment Commands
-  if (q.includes('reward') || q.includes('token') || q.includes('shodh token') || q.includes('coins') || q.includes('daily streak')) {
+  // Research Coins, Rewards & Gamification Commands
+  if (q.includes('reward') || q.includes('token') || q.includes('coin') || q.includes('research coin') || q.includes('shodh') || q.includes('daily streak') || q.includes('রিসার্চ কয়েন')) {
     return {
       spokenText: lang === 'Hinglish'
-        ? `Aapka Shodh Token Wallet aur Daily Rewards modal open kar diya hai bhai! Daily check-in karke aap aur tokens claim kar sakte hain.`
-        : `Opening your Shodh Token Wallet and Daily Rewards modal. You can earn tokens through streak check-ins.`,
+        ? `Aapka Research Coins (RC) Wallet aur Daily Rewards modal open kar diya hai bhai! Daily streak claim karke aur authentic research karke aap aur coins earn kar sakte hain.`
+        : `Opening your Research Coins (RC) Wallet and Rewards modal. Earn coins through daily research streaks and verified outreach.`,
       detectedLanguage: lang,
       suggestedAction: 'open_rewards',
       modelUsed: activeModelDisplay

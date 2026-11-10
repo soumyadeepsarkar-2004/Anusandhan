@@ -177,15 +177,15 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
           )}
 
-          {/* Shodh Token Rewards Trigger */}
+          {/* Research Coins Rewards Trigger */}
           {isAuthenticated && onOpenRewardsModal && (
             <button
               onClick={onOpenRewardsModal}
               className="hidden sm:flex items-center space-x-1 px-2.5 h-8 rounded-full bg-white/[0.04] hover:bg-white/[0.08] border border-amber-500/30 text-amber-300 text-xs font-mono transition-all cursor-pointer shadow-sm shrink-0"
-              title="Shodh Token Wallet & Daily Rewards"
+              title="Research Coins (রিসার্চ কয়েন) & Daily Rewards"
             >
               <span>🪙</span>
-              <span className="text-[11px] font-bold">{user?.tokensBalance || 0}</span>
+              <span className="text-[11px] font-bold">{user?.tokensBalance || 0} RC</span>
             </button>
           )}
 

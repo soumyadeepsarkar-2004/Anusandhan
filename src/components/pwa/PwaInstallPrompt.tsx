@@ -5,12 +5,10 @@ import { AnusandhanLogo } from '../common/AnusandhanLogo';
 
 interface PwaInstallPromptProps {
   onOpenCrossNativeModal: () => void;
-  onInstallPwaRegistered?: (triggerFn: () => void, canInstall: boolean) => void;
 }
 
 export const PwaInstallPrompt: React.FC<PwaInstallPromptProps> = ({
-  onOpenCrossNativeModal,
-  onInstallPwaRegistered
+  onOpenCrossNativeModal
 }) => {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [isVisible, setIsVisible] = useState<boolean>(false);
@@ -19,8 +17,10 @@ export const PwaInstallPrompt: React.FC<PwaInstallPromptProps> = ({
   useEffect(() => {
     // Check if running in standalone mode (already installed PWA)
     const isStandalone = 
-      window.matchMedia('(display-mode: standalone)').matches ||
-      (window.navigator as any).standalone === true;
+      typeof window !== 'undefined' && (
+        window.matchMedia('(display-mode: standalone)').matches ||
+        (window.navigator as any).standalone === true
+      );
 
     if (isStandalone) {
       setIsInstalled(true);
@@ -28,26 +28,27 @@ export const PwaInstallPrompt: React.FC<PwaInstallPromptProps> = ({
     }
 
     // Check if user dismissed recently this session
-    const dismissedThisSession = sessionStorage.getItem('anusandhan_pwa_dismissed');
+    const dismissedThisSession = typeof sessionStorage !== 'undefined' && sessionStorage.getItem('anusandhan_pwa_dismissed');
 
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e);
       if (!dismissedThisSession) {
-        // Show pop up smoothly after 2 seconds of using the platform
-        setTimeout(() => setIsVisible(true), 2000);
+        // Show pop up smoothly after 2.5 seconds of using the platform
+        setTimeout(() => setIsVisible(true), 2500);
+      }
+    };
+
+    const handleCustomTrigger = () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+      } else {
+        onOpenCrossNativeModal();
       }
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-
-    // If beforeinstallprompt hasn't fired after 3 seconds (e.g. Chrome desktop or iOS Safari),
-    // still display the PWA / Android installation banner if not dismissed
-    const timer = setTimeout(() => {
-      if (!dismissedThisSession && !isStandalone) {
-        setIsVisible(true);
-      }
-    }, 2500);
+    window.addEventListener('trigger-pwa-install', handleCustomTrigger);
 
     // Listen for successful installation
     window.addEventListener('appinstalled', () => {
@@ -59,28 +60,9 @@ export const PwaInstallPrompt: React.FC<PwaInstallPromptProps> = ({
 
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-      clearTimeout(timer);
+      window.removeEventListener('trigger-pwa-install', handleCustomTrigger);
     };
-  }, []);
-
-  // Register trigger function with parent if needed
-  useEffect(() => {
-    if (onInstallPwaRegistered) {
-      const triggerFn = async () => {
-        if (deferredPrompt) {
-          deferredPrompt.prompt();
-          const { outcome } = await deferredPrompt.userChoice;
-          if (outcome === 'accepted') {
-            setIsVisible(false);
-          }
-          setDeferredPrompt(null);
-        } else {
-          onOpenCrossNativeModal();
-        }
-      };
-      onInstallPwaRegistered(triggerFn, Boolean(deferredPrompt));
-    }
-  }, [deferredPrompt, onOpenCrossNativeModal, onInstallPwaRegistered]);
+  }, [onOpenCrossNativeModal, deferredPrompt]);
 
   const handleInstallClick = async () => {
     if (deferredPrompt) {

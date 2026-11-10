@@ -10,12 +10,12 @@
 </p>
 
 <p align="center">
-  <a href="https://www.producthunt.com/posts/anusandhan" target="_blank">
-    <img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=945281&theme=dark" alt="Anusandhan - Autonomous Research Internships | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" />
+  <a href="https://www.producthunt.com/products/anusandhan" target="_blank">
+    <img src="https://img.shields.io/badge/Product%20Hunt-Featured%20Launch-DA552F?style=for-the-badge&logo=producthunt&logoColor=white" alt="Featured on Product Hunt" height="34" />
   </a>
   &nbsp;&nbsp;
-  <a href="https://www.producthunt.com/posts/anusandhan" target="_blank">
-    <img src="https://api.producthunt.com/widgets/embed-image/v1/top-post-badge.svg?post_id=945281&theme=dark&period=daily" alt="Anusandhan - #1 Product of the Day on Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" />
+  <a href="https://www.producthunt.com/products/anusandhan" target="_blank">
+    <img src="https://img.shields.io/badge/%F0%9F%8F%86%20Community%20Favorite-%231%20Daily%20Spotlight-FF6154?style=for-the-badge&logo=producthunt&logoColor=white" alt="#1 Daily Spotlight" height="34" />
   </a>
 </p>
 
@@ -100,6 +100,16 @@ Anusandhan eliminates financial barriers to research access by integrating high-
 - **Qwen 2.5 Coder 32B**: Deep code analysis, reproducible repository scanning, and benchmark synthesis.
 - **Llama 3.3 70B & Mistral NeMo**: Academic discourse calibration and polite email drafting.
 - **Anusandhan Core (Zero-Cost Local)**: Deterministic, privacy-first offline heuristic engine for offline operation.
+
+### 8. Gamified Research Coins (রিসার্চ কয়েন) & Anti-Cheat Security Architecture
+To motivate daily research consistency and rigorous preparation without financial paywalls, Anusandhan introduces a secure, tamper-evident merit reward economy:
+- **Daily Research Streaks & Multipliers**: Earn +5 Research Coins (RC) for each 24h consecutive research check-in, unlocking streak multipliers at 3-day, 7-day, and 30-day milestones.
+- **Scholar Achievement Badges**: Unlock verifiable milestones (*Paper Reader Verified*, *146-Word Outreach Grounded*, *Academic Viva Master*, *.edu Institutional Scholar*).
+- **Anti-Cheat & Cryptographic Verification**:
+  - **Server-Side Timestamp Validation**: Protects against client-side system clock manipulation.
+  - **Anti-Replay Monotonic Tokens**: Enforces single-claim per 24h UTC window, preventing double-spend and automated script attacks.
+  - **HMAC Tamper-Proof Balances**: Coin balances and streak counters are cryptographically validated against server state before redemption.
+  - **Zero Commercial Paywall**: Students earn 100% of credits through authentic research work, eliminating economic disparities.
 
 ---
 

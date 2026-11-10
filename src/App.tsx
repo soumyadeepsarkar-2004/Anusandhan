@@ -59,72 +59,6 @@ const SuspenseSkeleton: React.FC = () => (
   </div>
 );
 
-interface ErrorBoundaryState {
-  hasError: boolean;
-  error: Error | null;
-}
-
-class ErrorBoundary extends React.Component<{ children: React.ReactNode }, ErrorBoundaryState> {
-  constructor(props: { children: React.ReactNode }) {
-    super(props);
-    this.state = { hasError: false, error: null };
-  }
-
-  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
-    return { hasError: true, error };
-  }
-
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('[Anusandhan ErrorBoundary Caught]:', error, errorInfo);
-  }
-
-  handleReload = () => {
-    window.location.reload();
-  };
-
-  handleReset = () => {
-    try {
-      localStorage.removeItem('anusandhan_last_route');
-      window.location.hash = '';
-    } catch {}
-    window.location.reload();
-  };
-
-  render() {
-    if (this.state.hasError) {
-      return (
-        <div className="min-h-screen bg-[#070A12] text-zinc-100 flex flex-col items-center justify-center p-6 relative overflow-hidden font-sans">
-          <div className="absolute inset-0 bg-gradient-to-b from-amber-500/10 via-transparent to-black pointer-events-none" />
-          <div className="relative z-10 max-w-md w-full bg-zinc-950/95 border border-amber-500/40 rounded-3xl p-6 sm:p-8 text-center shadow-2xl backdrop-blur-2xl space-y-4">
-            <div className="w-12 h-12 mx-auto rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400">
-              <span className="text-xl">🛡️</span>
-            </div>
-            <h1 className="text-xl font-bold tracking-tight text-white">Anusandhan Resilience Guard</h1>
-            <p className="text-xs text-zinc-400 leading-relaxed">
-              A momentary client exception occurred during runtime. Your outbox, saved notes, and research state remain completely secure.
-            </p>
-            <div className="pt-2 flex flex-col sm:flex-row gap-2">
-              <button
-                onClick={this.handleReload}
-                className="flex-1 py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-400 to-amber-600 text-zinc-950 font-bold text-xs shadow-md shadow-amber-500/20 hover:from-amber-300 hover:to-amber-500 transition-all cursor-pointer"
-              >
-                Reload Platform
-              </button>
-              <button
-                onClick={this.handleReset}
-                className="py-2.5 px-4 rounded-xl bg-white/5 hover:bg-white/10 text-zinc-300 border border-white/10 text-xs font-semibold transition-all cursor-pointer"
-              >
-                Clear Cache & Recover
-              </button>
-            </div>
-          </div>
-        </div>
-      );
-    }
-    return this.props.children;
-  }
-}
-
 const AppContent: React.FC = () => {
   const { user, isAuthenticated } = useAuth();
 
@@ -880,18 +814,12 @@ const AppContent: React.FC = () => {
       {/* Progressive Web App Dynamic Pop-up Prompt */}
       <PwaInstallPrompt
         onOpenCrossNativeModal={() => setIsCrossNativeModalOpen(true)}
-        onInstallPwaRegistered={(triggerFn, canInstall) => {
-          setPwaTriggerFn(() => triggerFn);
-          setCanInstallPwa(canInstall);
-        }}
       />
 
       {/* Cross-Native Android APK Direct Download & PWA Modal */}
       <CrossNativeAppModal
         isOpen={isCrossNativeModalOpen}
         onClose={() => setIsCrossNativeModalOpen(false)}
-        onTriggerPwaInstall={pwaTriggerFn || undefined}
-        canInstallPwa={canInstallPwa}
       />
 
     </div>
@@ -900,13 +828,11 @@ const AppContent: React.FC = () => {
 
 export const App: React.FC = () => {
   return (
-    <ErrorBoundary>
-      <ThemeProvider>
-        <AuthProvider>
-          <AppContent />
-        </AuthProvider>
-      </ThemeProvider>
-    </ErrorBoundary>
+    <ThemeProvider>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </ThemeProvider>
   );
 };
 
