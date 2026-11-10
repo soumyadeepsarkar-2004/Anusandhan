@@ -87,22 +87,22 @@ test('2. CV-based registration stores candidate actual custom CV data', async ()
   assert.strictEqual(data.user.rrsTier, 'Distinguished Candidate');
 });
 
-test('3. OAuth sign-in enforces valid email and rejects blank identity', async () => {
+test('3. OAuth sign-in enforces valid cryptographic token and rejects blank identity', async () => {
   const res = await fetch(`${BASE_URL}/api/auth/oauth`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       provider: 'google'
-      // Missing email
+      // Missing credential token
     })
   });
 
-  assert.strictEqual(res.status, 400);
+  assert.strictEqual(res.status, 401);
   const data = await res.json();
-  assert.ok(data.error.includes('email is required') || data.error.includes('valid email'));
+  assert.ok(data.error.includes('Google') || data.error.includes('credential'));
 });
 
-test('4. OAuth sign-in creates account with verified custom identity and no demo data', async () => {
+test('4. OAuth rejects unverified raw email bypass to prevent fake accounts', async () => {
   const oauthEmail = `scholar.oauth.${Date.now()}@stanford.edu`;
   const res = await fetch(`${BASE_URL}/api/auth/oauth`, {
     method: 'POST',
@@ -114,13 +114,10 @@ test('4. OAuth sign-in creates account with verified custom identity and no demo
     })
   });
 
-  assert.strictEqual(res.status, 200);
+  // Must reject direct unverified email registration through OAuth endpoint
+  assert.strictEqual(res.status, 400);
   const data = await res.json();
-  assert.strictEqual(data.user.email, oauthEmail);
-  assert.strictEqual(data.user.fullName, 'Rohan Banerjee');
-  assert.strictEqual(data.user.cgpa, 0, 'New OAuth user CGPA must be 0 until CV/intake');
-  assert.strictEqual(data.user.rrsScore, 0, 'New OAuth user RRS must be 0 until CV/intake');
-  assert.strictEqual(data.user.rrsTier, 'Developing', 'New OAuth user tier must be Developing');
+  assert.ok(data.error.includes('exchange') || data.error.includes('authorization code'));
 });
 
 test('5. OAuth code exchange endpoint validates required parameters', async () => {

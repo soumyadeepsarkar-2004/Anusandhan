@@ -531,30 +531,39 @@ router.post('/oauth', async (req, res) => {
       return res.status(400).json({ error: 'Invalid OAuth provider. Expected "google", "linkedin", or "github".' });
     }
 
-    // Support authentic Google Identity Services (GIS) / OpenID Connect token verification
-    if (provider === 'google' && (credential || idToken)) {
-      try {
-        const rawToken = credential || idToken;
-        const verifyRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(rawToken)}`);
-        if (verifyRes.ok) {
-          const payload = await verifyRes.json();
-          if (payload.email) {
-            email = payload.email;
-            fullName = payload.name || payload.given_name || fullName;
-            avatarUrl = payload.picture || avatarUrl;
-          }
-        }
-      } catch (tokenErr) {
-        console.warn('[GIS Tokeninfo Warning]:', tokenErr.message);
+    let verifiedEmail = null;
+    let verifiedName = fullName || '';
+    let verifiedAvatar = avatarUrl || '';
+
+    // Enforce authentic cryptographic token verification for Google
+    if (provider === 'google') {
+      const rawToken = credential || idToken;
+      if (!rawToken) {
+        return res.status(401).json({ error: 'Google sign-in requires a valid Google Identity Services (GIS) credential token.' });
       }
+
+      try {
+        const verifyRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(rawToken)}`);
+        if (!verifyRes.ok) {
+          return res.status(401).json({ error: 'Cryptographic verification of Google ID token failed with Google OAuth servers.' });
+        }
+        const payload = await verifyRes.json();
+        if (!payload.email) {
+          return res.status(401).json({ error: 'Google ID token did not contain a verified email address.' });
+        }
+        verifiedEmail = payload.email;
+        verifiedName = payload.name || payload.given_name || verifiedName;
+        verifiedAvatar = payload.picture || verifiedAvatar;
+      } catch (tokenErr) {
+        return res.status(401).json({ error: 'Failed to contact Google OAuth tokeninfo verification endpoint: ' + tokenErr.message });
+      }
+    } else {
+      // GitHub & LinkedIn must exchange code via /api/auth/oauth/exchange
+      return res.status(400).json({ error: `${provider.toUpperCase()} OAuth requires authorization code exchange via /api/auth/oauth/exchange.` });
     }
 
-    if (!email || typeof email !== 'string' || !email.includes('@')) {
-      return res.status(400).json({ error: 'A valid email address is required for OAuth sign-in.' });
-    }
-
-    const normalizedEmail = email.toLowerCase().trim();
-    const effectiveName = fullName?.trim() || normalizedEmail.split('@')[0].replace(/[._\-]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    const normalizedEmail = verifiedEmail.toLowerCase().trim();
+    const effectiveName = verifiedName.trim() || normalizedEmail.split('@')[0].replace(/[._\-]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 
     let user = await findUserByEmail(normalizedEmail);
     if (!user) {
@@ -613,36 +622,39 @@ router.post('/oauth', async (req, res) => {
 
 /**
  * POST /api/auth/google
- * Dedicated Google Sign-In endpoint
+ * Dedicated Google Sign-In endpoint with cryptographic GIS / OIDC token verification
  */
 router.post('/google', async (req, res) => {
   req.body.provider = 'google';
-  let { email, fullName, avatarUrl, university, fieldOfStudy, credential, idToken } = req.body;
+  let { fullName, avatarUrl, university, fieldOfStudy, credential, idToken } = req.body;
 
-  // Support authentic Google Identity Services (GIS) / OpenID Connect token verification
-  if (credential || idToken) {
-    try {
-      const rawToken = credential || idToken;
-      const verifyRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(rawToken)}`);
-      if (verifyRes.ok) {
-        const payload = await verifyRes.json();
-        if (payload.email) {
-          email = payload.email;
-          fullName = payload.name || payload.given_name || fullName;
-          avatarUrl = payload.picture || avatarUrl;
-        }
-      }
-    } catch (tokenErr) {
-      console.warn('[GIS Google Tokeninfo Warning]:', tokenErr.message);
+  const rawToken = credential || idToken;
+  if (!rawToken) {
+    return res.status(401).json({ error: 'Google Sign-In requires an authentic Google Identity Services (GIS) credential or ID token.' });
+  }
+
+  let verifiedEmail = null;
+  let verifiedName = fullName || '';
+  let verifiedAvatar = avatarUrl || '';
+
+  try {
+    const verifyRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(rawToken)}`);
+    if (!verifyRes.ok) {
+      return res.status(401).json({ error: 'Cryptographic verification of Google ID token failed with Google OAuth servers.' });
     }
+    const payload = await verifyRes.json();
+    if (!payload.email) {
+      return res.status(401).json({ error: 'Google ID token did not contain a verified email address.' });
+    }
+    verifiedEmail = payload.email;
+    verifiedName = payload.name || payload.given_name || verifiedName;
+    verifiedAvatar = payload.picture || verifiedAvatar;
+  } catch (tokenErr) {
+    return res.status(401).json({ error: 'Failed to contact Google OAuth tokeninfo verification endpoint: ' + tokenErr.message });
   }
 
-  if (!email || typeof email !== 'string' || !email.includes('@')) {
-    return res.status(400).json({ error: 'A valid email address is required for Google Sign-In.' });
-  }
-
-  const normalizedEmail = email.toLowerCase().trim();
-  const effectiveName = fullName?.trim() || normalizedEmail.split('@')[0].replace(/[._\-]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+  const normalizedEmail = verifiedEmail.toLowerCase().trim();
+  const effectiveName = verifiedName.trim() || normalizedEmail.split('@')[0].replace(/[._\-]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 
   try {
     let user = await findUserByEmail(normalizedEmail);
@@ -795,70 +807,12 @@ router.post('/register-with-cv', async (req, res) => {
 
 /**
  * POST /api/auth/linkedin
- * Dedicated LinkedIn OAuth verification & sign-in endpoint
+ * Dedicated LinkedIn OAuth verification endpoint. Requires authentic OAuth code exchange.
  */
 router.post('/linkedin', async (req, res) => {
-  req.body.provider = 'linkedin';
-  try {
-    const { email, fullName, avatarUrl, university, fieldOfStudy } = req.body;
-    if (!email || typeof email !== 'string' || !email.includes('@')) {
-      return res.status(400).json({ error: 'A valid email address is required for LinkedIn Sign-In.' });
-    }
-
-    const normalizedEmail = email.toLowerCase().trim();
-    const effectiveName = fullName?.trim() || normalizedEmail.split('@')[0].replace(/[._\-]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-
-    let user = await findUserByEmail(normalizedEmail);
-    if (!user) {
-      user = {
-        id: `usr_linkedin_${Date.now().toString(36)}`,
-        _id: `usr_linkedin_${Date.now().toString(36)}`,
-        email: normalizedEmail,
-        fullName: effectiveName,
-        university: university ? university.trim() : '',
-        degreeLevel: 'B.Tech / B.S.',
-        cgpa: 0,
-        targetDomains: fieldOfStudy ? [fieldOfStudy] : [],
-        skills: [],
-        rrsScore: 0,
-        rrsTier: 'Developing',
-        role: 'student',
-        creditsRemaining: 10,
-        tokensBalance: 5,
-        loginStreak: 1,
-        xpPoints: 50,
-        dailyRewardClaimedToday: false,
-        scholarBadges: ['LinkedIn Verified', 'Early Scholar'],
-        oauthProvider: 'linkedin',
-        avatarUrl: avatarUrl || '',
-        isVerified: true,
-        linkedAccounts: { linkedinUrl: `https://linkedin.com/in/${effectiveName.toLowerCase().replace(/\s+/g, '-')}` },
-        createdAt: new Date()
-      };
-    } else {
-      user.oauthProvider = 'linkedin';
-      if (fullName && !user.fullName) user.fullName = effectiveName;
-      if (avatarUrl && !user.avatarUrl) user.avatarUrl = avatarUrl;
-    }
-
-    await saveUser(user);
-    const token = createToken({
-      id: user.id || user._id,
-      email: normalizedEmail,
-      fullName: user.fullName,
-      role: user.role || 'student'
-    });
-
-    res.json({
-      success: true,
-      provider: 'linkedin',
-      message: 'Signed in successfully via LinkedIn OAuth',
-      token,
-      user: sanitizeUser(user)
-    });
-  } catch (err) {
-    res.status(500).json({ error: 'LinkedIn OAuth authentication failed: ' + err.message });
-  }
+  return res.status(401).json({ 
+    error: 'LinkedIn authentication requires an authentic OAuth authorization code exchanged through /api/auth/oauth/exchange with LINKEDIN_CLIENT_ID and LINKEDIN_CLIENT_SECRET.' 
+  });
 });
 
 /**
