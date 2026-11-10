@@ -210,22 +210,22 @@ const FooterComponent: React.FC<FooterProps> = ({ onOpenPrivacy, onOpenTerms, on
             </a>
 
             <a
-              href="https://www.linkedin.com/company/anusandhan-ai"
-              target="_blank"
-              rel="noreferrer"
-              className="px-3 py-1.5 rounded-xl bg-[#0A66C2]/10 hover:bg-[#0A66C2]/20 border border-[#0A66C2]/30 text-zinc-300 hover:text-white text-xs font-mono transition-colors flex items-center gap-1.5"
-            >
-              <span>LinkedIn</span>
-              <ExternalLink className="w-3 h-3 text-[#0A66C2]" />
-            </a>
-
-            <a
-              href="https://x.com/anusandhan_ai"
+              href="https://soumyadeepsarkar-2004.github.io/Anusandhan/"
               target="_blank"
               rel="noreferrer"
               className="px-3 py-1.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 text-zinc-300 hover:text-white text-xs font-mono transition-colors flex items-center gap-1.5"
             >
-              <span>X / Twitter</span>
+              <span>Docs</span>
+              <ExternalLink className="w-3 h-3 text-amber-400" />
+            </a>
+
+            <a
+              href="https://x.com/sarkar58153"
+              target="_blank"
+              rel="noreferrer"
+              className="px-3 py-1.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 text-zinc-300 hover:text-white text-xs font-mono transition-colors flex items-center gap-1.5"
+            >
+              <span>X (@sarkar58153)</span>
               <ExternalLink className="w-3 h-3 text-zinc-400" />
             </a>
 
