@@ -64,7 +64,9 @@ class TelemetryClient {
       } catch {
         // Silent fallback
       }
-    } else if (process.env.NODE_ENV !== 'production') {
+    } else if (typeof process !== 'undefined' && process.env?.NODE_ENV !== 'production') {
+      console.warn('[Telemetry] Captured non-fatal event:', errorPayload);
+    } else if (typeof import.meta !== 'undefined' && (import.meta as any).env?.DEV) {
       console.warn('[Telemetry] Captured non-fatal event:', errorPayload);
     }
   }

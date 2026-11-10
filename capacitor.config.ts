@@ -1,11 +1,12 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'ai.researchintern.pro',
-  appName: 'ResearchIntern Pro',
+  appId: 'ai.anusandhan.pro',
+  appName: 'Anusandhan',
   webDir: 'dist',
   server: {
-    androidScheme: 'https'
+    androidScheme: 'https',
+    cleartext: false
   },
   plugins: {
     LocalNotifications: {

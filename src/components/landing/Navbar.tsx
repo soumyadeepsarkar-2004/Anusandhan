@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mic, ArrowRight, Menu, X, Sparkles, User, LogOut, ShieldCheck, Search, CreditCard, Scale, ChevronDown } from 'lucide-react';
+import { Mic, ArrowRight, Menu, X, Sparkles, User, LogOut, ShieldCheck, Search, CreditCard, Scale, ChevronDown, Smartphone } from 'lucide-react';
 import { AudioWaveformVisualizer, LiveRadarDot } from '../ui/AppleGlass';
 import { PullChainBulb } from '../ui/PullChainBulb';
 import { AnusandhanLogo } from '../common/AnusandhanLogo';
@@ -16,6 +16,7 @@ interface NavbarProps {
   onOpenRewardsModal?: () => void;
   onOpenPrivacyModal?: () => void;
   onOpenTermsModal?: () => void;
+  onOpenCrossNativeModal?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ 
@@ -27,7 +28,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenPricingModal,
   onOpenRewardsModal,
   onOpenPrivacyModal,
-  onOpenTermsModal
+  onOpenTermsModal,
+  onOpenCrossNativeModal
 }) => {
   const { user, isAuthenticated, logout } = useAuth();
   const [hoveredNav, setHoveredNav] = useState<string | null>(null);
@@ -161,6 +163,20 @@ export const Navbar: React.FC<NavbarProps> = ({
             </span>
           </button>
 
+          {/* Cross-Native Android & PWA App Header Button */}
+          {onOpenCrossNativeModal && (
+            <button
+              onClick={onOpenCrossNativeModal}
+              className="flex items-center space-x-1.5 px-2.5 h-8 rounded-full bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 hover:border-amber-400 text-amber-300 text-xs font-medium transition-all cursor-pointer shadow-sm group backdrop-blur-md shrink-0 active:scale-95"
+              title="Download Android APK & Install PWA"
+            >
+              <Smartphone className="w-3.5 h-3.5 text-amber-400 group-hover:scale-110 transition-transform" />
+              <span className="font-mono text-[11px] font-semibold text-amber-300">
+                App
+              </span>
+            </button>
+          )}
+
           {/* Shodh Token Rewards Trigger */}
           {isAuthenticated && onOpenRewardsModal && (
             <button
@@ -257,6 +273,20 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </a>
               ))}
             </div>
+
+            {/* Mobile Cross-Native App & PWA Action */}
+            {onOpenCrossNativeModal && (
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  onOpenCrossNativeModal();
+                }}
+                className="w-full flex items-center justify-center space-x-2 py-2.5 px-3 rounded-xl bg-gradient-to-r from-amber-500/20 to-amber-600/20 hover:from-amber-500/30 hover:to-amber-600/30 border border-amber-500/40 text-amber-300 transition-all font-semibold text-xs cursor-pointer"
+              >
+                <Smartphone className="w-4 h-4 text-amber-400" />
+                <span>Get Cross-Native Android APK / PWA</span>
+              </button>
+            )}
 
             {/* Mobile Compliance Actions */}
             {(onOpenPrivacyModal || onOpenTermsModal) && (

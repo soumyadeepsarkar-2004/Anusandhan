@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">ResearchIntern Pro</string>
-    <string name="title_activity_main">ResearchIntern Pro</string>
-    <string name="package_name">ai.researchintern.pro</string>
-    <string name="custom_url_scheme">ai.researchintern.pro</string>
+    <string name="app_name">Anusandhan</string>
+    <string name="title_activity_main">Anusandhan</string>
+    <string name="package_name">ai.anusandhan.pro</string>
+    <string name="custom_url_scheme">ai.anusandhan.pro</string>
 </resources>

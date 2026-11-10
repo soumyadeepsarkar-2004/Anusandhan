@@ -12,7 +12,8 @@ import {
   Flame, 
   Coins,
   ShieldCheck,
-  Scale
+  Scale,
+  Smartphone
 } from 'lucide-react';
 import { StudentProfile } from '../../types';
 import { MacOSDock } from '../ui/MacOSDock';
@@ -38,6 +39,7 @@ interface AppLayoutProps {
   onOpenAuth?: () => void;
   onOpenPrivacyModal?: () => void;
   onOpenTermsModal?: () => void;
+  onOpenCrossNativeModal?: () => void;
   student: StudentProfile;
   followUpDueCount: number;
   children: React.ReactNode;
@@ -55,6 +57,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
   onOpenAuth,
   onOpenPrivacyModal,
   onOpenTermsModal,
+  onOpenCrossNativeModal,
   student,
   followUpDueCount,
   children
@@ -163,6 +166,20 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
                 Voice
               </span>
             </button>
+
+            {/* Cross-Native Android & PWA App Header Pill */}
+            {onOpenCrossNativeModal && (
+              <button
+                onClick={onOpenCrossNativeModal}
+                className="flex items-center space-x-1 px-2.5 py-1.5 rounded-full bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 hover:border-amber-400 text-amber-300 font-medium text-xs shadow-sm transition-all cursor-pointer group backdrop-blur-md active:scale-95"
+                title="Download Android APK & Install PWA"
+              >
+                <Smartphone className="w-3.5 h-3.5 text-amber-400 group-hover:scale-110 transition-transform" />
+                <span className="hidden sm:inline font-mono text-[11px] font-semibold text-amber-300">
+                  App
+                </span>
+              </button>
+            )}
 
             {/* Pull-Chain Bulb Theme Switcher */}
             <div className="flex items-center px-1">
