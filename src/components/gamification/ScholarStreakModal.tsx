@@ -66,7 +66,7 @@ export const ScholarStreakModal: React.FC<ScholarStreakModalProps> = ({
         onClose();
         onOpenAuth();
       } else {
-        setClaimFeedback('Please sign in with Google or your academic CV to claim daily tokens.');
+        setClaimFeedback('Please sign in to your scholar account or upload your academic CV to claim daily tokens.');
       }
       return;
     }

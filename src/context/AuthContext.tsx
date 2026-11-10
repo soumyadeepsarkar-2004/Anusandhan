@@ -467,18 +467,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const oauthLogin = async (provider: 'google' | 'linkedin' | 'github', userDetails?: { email?: string; fullName?: string; credential?: string }) => {
-    // 1. If explicit GIS credential token or userDetails with email is provided, authenticate directly
-    if (userDetails?.credential || (userDetails?.email && userDetails.email.trim().includes('@'))) {
+    // 1. If explicit verified GIS/OIDC credential token is provided, verify against provider tokeninfo
+    if (userDetails?.credential) {
       setIsLoading(true);
       try {
         const subpath = provider === 'google' ? '/google' : (provider === 'linkedin' ? '/linkedin' : '/oauth');
-        const payload: any = { provider };
-        if (userDetails.credential) {
-          payload.credential = userDetails.credential;
-        }
-        if (userDetails.email) {
-          payload.email = userDetails.email.trim();
-        }
+        const payload: any = { provider, credential: userDetails.credential };
         if (userDetails.fullName) {
           payload.fullName = userDetails.fullName.trim();
         }
@@ -507,7 +501,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     }
 
-    // 2. Otherwise try opening real OAuth popup or redirect
+    // 2. Real OAuth flow with popup window or full-page redirect to provider authorization screen
     try {
       await openOAuthPopup(provider);
     } catch {
