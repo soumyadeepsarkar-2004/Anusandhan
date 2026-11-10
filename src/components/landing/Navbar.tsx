@@ -82,7 +82,9 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <div className="fixed top-3 sm:top-5 inset-x-0 mx-auto max-w-7xl w-[96%] z-50 px-2 sm:px-4 pointer-events-none">
-      <header className="pointer-events-auto apple-glass-pill rounded-full min-h-[56px] h-[56px] px-3.5 sm:px-5 lg:px-6 flex items-center justify-between transition-all duration-300 gap-2 sm:gap-4 shadow-2xl relative">
+      <header className="pointer-events-auto rounded-full min-h-[56px] h-[56px] px-3.5 sm:px-5 lg:px-6 flex items-center justify-between transition-all duration-300 gap-2 sm:gap-4 backdrop-blur-2xl bg-white/[0.03] border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.36)] relative overflow-hidden">
+        {/* Specular Top Sheen Highlight Line */}
+        <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
         
         {/* Dynamic Theme-Aware Brand Logo */}
         <div 

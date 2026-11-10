@@ -68,8 +68,8 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
   return (
     <div className="min-h-screen bg-[var(--canvas-bg)] text-[var(--text-primary)] flex flex-col pb-16 relative transition-colors duration-300">
       
-      {/* Top Application Header */}
-      <header className="sticky top-0 z-30 w-full border-b border-[var(--border-subtle)] bg-[var(--surface-bg)]/80 backdrop-blur-3xl shadow-sm relative transition-colors duration-300">
+      {/* Top Application Header - Layered Frosted Glass */}
+      <header className="sticky top-0 z-30 w-full border-b border-white/10 backdrop-blur-2xl bg-white/[0.03] shadow-[0_8px_32px_0_rgba(0,0,0,0.36)] relative transition-colors duration-300">
         {/* Specular Top Sheen */}
         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-400/40 to-transparent" />
         

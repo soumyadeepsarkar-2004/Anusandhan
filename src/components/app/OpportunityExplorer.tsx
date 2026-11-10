@@ -266,7 +266,7 @@ export const OpportunityExplorer: React.FC<OpportunityExplorerProps> = ({
     <div className="space-y-5 animate-fadeIn">
       
       {/* Autonomous Ingestion Engine Live Telemetry Banner */}
-      <div className="p-4 rounded-2xl glass-panel border border-amber-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs shadow-lg relative overflow-hidden">
+      <div className="p-4 rounded-3xl backdrop-blur-2xl bg-white/[0.03] border border-amber-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs shadow-[0_8px_32px_0_rgba(0,0,0,0.36)] relative overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-amber-300/40 to-transparent pointer-events-none" />
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl bg-amber-500/15 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0 shadow-inner">
@@ -303,8 +303,10 @@ export const OpportunityExplorer: React.FC<OpportunityExplorerProps> = ({
         </div>
       </div>
 
-      {/* Top Controls Bar */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 p-4 rounded-2xl glass-panel shadow-lg">
+      {/* Top Controls Bar - Layered Frosted Glass Container */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 p-4 rounded-3xl backdrop-blur-2xl bg-white/[0.03] border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.36)] relative overflow-hidden">
+        {/* Specular Top Sheen */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent" />
         
         {/* Sub-tab Switcher with Scraped Openings */}
         <div className="flex p-1 rounded-xl bg-white/[0.04] border border-white/10 text-xs backdrop-blur-md">

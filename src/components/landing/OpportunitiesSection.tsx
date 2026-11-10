@@ -79,15 +79,16 @@ const OpportunitiesSectionComponent: React.FC<OpportunitiesSectionProps> = ({
   return (
     <section id="opportunities" className="py-16 sm:py-24 bg-transparent border-t border-white/5 relative overflow-hidden select-none">
       
-      {/* Specular Ambient Glow */}
-      <div className="absolute top-1/3 left-1/4 w-[500px] h-[400px] bg-amber-500/5 blur-[140px] pointer-events-none -z-10" />
+      {/* Specular Ambient Glow Orbs */}
+      <div className="ambient-orb top-1/4 left-1/4 w-[600px] h-[500px] bg-amber-500/10 blur-[160px] -z-10" />
+      <div className="ambient-orb bottom-10 right-1/4 w-[500px] h-[400px] bg-indigo-500/10 blur-[160px] -z-10" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
         
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6 sm:mb-8">
           <div className="space-y-2 max-w-2xl">
-            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full apple-glass-pill text-xs text-zinc-300">
+            <div className="inline-flex items-center space-x-2 px-3.5 py-1 rounded-full backdrop-blur-xl bg-white/[0.04] border border-white/12 text-xs text-zinc-300 shadow-sm">
               <Sparkles className="w-3.5 h-3.5 text-amber-400" />
               <span>Multi-Disciplinary Research & Faculty Intelligence</span>
             </div>
@@ -99,18 +100,18 @@ const OpportunitiesSectionComponent: React.FC<OpportunitiesSectionProps> = ({
               </span>
             </h2>
             
-            <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed font-sans">
+            <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed font-sans font-light">
               Real-time faculty intelligence tracking active funding allocations from DST, MeitY, CSIR, NSF, and ERC. Every lab has verified student co-authorship track records.
             </p>
           </div>
 
-          {/* Quick Scope Filter Toggle */}
-          <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-2xl bg-canvas-card border border-white/10 shrink-0">
+          {/* Quick Scope Filter Toggle - Layered Frosted Glass */}
+          <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-2xl backdrop-blur-2xl bg-white/[0.03] border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.36)] shrink-0">
             <button
               onClick={() => setSelectedScope('all')}
               className={`min-h-[34px] px-3.5 py-1 rounded-xl text-xs font-mono font-medium transition-all cursor-pointer ${
                 selectedScope === 'all'
-                  ? 'bg-amber-400 text-canvas font-semibold shadow-sm'
+                  ? 'bg-amber-400 text-slate-950 font-bold shadow-md'
                   : 'text-zinc-400 hover:text-white'
               }`}
             >
@@ -120,7 +121,7 @@ const OpportunitiesSectionComponent: React.FC<OpportunitiesSectionProps> = ({
               onClick={() => setSelectedScope('national')}
               className={`min-h-[34px] px-3.5 py-1 rounded-xl text-xs font-mono font-medium transition-all cursor-pointer ${
                 selectedScope === 'national'
-                  ? 'bg-amber-400 text-canvas font-semibold shadow-sm'
+                  ? 'bg-amber-400 text-slate-950 font-bold shadow-md'
                   : 'text-zinc-400 hover:text-white'
               }`}
             >
@@ -130,7 +131,7 @@ const OpportunitiesSectionComponent: React.FC<OpportunitiesSectionProps> = ({
               onClick={() => setSelectedScope('global')}
               className={`min-h-[34px] px-3.5 py-1 rounded-xl text-xs font-mono font-medium transition-all cursor-pointer ${
                 selectedScope === 'global'
-                  ? 'bg-amber-400 text-canvas font-semibold shadow-sm'
+                  ? 'bg-amber-400 text-slate-950 font-bold shadow-md'
                   : 'text-zinc-400 hover:text-white'
               }`}
             >
@@ -142,7 +143,7 @@ const OpportunitiesSectionComponent: React.FC<OpportunitiesSectionProps> = ({
         {/* Search & Domain Filter Bar */}
         <div className="mb-8 space-y-3">
           <div className="flex flex-col sm:flex-row items-center gap-3">
-            {/* Search Input */}
+            {/* Search Input - Aceternity Frosted Glass */}
             <div className="relative w-full sm:flex-1">
               <Search className="w-4 h-4 text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
@@ -150,12 +151,12 @@ const OpportunitiesSectionComponent: React.FC<OpportunitiesSectionProps> = ({
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search by professor name, university (IISc, MIT, IIT Bombay), or research keywords..."
-                className="w-full min-h-[44px] pl-10 pr-4 py-2.5 rounded-xl bg-canvas-card border border-white/10 text-xs sm:text-sm text-zinc-100 placeholder-zinc-500 focus:border-amber-500/50 outline-none transition-all shadow-inner"
+                className="w-full min-h-[46px] pl-10 pr-4 py-2.5 rounded-2xl backdrop-blur-2xl bg-white/[0.03] border border-white/10 text-xs sm:text-sm text-zinc-100 placeholder-zinc-500 focus:border-amber-400/60 focus:bg-white/[0.06] outline-none transition-all shadow-[0_8px_32px_0_rgba(0,0,0,0.36)]"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-mono text-zinc-400 hover:text-white"
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-mono text-zinc-400 hover:text-white cursor-pointer"
                 >
                   Clear
                 </button>
@@ -164,7 +165,7 @@ const OpportunitiesSectionComponent: React.FC<OpportunitiesSectionProps> = ({
 
             <button
               onClick={onLaunchPlatform}
-              className="w-full sm:w-auto min-h-[44px] px-5 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-canvas font-semibold text-xs transition-all shadow-md active:scale-98 cursor-pointer flex items-center justify-center space-x-2 shrink-0"
+              className="w-full sm:w-auto min-h-[46px] px-6 py-2.5 rounded-2xl bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-slate-950 font-bold text-xs shadow-[0_0_20px_rgba(245,158,11,0.25)] hover:shadow-[0_0_30px_rgba(245,158,11,0.45)] border border-amber-300/40 active:scale-98 cursor-pointer flex items-center justify-center space-x-2 shrink-0 transition-all"
             >
               <Sparkles className="w-3.5 h-3.5" />
               <span>Auto-Match with My CV</span>
@@ -177,10 +178,10 @@ const OpportunitiesSectionComponent: React.FC<OpportunitiesSectionProps> = ({
               <button
                 key={dom.id}
                 onClick={() => setSelectedDomain(dom.id)}
-                className={`min-h-[34px] px-3.5 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition-all cursor-pointer border ${
+                className={`min-h-[34px] px-3.5 py-1 rounded-xl text-xs font-medium whitespace-nowrap transition-all cursor-pointer backdrop-blur-xl border ${
                   selectedDomain === dom.id
-                    ? 'bg-zinc-800 border-amber-500/40 text-amber-300 shadow-sm'
-                    : 'bg-canvas-subtle/60 border-white/5 text-zinc-400 hover:text-zinc-200 hover:bg-canvas-card'
+                    ? 'bg-amber-500/15 border-amber-400/50 text-amber-300 shadow-sm'
+                    : 'bg-white/[0.03] border-white/8 text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.06] hover:border-white/15'
                 }`}
               >
                 {dom.label}
@@ -189,12 +190,12 @@ const OpportunitiesSectionComponent: React.FC<OpportunitiesSectionProps> = ({
           </div>
         </div>
 
-        {/* Faculty Grid - Curated 3 Spotlight Labs with Non-Overlapping Layout */}
+        {/* Faculty Grid - Curated 3 Spotlight Labs with Layered Frosted Glass Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
           {filteredFaculty.slice(0, 3).map((prof) => (
             <AppleGlassCard
               key={prof.id}
-              className="p-6 shadow-xl group border border-white/10 hover:border-amber-500/30 transition-all rounded-2xl bg-zinc-900/60"
+              className="p-6 shadow-[0_8px_32px_0_rgba(0,0,0,0.36)] group border border-white/10 hover:border-amber-400/40 transition-all rounded-3xl backdrop-blur-2xl bg-white/[0.03] hover:bg-white/[0.06]"
               enableTilt={true}
             >
               <div className="flex flex-col justify-between h-full min-h-[480px]">

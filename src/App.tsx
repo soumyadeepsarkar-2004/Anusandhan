@@ -555,7 +555,7 @@ const AppContent: React.FC = () => {
       {view === 'intake' && (
         /* STEPPED STUDENT INTAKE & PROFILE FAILURE DIAGNOSTICS */
         <div className="relative z-10 min-h-screen pb-16">
-          <header className="sticky top-0 z-30 w-full border-b border-[var(--border-subtle)] bg-[var(--surface-bg)]/80 backdrop-blur-3xl shadow-sm px-4 sm:px-6 h-14 flex items-center justify-between">
+          <header className="sticky top-0 z-30 w-full border-b border-white/10 backdrop-blur-2xl bg-white/[0.03] shadow-[0_8px_32px_0_rgba(0,0,0,0.36)] px-4 sm:px-6 h-14 flex items-center justify-between">
             <div 
               className="flex items-center cursor-pointer select-none"
               onClick={() => navigateToView('landing')}
@@ -567,7 +567,7 @@ const AppContent: React.FC = () => {
               <PullChainBulb size="sm" />
               <button
                 onClick={() => navigateToView('landing')}
-                className="text-xs font-mono text-[var(--text-muted)] hover:text-[var(--text-primary)] px-3 py-1.5 rounded-xl glass-chip transition-colors cursor-pointer"
+                className="text-xs font-mono text-zinc-300 hover:text-white px-3 py-1.5 rounded-xl backdrop-blur-xl bg-white/[0.04] border border-white/10 transition-colors cursor-pointer"
               >
                 ← Return to Home
               </button>

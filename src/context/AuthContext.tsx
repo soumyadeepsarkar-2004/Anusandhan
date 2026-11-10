@@ -61,6 +61,7 @@ interface AuthContextType {
   register: (data: RegisterData) => Promise<void>;
   registerWithCv: (cvData: any, password?: string) => Promise<void>;
   initiateOAuth: (provider: 'google' | 'linkedin' | 'github') => void;
+  openOAuthPopup: (provider: 'google' | 'linkedin' | 'github') => Promise<UserProfile>;
   oauthLogin: (provider: 'google' | 'linkedin' | 'github', userDetails?: { email?: string; fullName?: string }) => Promise<void>;
   claimDailyReward: () => Promise<DailyClaimResult>;
   claimDailyStreak: () => Promise<DailyClaimResult>;
@@ -123,6 +124,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const urlParams = new URLSearchParams(window.location.search);
         const code = urlParams.get('code');
         const oauthError = urlParams.get('error') || urlParams.get('error_description');
+
+        // Check if inside a popup window with parent opener
+        if (window.opener && window.opener !== window) {
+          try {
+            window.opener.postMessage({
+              type: 'rip_oauth_response',
+              provider: sessionStorage.getItem('rip_oauth_provider') || 'google',
+              code,
+              error: oauthError,
+              state: urlParams.get('state')
+            }, window.location.origin);
+            window.close();
+            return;
+          } catch (e) {
+            console.warn('[OAuth Popup postMessage failed]:', e);
+          }
+        }
 
         if (oauthError) {
           console.warn('[OAuth Provider Error]:', oauthError);
@@ -286,7 +304,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const initiateOAuth = (provider: 'google' | 'linkedin' | 'github') => {
+  const getOAuthUrl = (provider: 'google' | 'linkedin' | 'github', redirectUri: string, state: string): { url: string; hasClientId: boolean } => {
     const clientId = provider === 'google'
       ? (import.meta.env.VITE_GOOGLE_CLIENT_ID || (import.meta.env.GOOGLE_CLIENT_ID as string) || '')
       : provider === 'github'
@@ -294,15 +312,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       : (import.meta.env.VITE_LINKEDIN_CLIENT_ID || (import.meta.env.LINKEDIN_CLIENT_ID as string) || '');
 
     if (!clientId) {
-      throw new Error(`Real ${provider.charAt(0).toUpperCase() + provider.slice(1)} OAuth requires VITE_${provider.toUpperCase()}_CLIENT_ID in your .env. Please enter your email address to sign in directly.`);
+      return { url: '', hasClientId: false };
     }
-
-    const state = Math.random().toString(36).substring(2) + Date.now().toString(36);
-    const redirectUri = window.location.origin;
-
-    sessionStorage.setItem('rip_oauth_provider', provider);
-    sessionStorage.setItem('rip_oauth_state', state);
-    sessionStorage.setItem('rip_oauth_redirect_uri', redirectUri);
 
     let authUrl = '';
     if (provider === 'google') {
@@ -313,7 +324,107 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       authUrl = `https://www.linkedin.com/oauth/v2/authorization?client_id=${encodeURIComponent(clientId)}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${encodeURIComponent('openid profile email')}&state=${state}`;
     }
 
+    return { url: authUrl, hasClientId: true };
+  };
+
+  const initiateOAuth = (provider: 'google' | 'linkedin' | 'github') => {
+    const state = Math.random().toString(36).substring(2) + Date.now().toString(36);
+    const redirectUri = window.location.origin;
+
+    sessionStorage.setItem('rip_oauth_provider', provider);
+    sessionStorage.setItem('rip_oauth_state', state);
+    sessionStorage.setItem('rip_oauth_redirect_uri', redirectUri);
+
+    const { url: authUrl, hasClientId } = getOAuthUrl(provider, redirectUri, state);
+    if (!hasClientId || !authUrl) {
+      throw new Error(`Real ${provider.charAt(0).toUpperCase() + provider.slice(1)} OAuth requires VITE_${provider.toUpperCase()}_CLIENT_ID in your .env. Please enter your email address to sign in directly.`);
+    }
+
     window.location.href = authUrl;
+  };
+
+  const openOAuthPopup = (provider: 'google' | 'linkedin' | 'github'): Promise<UserProfile> => {
+    return new Promise((resolve, reject) => {
+      const state = Math.random().toString(36).substring(2) + Date.now().toString(36);
+      const redirectUri = window.location.origin;
+
+      sessionStorage.setItem('rip_oauth_provider', provider);
+      sessionStorage.setItem('rip_oauth_state', state);
+      sessionStorage.setItem('rip_oauth_redirect_uri', redirectUri);
+
+      const { url: authUrl, hasClientId } = getOAuthUrl(provider, redirectUri, state);
+      if (!hasClientId || !authUrl) {
+        reject(new Error(`OAuth credentials (VITE_${provider.toUpperCase()}_CLIENT_ID) are not configured.`));
+        return;
+      }
+
+      const width = 600;
+      const height = 700;
+      const left = window.screenX + Math.max(0, (window.outerWidth - width) / 2);
+      const top = window.screenY + Math.max(0, (window.outerHeight - height) / 2);
+
+      const popup = window.open(
+        authUrl,
+        `rip_${provider}_oauth_window`,
+        `width=${width},height=${height},left=${left},top=${top},status=no,resizable=yes,scrollbars=yes`
+      );
+
+      if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+        window.location.href = authUrl;
+        return;
+      }
+
+      let popupClosedInterval: any = null;
+
+      const messageHandler = async (event: MessageEvent) => {
+        if (event.origin !== window.location.origin) return;
+        if (event.data?.type === 'rip_oauth_response') {
+          window.removeEventListener('message', messageHandler);
+          if (popupClosedInterval) clearInterval(popupClosedInterval);
+
+          const { code, error } = event.data;
+          if (error) {
+            reject(new Error(error));
+            return;
+          }
+
+          if (code) {
+            setIsLoading(true);
+            try {
+              const exchangeRes = await fetchWithCandidateUrls('/oauth/exchange', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ provider, code, redirectUri })
+              });
+
+              const data = await exchangeRes.json();
+              if (!exchangeRes.ok || !data.token || !data.user) {
+                throw new Error(data.error || 'Failed to exchange authorization code.');
+              }
+
+              localStorage.setItem('rip_auth_token', data.token);
+              localStorage.setItem('rip_user_profile', JSON.stringify(data.user));
+              setUser(data.user);
+              setToken(data.token);
+              resolve(data.user);
+            } catch (exchangeErr: any) {
+              reject(exchangeErr);
+            } finally {
+              setIsLoading(false);
+            }
+          }
+        }
+      };
+
+      window.addEventListener('message', messageHandler);
+
+      popupClosedInterval = setInterval(() => {
+        if (popup.closed) {
+          clearInterval(popupClosedInterval);
+          window.removeEventListener('message', messageHandler);
+        }
+      }, 1000);
+    });
   };
 
   const oauthLogin = async (provider: 'google' | 'linkedin' | 'github', userDetails?: { email?: string; fullName?: string }) => {
@@ -350,8 +461,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     }
 
-    // 2. Otherwise initiate real browser OAuth redirect with provider
-    initiateOAuth(provider);
+    // 2. Otherwise try opening real OAuth popup or redirect
+    try {
+      await openOAuthPopup(provider);
+    } catch {
+      initiateOAuth(provider);
+    }
   };
 
   const claimDailyReward = async (): Promise<DailyClaimResult> => {
@@ -499,6 +614,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       register,
       registerWithCv,
       initiateOAuth,
+      openOAuthPopup,
       oauthLogin,
       claimDailyReward,
       claimDailyStreak: claimDailyReward,

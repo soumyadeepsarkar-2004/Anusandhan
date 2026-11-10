@@ -308,6 +308,19 @@ router.post('/verify-institutional-email', authenticateToken, async (req, res) =
 });
 
 /**
+ * GET /api/auth/oauth/config
+ * Exposes configured OAuth client IDs so the frontend can initiate authentic OAuth 2.0 flows.
+ */
+router.get('/oauth/config', (req, res) => {
+  res.json({
+    googleClientId: process.env.GOOGLE_CLIENT_ID || process.env.VITE_GOOGLE_CLIENT_ID || '',
+    githubClientId: process.env.GITHUB_CLIENT_ID || process.env.VITE_GITHUB_CLIENT_ID || '',
+    linkedinClientId: process.env.LINKEDIN_CLIENT_ID || process.env.VITE_LINKEDIN_CLIENT_ID || '',
+    redirectUri: process.env.GOOGLE_REDIRECT_URI || ''
+  });
+});
+
+/**
  * POST /api/auth/oauth/exchange
  * Exchanges OAuth authorization code with provider for real access token and user profile.
  */

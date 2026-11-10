@@ -69,13 +69,15 @@ export const PricingModal: React.FC<PricingModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-2xl animate-fadeIn">
-      {/* Ambient Radial Lighting Glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-amber-500/10 rounded-full blur-[140px] pointer-events-none" />
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-2xl animate-fadeIn">
+      {/* Ambient Glowing Orbs */}
+      <div className="ambient-orb -top-20 -left-20 w-80 h-80 bg-amber-500/15" />
+      <div className="ambient-orb -bottom-20 -right-20 w-80 h-80 bg-indigo-500/15" />
 
-      <div className="w-full max-w-4xl glass-modal rounded-3xl border border-white/20 shadow-[0_30px_90px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col max-h-[90vh] relative">
-        {/* Specular Highlight Sheen */}
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-amber-300/40 to-transparent pointer-events-none" />
+      {/* Aceternity UI / 21st.dev Layered Glassmorphic Container */}
+      <div className="w-full max-w-4xl aceternity-glass rounded-3xl border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.48)] overflow-hidden flex flex-col max-h-[90vh] relative bg-zinc-950/85">
+        {/* Specular Top Sheen */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/35 to-transparent" />
         
         {/* Header */}
         <div className="p-5 sm:p-6 border-b border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white/[0.02] backdrop-blur-md">
