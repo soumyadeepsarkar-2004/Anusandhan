@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Download, Smartphone, Globe, X, Sparkles, CheckCircle2 } from 'lucide-react';
 import { AnusandhanLogo } from '../common/AnusandhanLogo';
@@ -13,6 +13,12 @@ export const PwaInstallPrompt: React.FC<PwaInstallPromptProps> = ({
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const [isInstalled, setIsInstalled] = useState<boolean>(false);
+
+  const onOpenRef = useRef(onOpenCrossNativeModal);
+  onOpenRef.current = onOpenCrossNativeModal;
+
+  const deferredPromptRef = useRef(deferredPrompt);
+  deferredPromptRef.current = deferredPrompt;
 
   useEffect(() => {
     // Check if running in standalone mode (already installed PWA)
@@ -30,20 +36,21 @@ export const PwaInstallPrompt: React.FC<PwaInstallPromptProps> = ({
     // Check if user dismissed recently this session
     const dismissedThisSession = typeof sessionStorage !== 'undefined' && sessionStorage.getItem('anusandhan_pwa_dismissed');
 
+    let timerId: any = null;
+
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e);
       if (!dismissedThisSession) {
-        // Show pop up smoothly after 2.5 seconds of using the platform
-        setTimeout(() => setIsVisible(true), 2500);
+        timerId = setTimeout(() => setIsVisible(true), 4000);
       }
     };
 
     const handleCustomTrigger = () => {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
+      if (deferredPromptRef.current) {
+        deferredPromptRef.current.prompt();
       } else {
-        onOpenCrossNativeModal();
+        onOpenRef.current();
       }
     };
 
@@ -51,18 +58,22 @@ export const PwaInstallPrompt: React.FC<PwaInstallPromptProps> = ({
     window.addEventListener('trigger-pwa-install', handleCustomTrigger);
 
     // Listen for successful installation
-    window.addEventListener('appinstalled', () => {
+    const handleAppInstalled = () => {
       setIsInstalled(true);
       setIsVisible(false);
       setDeferredPrompt(null);
       console.log('[PWA] Anusandhan was installed successfully');
-    });
+    };
+
+    window.addEventListener('appinstalled', handleAppInstalled);
 
     return () => {
+      if (timerId) clearTimeout(timerId);
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
       window.removeEventListener('trigger-pwa-install', handleCustomTrigger);
+      window.removeEventListener('appinstalled', handleAppInstalled);
     };
-  }, [onOpenCrossNativeModal, deferredPrompt]);
+  }, []);
 
   const handleInstallClick = async () => {
     if (deferredPrompt) {

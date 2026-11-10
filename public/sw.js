@@ -1,5 +1,5 @@
 // Anusandhan Autonomous Service Worker (Offline-First & PWA Asset Cache)
-const CACHE_NAME = 'anusandhan-v1.0.1';
+const CACHE_NAME = 'anusandhan-v1.0.2';
 const PRECACHE_ASSETS = [
   '/',
   '/index.html',
@@ -10,12 +10,13 @@ const PRECACHE_ASSETS = [
 ];
 
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(PRECACHE_ASSETS).catch((err) => {
         console.warn('[ServiceWorker] Precache assets non-fatal error:', err);
       });
-    }).then(() => self.skipWaiting())
+    })
   );
 });
 
@@ -25,7 +26,7 @@ self.addEventListener('activate', (event) => {
       return Promise.all(
         cacheNames.map((cache) => {
           if (cache !== CACHE_NAME) {
-            console.log('[ServiceWorker] Clearing legacy cache:', cache);
+            console.log('[ServiceWorker] Clearing legacy cache store:', cache);
             return caches.delete(cache);
           }
         })
@@ -34,13 +35,25 @@ self.addEventListener('activate', (event) => {
   );
 });
 
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+  if (event.data && event.data.type === 'CLEAR_CACHE') {
+    caches.keys().then((keys) => Promise.all(keys.map((k) => caches.delete(k))));
+  }
+});
+
 self.addEventListener('fetch', (event) => {
   const request = event.request;
 
-  // Never intercept API endpoints, auth routes, or POST/PUT/DELETE requests
+  // Never intercept API endpoints, auth routes, downloads, or hashed assets
+  // Vite assigns unique immutable hashes to /assets/*; caching them in SW causes chunk mismatch errors
   if (
     request.method !== 'GET' ||
     request.url.includes('/api/') ||
+    request.url.includes('/downloads/') ||
+    request.url.includes('/assets/') ||
     request.url.includes('chrome-extension') ||
     request.url.includes('vercel.app/api')
   ) {
@@ -63,7 +76,7 @@ self.addEventListener('fetch', (event) => {
           if (cached) return cached;
           const fallback = await caches.match('/index.html');
           if (fallback) return fallback;
-          return new Response('Offline: Anusandhan is cached and ready. Please reconnect or launch installed app.', {
+          return new Response('Offline: Anusandhan is cached and ready. Please reconnect.', {
             headers: { 'Content-Type': 'text/plain' }
           });
         })
@@ -71,20 +84,21 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Static assets (JS, CSS, SVGs, Fonts, Images): Stale-While-Revalidate
+  // General static assets (SVGs, Icons, Manifest): Cache-First with Network Fallback
   event.respondWith(
     caches.match(request).then((cachedResponse) => {
-      const fetchPromise = fetch(request)
-        .then((networkResponse) => {
-          if (networkResponse && networkResponse.status === 200) {
-            const clone = networkResponse.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
-          }
-          return networkResponse;
-        })
-        .catch(() => cachedResponse);
-
-      return cachedResponse || fetchPromise;
+      if (cachedResponse) {
+        return cachedResponse;
+      }
+      return fetch(request).then((networkResponse) => {
+        if (networkResponse && networkResponse.status === 200) {
+          const clone = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+        }
+        return networkResponse;
+      }).catch(() => {
+        return new Response('', { status: 404, statusText: 'Not Found' });
+      });
     })
   );
 });
