@@ -828,65 +828,13 @@ const AppContent: React.FC = () => {
   );
 };
 
-interface SilentErrorBoundaryState {
-  hasError: boolean;
-}
-
-class SilentErrorBoundary extends React.Component<{ children: React.ReactNode }, SilentErrorBoundaryState> {
-  state: SilentErrorBoundaryState = { hasError: false };
-
-  static getDerivedStateFromError(error: any): SilentErrorBoundaryState {
-    const errorStr = String(error?.message || error || '');
-    if (errorStr.includes('Failed to fetch dynamically imported module') || errorStr.includes('Loading chunk')) {
-      try {
-        const lastReload = sessionStorage.getItem('rip_chunk_reload');
-        if (!lastReload || Date.now() - Number(lastReload) > 10000) {
-          sessionStorage.setItem('rip_chunk_reload', String(Date.now()));
-          window.location.reload();
-        }
-      } catch {}
-    }
-    return { hasError: true };
-  }
-
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.warn('[SilentErrorBoundary Caught non-fatal exception]:', error, errorInfo);
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return (
-        <div className="min-h-screen bg-[#070A12] text-zinc-100 flex flex-col items-center justify-center p-4">
-          <div className="text-center space-y-3">
-            <h2 className="text-lg font-serif font-medium text-amber-300">Anusandhan (अनुसंधान)</h2>
-            <p className="text-xs text-zinc-400">Restoring research workspace...</p>
-            <button
-              onClick={() => {
-                this.setState({ hasError: false });
-                window.location.hash = '';
-                window.location.reload();
-              }}
-              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-zinc-950 font-semibold text-xs shadow-md shadow-amber-500/20 cursor-pointer"
-            >
-              Continue to Workspace →
-            </button>
-          </div>
-        </div>
-      );
-    }
-    return this.props.children;
-  }
-}
-
 export const App: React.FC = () => {
   return (
-    <SilentErrorBoundary>
-      <ThemeProvider>
-        <AuthProvider>
-          <AppContent />
-        </AuthProvider>
-      </ThemeProvider>
-    </SilentErrorBoundary>
+    <ThemeProvider>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </ThemeProvider>
   );
 };
 

@@ -16,19 +16,19 @@ export function matchProfessorsForStudent(student: StudentProfile): Professor[] 
     }
 
     // High Mentorship Ratio (+10)
-    if (prof.metrics.studentCoAuthorshipRatio >= 0.8) {
+    if ((prof.metrics?.studentCoAuthorshipRatio || 0) >= 0.8) {
       score += 10;
-    } else if (prof.metrics.studentCoAuthorshipRatio >= 0.7) {
+    } else if ((prof.metrics?.studentCoAuthorshipRatio || 0) >= 0.7) {
       score += 6;
     }
 
     // Active Grant (+8)
-    if (prof.metrics.activeGrant) {
+    if (prof.metrics?.activeGrant) {
       score += 8;
     }
 
     // RRS alignment (+7)
-    if (student.rrsScore >= 70 && prof.metrics.hIndex > 50) {
+    if (student.rrsScore >= 70 && (prof.metrics?.hIndex || 0) > 50) {
       score += 7;
     }
 

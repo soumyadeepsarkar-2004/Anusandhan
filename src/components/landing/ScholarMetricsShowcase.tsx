@@ -82,7 +82,7 @@ export const ScholarMetricsShowcase: React.FC = () => {
               </div>
 
               {/* Active Grant Indicator */}
-              {sampleProf.metrics.activeGrant && (
+              {sampleProf.metrics?.activeGrant && (
                 <div className="p-3.5 rounded-xl bg-canvas-card border border-white/10 mb-4 flex items-start space-x-3">
                   <div className="w-7 h-7 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-400 flex items-center justify-center shrink-0 mt-0.5">
                     <Award className="w-4 h-4" />
