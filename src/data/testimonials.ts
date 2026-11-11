@@ -13,8 +13,8 @@ export interface Testimonial {
 export const TESTIMONIALS: Testimonial[] = [
   {
     id: 't-1',
-    studentName: 'Aarav Sharma',
-    avatarUrl: '/testimonials/aarav-sharma.jpg',
+    studentName: 'Aditya S.',
+    avatarUrl: '/testimonials/aditya-s.jpg',
     originUniversity: 'IIT Bombay, CSE',
     placedProgram: 'DAAD WISE Fellow 2026',
     hostInstitute: 'Max Planck Institute for Intelligent Systems (Tübingen)',

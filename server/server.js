@@ -35,6 +35,7 @@ import agentRoutes from './routes/agentRoutes.js';
 import ingestionRoutes from './routes/ingestionRoutes.js';
 import billingRoutes from './routes/billingRoutes.js';
 import syncRoutes from './routes/syncRoutes.js';
+import { circuitBreakers } from './utils/circuitBreaker.js';
 import { ingestionScheduler } from './services/dataIngestionScheduler.js';
 import { PythonBridge } from './services/pythonBridge.js';
 import { cache } from './services/redisCache.js';
@@ -317,7 +318,52 @@ app.get('/api/health', async (req, res) => {
       database_pool: pool ? 'Supabase PgBouncer (Port 6543)' : 'In-Memory Transactional Store',
       mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'in-memory-fallback',
       redis_cache: cacheStats,
+      circuit_breakers: {
+        pythonMicroservice: circuitBreakers.pythonMicroservice.getStats(),
+        mongoCluster: circuitBreakers.mongoCluster.getStats(),
+        openAlexApi: circuitBreakers.openAlexApi.getStats()
+      },
       python_ai_microservice: pythonStatus
+    }
+  });
+});
+
+// 5.1 Deep System Design Telemetry & Performance Metrics
+app.get('/api/system/metrics', (req, res) => {
+  const mem = process.memoryUsage();
+  res.json({
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    uptimeSeconds: Math.floor(process.uptime()),
+    process: {
+      nodeVersion: process.version,
+      rssMB: Math.round((mem.rss / 1024 / 1024) * 100) / 100,
+      heapUsedMB: Math.round((mem.heapUsed / 1024 / 1024) * 100) / 100,
+      heapTotalMB: Math.round((mem.heapTotal / 1024 / 1024) * 100) / 100
+    },
+    caching: cache.getStats(),
+    circuitBreakers: {
+      pythonMicroservice: circuitBreakers.pythonMicroservice.getStats(),
+      mongoCluster: circuitBreakers.mongoCluster.getStats(),
+      openAlexApi: circuitBreakers.openAlexApi.getStats()
+    },
+    database: {
+      mongodb: {
+        status: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+        cluster: 'Cluster0 (AWS Mumbai / ap-south-1)',
+        poolSockets: '10-50 connections'
+      },
+      sqlite: {
+        status: 'active',
+        storage: 'server/db/anusandhan.sqlite',
+        durability: 'WAL mode + Normal synchronous'
+      }
+    },
+    architecture: {
+      singleFlightCoalescing: 'enabled',
+      circuitBreakerFailFast: 'enabled',
+      multiTierCache: 'L1 Memory LRU (5,000 cap) + L2 Redis',
+      offlineSyncBatch: 'enabled (/api/sync/batch)'
     }
   });
 });

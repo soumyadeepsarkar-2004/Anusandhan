@@ -248,22 +248,22 @@ export const InteractiveDemo: React.FC<InteractiveDemoProps> = ({ onLaunchApp, o
                   className="space-y-4"
                 >
                   <div className="flex items-center justify-between text-xs text-zinc-400 font-mono pb-1 border-b border-zinc-800">
-                    <span>SUBJECT: Research Inquiry: Extending Token Distillation (IIT Delhi)</span>
-                    <span className="text-amber-400 font-semibold">146 words · 100% Academic Compliance</span>
+                    <span>SUBJECT: [Research Inquiry] Synthesizing Contribution on [Target Paper Topic]</span>
+                    <span className="text-amber-400 font-semibold">146-Word Structure · 100% Academic Ethics Standards</span>
                   </div>
 
                   <div className="p-4 rounded-xl bg-zinc-950/80 border border-zinc-800 text-xs text-zinc-300 font-mono leading-relaxed space-y-2.5">
-                    <p><span className="text-amber-300 font-semibold">Dear Prof. Tian,</span></p>
+                    <p><span className="text-amber-300 font-semibold">Dear Professor [Faculty Name],</span></p>
                     <p>
-                      I recently studied your group's ICRA 2025 paper on <em>"Cross-Embodiment Visuomotor Policies via Spatial Token Distillation"</em> with great admiration.
+                      I recently evaluated your group's publication on <em>"[Target Paper Title]"</em> with great academic interest and replicated your open benchmark.
                     </p>
                     <p>
-                      As a CS undergraduate at IIT Delhi (CGPA: 9.42/10), I benchmarked an accelerated diffusion pipeline on GitHub (<span className="text-amber-300 underline">github.com/aarav/distill-rl</span>) showing that pruning spatial keys reduces rollout latency by 18% on constrained edge hardware. Seeing your team's trajectory, I would love to explore extending this architecture to dexterous tactile manipulation.
+                      Drawing from my project trajectory at [Your University], I identified a concrete contribution opportunity on [Your Code Repository / Paper Reproduction] that improves [Specific Metric / Latency] on constrained hardware setups.
                     </p>
                     <p>
-                      I am seeking an on-site summer research fellowship and am applying via the fully funded <strong>DAAD WISE program</strong>. Would you have 10 minutes next week for a brief technical discussion?
+                      I am applying for summer research opportunities via institutional programs (e.g. DAAD WISE / Mitacs Globalink). Would you have 10 minutes next week for a brief technical discussion?
                     </p>
-                    <p className="text-zinc-400 pt-1">Sincerely,<br />Aarav Sharma</p>
+                    <p className="text-zinc-400 pt-1">Sincerely,<br />[Your Name] · [Your University]</p>
                   </div>
                 </motion.div>
               )}

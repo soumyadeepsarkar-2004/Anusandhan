@@ -174,9 +174,10 @@ export const Navbar: React.FC<NavbarProps> = ({
             <div className="flex items-center p-0.5 rounded-full bg-white/[0.04] border border-white/10 backdrop-blur-md shrink-0 gap-1 shadow-inner">
               <button
                 onClick={onLaunchApp}
-                className="h-8 group flex items-center space-x-1.5 px-4 rounded-full bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-slate-950 font-bold text-xs shadow-[0_0_20px_rgba(245,158,11,0.25)] hover:shadow-[0_0_25px_rgba(245,158,11,0.4)] transition-all cursor-pointer transform active:scale-95 shrink-0 whitespace-nowrap border border-amber-300/40"
+                className="h-8 group flex items-center space-x-1 px-3 sm:px-4 rounded-full bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-slate-950 font-bold text-xs shadow-[0_0_20px_rgba(245,158,11,0.25)] hover:shadow-[0_0_25px_rgba(245,158,11,0.4)] transition-all cursor-pointer transform active:scale-95 shrink-0 whitespace-nowrap border border-amber-300/40"
               >
-                <span>Launch Platform</span>
+                <span className="hidden sm:inline">Launch Platform</span>
+                <span className="sm:hidden">Launch</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
 
@@ -193,16 +194,17 @@ export const Navbar: React.FC<NavbarProps> = ({
             <div className="flex items-center p-0.5 rounded-full bg-white/[0.04] border border-white/10 backdrop-blur-md shrink-0 gap-1 shadow-inner">
               <button
                 onClick={onOpenAuth}
-                className="h-8 px-3.5 rounded-full text-xs font-semibold text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors cursor-pointer shrink-0 whitespace-nowrap"
+                className="hidden sm:inline-block h-8 px-3.5 rounded-full text-xs font-semibold text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors cursor-pointer shrink-0 whitespace-nowrap"
               >
                 Sign In
               </button>
 
               <button
                 onClick={onLaunchApp}
-                className="h-8 group flex items-center space-x-1.5 px-4 rounded-full bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-slate-950 font-bold text-xs shadow-[0_0_20px_rgba(245,158,11,0.25)] hover:shadow-[0_0_25px_rgba(245,158,11,0.4)] transition-all cursor-pointer transform active:scale-95 shrink-0 whitespace-nowrap border border-amber-300/40"
+                className="h-8 group flex items-center space-x-1 px-3 sm:px-4 rounded-full bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-slate-950 font-bold text-xs shadow-[0_0_20px_rgba(245,158,11,0.25)] hover:shadow-[0_0_25px_rgba(245,158,11,0.4)] transition-all cursor-pointer transform active:scale-95 shrink-0 whitespace-nowrap border border-amber-300/40"
               >
-                <span>Launch Platform</span>
+                <span className="hidden sm:inline">Launch Platform</span>
+                <span className="sm:hidden">Launch</span>
                 <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
               </button>
             </div>

@@ -253,8 +253,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onLaunchApp, onOpenVoi
                 </div>
 
                 <div className="mt-3 space-y-1">
-                  <div className="text-xs font-semibold text-zinc-200">Aarav Sharma · IIT Bombay</div>
-                  <p className="text-[11px] text-zinc-400 font-mono">B.Tech Comp Sci · CGPA 9.42 / 10</p>
+                  <div className="text-xs font-semibold text-zinc-200">Scholar Profile Verification</div>
+                  <p className="text-[11px] text-zinc-400 font-mono">Domain: Robotics & Distributed AI</p>
                 </div>
               </div>
 
@@ -322,8 +322,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onLaunchApp, onOpenVoi
                       <span>28.4% REPLY RATE</span>
                     </div>
                     <p className="line-clamp-6">
-                      <span className="text-amber-300 font-medium">"Dear Prof. Tian, </span>
-                      I read your ICRA 2025 paper on Cross-Embodiment Token Distillation. I reproduced your latency benchmark on GitHub (github.com/aarav/distill-rl) and found that pruning spatial keys reduces rollout latency by 18%... My travel is fully funded via the DAAD WISE fellowship."
+                      <span className="text-amber-300 font-medium">"Dear Professor [Last Name], </span>
+                      I read your group's publication on Cross-Embodiment Token Distillation. I reproduced your latency benchmark on GitHub (github.com/scholar/reproducible-bench) and evaluated a reproducible contribution proposal... My travel is fully funded via the DAAD WISE fellowship."
                     </p>
                   </div>
                 ) : (

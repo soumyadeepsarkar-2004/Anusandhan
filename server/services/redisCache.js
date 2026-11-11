@@ -2,6 +2,11 @@
  * Upstash Redis / In-Memory Multi-Tier Caching Service
  * Accelerates high-frequency read endpoints (faculty catalog, fellowship programs, user stats)
  * to achieve sub-5ms response latencies and protect the database under 1,000–2,000 concurrent users.
+ * 
+ * Features:
+ *  - L1 High-speed in-memory LRU cache with capacity limit.
+ *  - L2 Upstash / TCP Redis support.
+ *  - Single-Flight Request Coalescing (Thundering Herd / Cache Stampede prevention).
  */
 import dotenv from 'dotenv';
 if (process.env.NODE_ENV !== 'production') {
@@ -20,17 +25,20 @@ const memoryExpiry = new Map();
 // Telemetry Stats
 let hits = 0;
 let misses = 0;
+let coalescedHits = 0;
 
 class CacheService {
   constructor() {
     this.isUpstashEnabled = !!(UPSTASH_URL && UPSTASH_TOKEN);
     this.redisUrl = REDIS_URL || null;
+    this.inFlightMap = new Map();
+
     if (this.isUpstashEnabled) {
       console.log('[Redis Cache] Configured with Upstash Redis Serverless REST endpoint.');
     } else if (this.redisUrl) {
       console.log(`[Redis Cache] Operating with Redis TCP gateway (${this.redisUrl.replace(/\/\/.*@/, '//***@')}) with in-memory LRU backup.`);
     } else {
-      console.log(`[Redis Cache] Operating with high-speed memory cache (TTL enabled, LRU cap: ${MAX_MEMORY_KEYS} keys).`);
+      console.log(`[Redis Cache] Operating with high-speed memory cache (TTL enabled, LRU cap: ${MAX_MEMORY_KEYS} keys, Single-Flight active).`);
     }
   }
 
@@ -130,17 +138,38 @@ class CacheService {
     }
   }
 
+  /**
+   * Single-Flight Request Coalescing (Thundering Herd / Cache Stampede Prevention)
+   * Collapses N concurrent misses on the same key into a single DB / API invocation.
+   */
   async getOrSet(key, fetcher, ttlSeconds = 1800) {
     const cached = await this.get(key);
     if (cached !== null && cached !== undefined) {
       return { data: cached, source: 'cache' };
     }
 
-    const fresh = await fetcher();
-    if (fresh !== null && fresh !== undefined) {
-      await this.set(key, fresh, ttlSeconds);
+    // If an identical fetch is currently in-flight, coalesce into the same promise
+    if (this.inFlightMap.has(key)) {
+      coalescedHits++;
+      const data = await this.inFlightMap.get(key);
+      return { data, source: 'single-flight-coalesced' };
     }
-    return { data: fresh, source: 'fresh' };
+
+    const fetchPromise = (async () => {
+      try {
+        const fresh = await fetcher();
+        if (fresh !== null && fresh !== undefined) {
+          await this.set(key, fresh, ttlSeconds);
+        }
+        return fresh;
+      } finally {
+        this.inFlightMap.delete(key);
+      }
+    })();
+
+    this.inFlightMap.set(key, fetchPromise);
+    const data = await fetchPromise;
+    return { data, source: 'fresh' };
   }
 
   getStats() {
@@ -149,9 +178,13 @@ class CacheService {
     return {
       hits,
       misses,
+      coalescedHits,
       totalRequests: total,
       hitRate,
-      backend: this.isUpstashEnabled ? 'Upstash Redis' : 'In-Memory LRU'
+      inFlightCount: this.inFlightMap.size,
+      memoryKeysCount: memoryStore.size,
+      maxCapacity: MAX_MEMORY_KEYS,
+      backend: this.isUpstashEnabled ? 'Upstash Redis' : 'In-Memory LRU + Single-Flight'
     };
   }
 }
