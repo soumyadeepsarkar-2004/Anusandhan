@@ -29,9 +29,10 @@ export const CrossNativeAppModal: React.FC<CrossNativeAppModalProps> = ({
   const [copiedLink, setCopiedLink] = useState<boolean>(false);
 
   const currentUrl = typeof window !== 'undefined' ? window.location.origin : 'https://anusandhan.vercel.app';
-  const apkDownloadUrl = '/downloads/anusandhan-v1.0.apk';
-  const winDownloadUrl = '/downloads/anusandhan-setup-1.0.0.exe';
-  const macDownloadUrl = '/downloads/anusandhan-1.0.0-universal.dmg';
+  const githubReleaseBase = 'https://github.com/soumyadeepsarkar-2004/Anusandhan/releases/download/v1.0.0';
+  const apkDownloadUrl = `${githubReleaseBase}/anusandhan-v1.0.apk`;
+  const winDownloadUrl = `${githubReleaseBase}/anusandhan-setup-1.0.0.exe`;
+  const macDownloadUrl = `${githubReleaseBase}/anusandhan-1.0.0-universal.dmg`;
 
   const handleCopyLink = (url: string) => {
     navigator.clipboard.writeText(`${currentUrl}${url}`);

@@ -199,7 +199,7 @@ const FooterComponent: React.FC<FooterProps> = ({ onOpenPrivacy, onOpenTerms, on
               </button>
             ) : (
               <a
-                href="https://www.producthunt.com/posts/new"
+                href="https://www.producthunt.com/posts/new/OPGNCT3GA47JX2UOP5E426NGVQUKXDFBFG"
                 target="_blank"
                 rel="noreferrer"
                 className="px-3 py-1.5 rounded-xl bg-[#DA552F]/10 hover:bg-[#DA552F]/20 border border-[#DA552F]/30 text-zinc-200 hover:text-white text-xs font-mono transition-colors flex items-center gap-1.5"

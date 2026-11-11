@@ -1,6 +1,6 @@
 {
-  "appId": "ai.researchintern.pro",
-  "productName": "ResearchIntern Pro",
+  "appId": "ai.anusandhan.pro",
+  "productName": "Anusandhan",
   "directories": {
     "output": "dist-electron"
   },
@@ -21,13 +21,18 @@
         "arch": ["x64"]
       }
     ],
-    "icon": "public/favicon.svg"
+    "icon": "public/favicon.ico"
   },
   "nsis": {
     "oneClick": false,
     "allowToChangeInstallationDirectory": true,
     "createDesktopShortcut": true,
     "createStartMenuShortcut": true,
-    "shortcutName": "ResearchIntern Pro"
+    "shortcutName": "Anusandhan"
+  },
+  "mac": {
+    "target": ["dmg", "zip"],
+    "category": "public.app-category.education",
+    "icon": "public/brand-emblem.png"
   }
 }

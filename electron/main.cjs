@@ -1,23 +1,23 @@
 /**
- * Electron Main Process for ResearchIntern Pro Desktop (Windows .EXE).
- * Packages the React/Vite application into a standalone desktop executable with offline caching.
+ * Electron Main Process for Anusandhan Desktop (Windows & macOS).
+ * Standalone cross-platform desktop executable with offline-first architecture.
  */
-const { app, BrowserWindow, shell, ipcMain, Notification } = require('electron');
+const { app, BrowserWindow, shell, ipcMain } = require('electron');
 const path = require('path');
 
 let mainWindow;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 1280,
-    height: 840,
-    minWidth: 960,
-    minHeight: 600,
-    backgroundColor: '#090A0E',
-    title: 'ResearchIntern Pro (अनुसंधान AI)',
+    width: 1320,
+    height: 880,
+    minWidth: 980,
+    minHeight: 640,
+    backgroundColor: '#070A12',
+    title: 'Anusandhan — Global Research Internships on Autopilot',
     autoHideMenuBar: true,
     show: false,
-    icon: path.join(__dirname, '../public/favicon.svg'),
+    icon: path.join(__dirname, '../public/brand-emblem.png'),
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,

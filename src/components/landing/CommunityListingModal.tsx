@@ -88,9 +88,9 @@ export const CommunityListingModal: React.FC<CommunityListingModalProps> = ({ is
       ),
       title: 'Product Hunt Submission Kit',
       description: 'Launch assets, tagline, and maker comment prepared. Direct link to create and publish your post on Product Hunt.',
-      ctaText: 'Submit on Product Hunt',
-      url: 'https://www.producthunt.com/posts/new',
-      tag: 'Ready to Submit'
+      ctaText: 'Open Product Hunt Draft',
+      url: 'https://www.producthunt.com/posts/new/OPGNCT3GA47JX2UOP5E426NGVQUKXDFBFG',
+      tag: 'Draft Live & Active'
     }
   ];
 

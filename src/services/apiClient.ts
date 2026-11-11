@@ -8,8 +8,17 @@
 const isBrowser = typeof window !== 'undefined';
 const getGatewayBaseUrl = () => {
   if (isBrowser) {
+    if ((import.meta as any).env?.VITE_API_URL) {
+      return (import.meta as any).env.VITE_API_URL;
+    }
+    const isElectron = !!(window as any).electronAPI || window.location.protocol === 'file:';
+    const isCapacitor = !!(window as any).Capacitor?.isNativePlatform?.() || (window.location.hostname === 'localhost' && !window.location.port);
+    if (isElectron || isCapacitor) {
+      return 'https://anusandhan.vercel.app/api';
+    }
     const host = window.location.hostname;
-    if (host === 'localhost' || host === '127.0.0.1') {
+    const port = window.location.port;
+    if ((host === 'localhost' || host === '127.0.0.1') && port === '5173') {
       return 'http://localhost:5000/api';
     }
     return '/api';
@@ -18,9 +27,23 @@ const getGatewayBaseUrl = () => {
 };
 
 const GATEWAY_BASE_URL = getGatewayBaseUrl();
-const PYTHON_BASE_URL = isBrowser && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1'
-  ? '/api'
-  : 'http://localhost:8000/api/v1';
+const getPythonBaseUrl = () => {
+  if (isBrowser) {
+    const isElectron = !!(window as any).electronAPI || window.location.protocol === 'file:';
+    const isCapacitor = !!(window as any).Capacitor?.isNativePlatform?.() || (window.location.hostname === 'localhost' && !window.location.port);
+    if (isElectron || isCapacitor) {
+      return 'https://anusandhan.vercel.app/api';
+    }
+    const host = window.location.hostname;
+    const port = window.location.port;
+    if ((host === 'localhost' || host === '127.0.0.1') && port === '5173') {
+      return 'http://localhost:8000/api/v1';
+    }
+    return '/api';
+  }
+  return '/api';
+};
+const PYTHON_BASE_URL = getPythonBaseUrl();
 
 export class ApiClient {
   private static async request<T>(baseUrl: string, endpoint: string, options: RequestInit = {}): Promise<T> {

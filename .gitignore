@@ -6,8 +6,13 @@ node_modules/
 
 # Production build outputs
 dist/
+dist-electron/
 build/
 out/
+public/downloads/*.exe
+public/downloads/*.dmg
+public/downloads/*.apk
+public/downloads/*.zip
 .vitepress/dist
 .vitepress/cache
 

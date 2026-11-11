@@ -82,6 +82,12 @@ const getCandidateAuthUrls = (subpath: string): string[] => {
   const cleanPath = subpath.startsWith('/') ? subpath : `/${subpath}`;
   const candidates: string[] = [];
   if (typeof window !== 'undefined') {
+    const isElectron = !!(window as any).electronAPI || window.location.protocol === 'file:';
+    const isCapacitor = !!(window as any).Capacitor?.isNativePlatform?.() || (window.location.hostname === 'localhost' && !window.location.port);
+    if (isElectron || isCapacitor) {
+      candidates.push(`https://anusandhan.vercel.app/api/auth${cleanPath}`);
+      return candidates;
+    }
     const origin = window.location.origin;
     if (origin.includes('anusandhan.vercel.app')) {
       candidates.push(`/api/auth${cleanPath}`);
