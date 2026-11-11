@@ -10,12 +10,12 @@
 </p>
 
 <p align="center">
-  <a href="https://www.producthunt.com/products/anusandhan" target="_blank">
-    <img src="https://img.shields.io/badge/Product%20Hunt-Featured%20Launch-DA552F?style=for-the-badge&logo=producthunt&logoColor=white" alt="Featured on Product Hunt" height="34" />
+  <a href="https://github.com/soumyadeepsarkar-2004/Anusandhan/releases/tag/v1.0.0" target="_blank">
+    <img src="https://img.shields.io/badge/GitHub%20Release-v1.0.0%20Stable-10B981?style=for-the-badge&logo=github&logoColor=white" alt="v1.0.0 Stable Release" height="34" />
   </a>
   &nbsp;&nbsp;
-  <a href="https://www.producthunt.com/products/anusandhan" target="_blank">
-    <img src="https://img.shields.io/badge/%F0%9F%8F%86%20Community%20Favorite-%231%20Daily%20Spotlight-FF6154?style=for-the-badge&logo=producthunt&logoColor=white" alt="#1 Daily Spotlight" height="34" />
+  <a href="https://www.producthunt.com/posts/new/OPGNCT3GA47JX2UOP5E426NGVQUKXDFBFG" target="_blank">
+    <img src="https://img.shields.io/badge/Product%20Hunt-Launch%20Draft-DA552F?style=for-the-badge&logo=producthunt&logoColor=white" alt="Product Hunt Launch Draft" height="34" />
   </a>
 </p>
 
@@ -42,14 +42,16 @@
 - 📚 **VitePress Documentation (GitHub Pages)**: [https://soumyadeepsarkar-2004.github.io/Anusandhan/](https://soumyadeepsarkar-2004.github.io/Anusandhan/)
 - 📦 **GitHub Repository**: [https://github.com/soumyadeepsarkar-2004/Anusandhan](https://github.com/soumyadeepsarkar-2004/Anusandhan)
 
-### 📱 Universal Cross-Platform App Downloads
+### 📱 Universal Cross-Platform App Downloads (v1.0.0 Stable Binaries)
 
 | Platform | Format / Architecture | Status | Direct Download Link |
 | :--- | :--- | :--- | :--- |
-| **Android** | Universal APK (Capacitor 8) | Production Release | [Download APK (`anusandhan-v1.0.apk`)](https://anusandhan.vercel.app/downloads/anusandhan-v1.0.apk) |
-| **Windows** | x64 Installer (Electron 45) | Production Release | [Download Windows Setup (`.exe`)](https://anusandhan.vercel.app/downloads/anusandhan-setup-1.0.0.exe) |
-| **macOS** | Universal DMG (Apple Silicon & Intel) | Production Release | [Download macOS DMG (`.dmg`)](https://anusandhan.vercel.app/downloads/anusandhan-1.0.0-universal.dmg) |
+| **Android** | Universal APK (Capacitor 8) | Production Release | [Download APK (`anusandhan-v1.0.apk`)](https://github.com/soumyadeepsarkar-2004/Anusandhan/releases/download/v1.0.0/anusandhan-v1.0.apk) |
+| **Windows Installer** | x64 Setup (Electron 45 NSIS) | Production Release | [Download Windows Setup (`.exe`)](https://github.com/soumyadeepsarkar-2004/Anusandhan/releases/download/v1.0.0/anusandhan-setup-1.0.0.exe) |
+| **Windows Portable** | x64 Standalone Executable | Production Release | [Download Portable EXE (`.exe`)](https://github.com/soumyadeepsarkar-2004/Anusandhan/releases/download/v1.0.0/anusandhan-portable-1.0.0.exe) |
+| **macOS / Universal** | Universal Desktop Package | Production Release | [Download macOS DMG (`.dmg`)](https://github.com/soumyadeepsarkar-2004/Anusandhan/releases/download/v1.0.0/anusandhan-1.0.0-universal.dmg) |
 | **Web & iOS** | Progressive Web App (PWA) | Production Live | [Launch Web PWA](https://anusandhan.vercel.app) |
+| **Release Notes** | Full Release Catalog & Hashes | Live on GitHub | [View All v1.0.0 Assets](https://github.com/soumyadeepsarkar-2004/Anusandhan/releases/tag/v1.0.0) |
 
 ---
 
