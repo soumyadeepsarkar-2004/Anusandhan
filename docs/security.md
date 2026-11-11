@@ -71,8 +71,8 @@ All uploaded CV documents are verified for the standard `%PDF-` magic byte seque
 ## 5. DPDP Act 2023 & GDPR Statutory Compliance
 
 Anusandhan strictly adheres to **Section 5 of the Digital Personal Data Protection Act, 2023 (DPDP Act 2023)**:
-- **Data Fiduciary**: Anusandhan Technologies Pvt. Ltd.
+- **Data Fiduciary & Custodian**: Anusandhan (Open Academic Research Initiative led by Soumyadeep Sarkar).
 - **Data Principal**: University student applicants / independent research scholars.
 - **Purpose Limitation**: Student transcripts and CVs are utilized exclusively for matching and pitch calibration.
 - **Right to Erasure**: Students can trigger permanent account deletion with immediate cascading purge across PostgreSQL and MongoDB stores.
-- **Grievance Redressal**: Formal Data Protection Officer contact at `grievance@anusandhan.ai` with statutory 48-hour acknowledgment.
+- **Grievance & Inquiries**: Project Lead contact at `soumyadeepsarkar2004@outlook.com` with statutory 48-hour acknowledgment.

@@ -47,7 +47,7 @@ export default defineConfig({
     ],
     footer: {
       message: 'Released under Proprietary Academic License. Calibrated for 1,000+ Concurrent Scholars.',
-      copyright: 'Copyright © 2026-2027 Anusandhan Technologies Pvt. Ltd.'
+      copyright: 'Copyright © 2026-2027 Anusandhan · Open Research Initiative led by Soumyadeep Sarkar'
     },
     search: {
       provider: 'local'

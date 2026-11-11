@@ -148,7 +148,7 @@ export const TermsOfServiceModal: React.FC<TermsOfServiceModalProps> = ({ isOpen
                   5. Subscriptions, Credits & Cancellation
                 </h3>
                 <p>
-                  Paid Scholar Pro subscriptions and institutional passes provide additional daily quota allocations and deep paper deconstruction analysis. Subscriptions may be cancelled at any time from the account dashboard. Unused credits reset at each monthly billing cycle. Inquiries regarding billing disputes should be routed to <strong>billing@anusandhan.ai</strong>.
+                  Paid Scholar Pro subscriptions and institutional passes provide additional daily quota allocations and deep paper deconstruction analysis. Subscriptions may be cancelled at any time from the account dashboard. Unused credits reset at each monthly billing cycle. Inquiries regarding billing or support should be routed to <strong>soumyadeepsarkar2004@outlook.com</strong>.
                 </p>
               </div>
             </>
@@ -191,7 +191,7 @@ export const TermsOfServiceModal: React.FC<TermsOfServiceModalProps> = ({ isOpen
 
         {/* Footer Actions */}
         <div className="pt-4 border-t border-white/10 flex justify-between items-center text-xs font-mono">
-          <span className="text-zinc-500">Governed under Indian Information Technology Act & Laws of Karnataka</span>
+          <span className="text-zinc-500">Governed under Indian Information Technology Act & Academic Honor Codes</span>
           <button
             onClick={onClose}
             className="px-5 py-2 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-zinc-950 font-semibold cursor-pointer transition-all shadow-md active:scale-95"

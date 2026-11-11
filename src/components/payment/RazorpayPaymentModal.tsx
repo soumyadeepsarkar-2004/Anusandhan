@@ -232,7 +232,7 @@ export const RazorpayPaymentModal: React.FC<RazorpayPaymentModalProps> = ({
 
                 <div className="pt-3 border-t border-white/10 text-[10px] font-mono text-zinc-400 flex items-center justify-between">
                   <span>SAC: 998431 (Online Portal Services)</span>
-                  <span>GSTIN: 29ABCDE1234F1Z5</span>
+                  <span>Initiative: Anusandhan Open Research</span>
                 </div>
               </div>
 

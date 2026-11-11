@@ -293,7 +293,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
             </button>
           )}
           <a
-            href="mailto:support@anusandhan.ai"
+            href="mailto:soumyadeepsarkar2004@outlook.com"
             className="hover:text-amber-500 transition-colors"
           >
             Support

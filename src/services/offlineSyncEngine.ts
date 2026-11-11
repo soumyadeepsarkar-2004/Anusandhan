@@ -1,7 +1,7 @@
 /**
  * Offline-First Outbox Synchronization Engine.
  * Safeguards student outreach, draft edits, and CRM state during connectivity drops.
- * Automatically flushes queued actions with randomized jitter when reconnected.
+ * Automatically flushes queued actions with idempotency keys and randomized jitter when reconnected.
  */
 
 export interface OutboxItem {
@@ -15,13 +15,38 @@ export interface OutboxItem {
 
 type NetworkListener = (isOnline: boolean) => void;
 type SyncListener = (syncedCount: number, syncedItems: OutboxItem[]) => void;
+type StatusListener = (isSyncing: boolean) => void;
 
 export class OfflineSyncEngine {
   private static STORAGE_KEY = 'anusandhan_outbox_queue';
   private static isSyncing = false;
   private static networkListeners: Set<NetworkListener> = new Set();
   private static syncListeners: Set<SyncListener> = new Set();
+  private static statusListeners: Set<StatusListener> = new Set();
   private static isInitialized = false;
+
+  /**
+   * Dynamically resolves the API gateway base URL across Web, Electron, and Capacitor.
+   */
+  public static getApiBaseUrl(): string {
+    if (typeof window !== 'undefined') {
+      if ((import.meta as any).env?.VITE_API_URL) {
+        return (import.meta as any).env.VITE_API_URL;
+      }
+      const isElectron = !!(window as any).electronAPI || window.location.protocol === 'file:';
+      const isCapacitor = !!(window as any).Capacitor?.isNativePlatform?.() || (window.location.hostname === 'localhost' && !window.location.port);
+      if (isElectron || isCapacitor) {
+        return 'https://anusandhan.vercel.app/api';
+      }
+      const host = window.location.hostname;
+      const port = window.location.port;
+      if ((host === 'localhost' || host === '127.0.0.1') && port === '5173') {
+        return 'http://localhost:5000/api';
+      }
+      return '/api';
+    }
+    return '/api';
+  }
 
   /**
    * Initializes network watchers and auto-flush handlers.
@@ -47,6 +72,13 @@ export class OfflineSyncEngine {
    */
   static isOnline(): boolean {
     return typeof navigator !== 'undefined' ? navigator.onLine : true;
+  }
+
+  /**
+   * Check if sync is currently in progress.
+   */
+  static getIsSyncing(): boolean {
+    return this.isSyncing;
   }
 
   /**
@@ -88,59 +120,106 @@ export class OfflineSyncEngine {
   }
 
   /**
-   * Flushes pending outbox queue to the server.
+   * Manually trigger outbox synchronization.
+   */
+  static async syncNow(): Promise<number> {
+    return this.flushOutbox();
+  }
+
+  /**
+   * Flushes pending outbox queue to the cloud database and backend gateway.
    */
   static async flushOutbox(): Promise<number> {
     if (!this.isOnline() || this.isSyncing) return 0;
     this.isSyncing = true;
+    this.notifyStatusListeners(true);
 
     const items = this.getOutboxItems();
     if (items.length === 0) {
       this.isSyncing = false;
+      this.notifyStatusListeners(false);
       return 0;
     }
 
+    const apiBase = this.getApiBaseUrl();
+    const token = typeof localStorage !== 'undefined' ? localStorage.getItem('rip_auth_token') : null;
+    const authHeaders: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+    };
+
+    // Strategy 1: Attempt Batch Sync Endpoint for high efficiency and atomic guarantees
+    try {
+      const batchRes = await fetch(`${apiBase}/sync/batch`, {
+        method: 'POST',
+        headers: authHeaders,
+        body: JSON.stringify({ actions: items })
+      });
+
+      if (batchRes.ok) {
+        const batchData = await batchRes.json();
+        const syncedResults = batchData.results || [];
+        const syncedIds = new Set(syncedResults.filter((r: any) => r.status === 'synced').map((r: any) => r.id));
+
+        const syncedItems = items.filter(it => syncedIds.has(it.id));
+        const remaining = items.filter(it => !syncedIds.has(it.id));
+
+        this.persistOutbox(remaining);
+        this.isSyncing = false;
+        this.notifyStatusListeners(false);
+
+        if (syncedItems.length > 0) {
+          this.notifySyncListeners(syncedItems.length, syncedItems);
+        }
+
+        return syncedItems.length;
+      }
+    } catch (batchErr) {
+      console.warn('[OfflineSync] Batch sync endpoint unavailable, falling back to granular endpoints:', batchErr);
+    }
+
+    // Strategy 2: Granular item-by-item fallback
     const remaining: OutboxItem[] = [];
     const syncedItems: OutboxItem[] = [];
 
     for (const item of items) {
       try {
+        let success = false;
+
         if (item.type === 'QUEUE_OUTREACH') {
-          // Attempt dispatch to Node.js Express Gateway (port 5000) or Python (port 8000)
-          let success = false;
-          try {
-            const res = await fetch('http://localhost:5000/api/outreach/enqueue', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(item.payload)
+          const res = await fetch(`${apiBase}/outreach/enqueue`, {
+            method: 'POST',
+            headers: authHeaders,
+            body: JSON.stringify(item.payload)
+          });
+          if (res.ok) success = true;
+        } else if (item.type === 'UPDATE_PROFILE') {
+          const res = await fetch(`${apiBase}/students/me`, {
+            method: 'PUT',
+            headers: authHeaders,
+            body: JSON.stringify(item.payload)
+          });
+          if (res.ok) success = true;
+        } else if (item.type === 'UPDATE_CRM_STATUS') {
+          const id = item.payload.id || item.payload.draft_id;
+          if (id) {
+            const res = await fetch(`${apiBase}/outreach/${id}/status`, {
+              method: 'PUT',
+              headers: authHeaders,
+              body: JSON.stringify({ status: item.payload.status })
             });
             if (res.ok) success = true;
-          } catch {
-            // Try Python AI backend directly
-            try {
-              const resPy = await fetch('http://localhost:8000/api/v1/outreach/enqueue', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-Student-ID': 'student_active' },
-                body: JSON.stringify(item.payload)
-              });
-              if (resPy.ok) success = true;
-            } catch {
-              // Both offline; keep in outbox
-            }
           }
+        }
 
-          if (success) {
-            item.status = 'synced';
-            syncedItems.push(item);
-            continue;
-          }
-        } else if (item.type === 'UPDATE_PROFILE' || item.type === 'UPDATE_CRM_STATUS') {
-          // Sync profile or status
+        if (success) {
+          item.status = 'synced';
           syncedItems.push(item);
           continue;
         }
       } catch (err) {
-        console.warn(`Sync failed for outbox item ${item.id}:`, err);
+        console.warn(`[OfflineSync] Granular sync failed for outbox item ${item.id}:`, err);
       }
 
       item.retryCount++;
@@ -149,6 +228,7 @@ export class OfflineSyncEngine {
 
     this.persistOutbox(remaining);
     this.isSyncing = false;
+    this.notifyStatusListeners(false);
 
     if (syncedItems.length > 0) {
       this.notifySyncListeners(syncedItems.length, syncedItems);
@@ -190,6 +270,15 @@ export class OfflineSyncEngine {
     return () => this.syncListeners.delete(callback);
   }
 
+  /**
+   * Subscribes to syncing active/idle status changes.
+   */
+  static onStatusChange(callback: StatusListener): () => void {
+    this.init();
+    this.statusListeners.add(callback);
+    return () => this.statusListeners.delete(callback);
+  }
+
   private static notifyNetworkListeners(isOnline: boolean) {
     this.networkListeners.forEach(listener => {
       try {
@@ -204,6 +293,16 @@ export class OfflineSyncEngine {
     this.syncListeners.forEach(listener => {
       try {
         listener(count, items);
+      } catch (e) {
+        console.error(e);
+      }
+    });
+  }
+
+  private static notifyStatusListeners(isSyncing: boolean) {
+    this.statusListeners.forEach(listener => {
+      try {
+        listener(isSyncing);
       } catch (e) {
         console.error(e);
       }

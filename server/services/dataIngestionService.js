@@ -810,7 +810,7 @@ class DataIngestionService {
   async scrapeOpenAlexMetrics(searchName) {
     try {
       const url = `https://api.openalex.org/authors?filter=display_name.search:${encodeURIComponent(searchName)}`;
-      const res = await fetch(url, { headers: { 'User-Agent': 'AnusandhanAI/1.0 (academic-crawler; contact@anusandhan.ai)' } });
+      const res = await fetch(url, { headers: { 'User-Agent': 'AnusandhanAI/1.0 (academic-crawler; mailto:soumyadeepsarkar2004@outlook.com)' } });
       if (!res.ok) return null;
       const data = await res.json();
       const author = data.results?.[0];
@@ -1015,7 +1015,7 @@ class DataIngestionService {
     for (const ep of openAlexEndpoints) {
       try {
         const oaRes = await fetch(ep.url, {
-          headers: { 'User-Agent': 'AnusandhanAI/1.0 (academic-crawler; contact@anusandhan.ai)' }
+          headers: { 'User-Agent': 'AnusandhanAI/1.0 (academic-crawler; mailto:soumyadeepsarkar2004@outlook.com)' }
         });
         if (oaRes.ok) {
           const oaData = await oaRes.json();

@@ -70,12 +70,12 @@ export const PrivacyPolicyModal: React.FC<PrivacyPolicyModalProps> = ({ isOpen, 
                   1. Statutory Context & Legal Roles
                 </h3>
                 <p>
-                  This Privacy Notice is provided by <strong>Anusandhan Technologies Private Limited</strong> (&quot;Anusandhan&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;) in compliance with <strong>Section 5 of the Digital Personal Data Protection Act, 2023 (DPDP Act 2023)</strong>, the <strong>General Data Protection Regulation (GDPR)</strong>, and the <strong>Family Educational Rights and Privacy Act (FERPA)</strong>.
+                  This Privacy Notice is provided by <strong>Anusandhan</strong> (&quot;Anusandhan&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;), an open academic research platform and initiative founded and maintained by <strong>Soumyadeep Sarkar</strong>, in compliance with <strong>Section 5 of the Digital Personal Data Protection Act, 2023 (DPDP Act 2023)</strong>, the <strong>General Data Protection Regulation (GDPR)</strong>, and the <strong>Family Educational Rights and Privacy Act (FERPA)</strong>.
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
                   <div className="p-3 rounded-xl bg-white/[0.03] backdrop-blur-md border border-white/10">
                     <span className="font-mono text-zinc-400 block font-semibold text-[11px]">DATA FIDUCIARY (§ 2(i))</span>
-                    <span className="text-white">Anusandhan Technologies Pvt. Ltd.</span>
+                    <span className="text-white">Anusandhan Research Initiative · Lead: Soumyadeep Sarkar</span>
                   </div>
                   <div className="p-3 rounded-xl bg-white/[0.03] backdrop-blur-md border border-white/10">
                     <span className="font-mono text-zinc-400 block font-semibold text-[11px]">DATA PRINCIPAL (§ 2(j))</span>
@@ -144,14 +144,14 @@ export const PrivacyPolicyModal: React.FC<PrivacyPolicyModalProps> = ({ isOpen, 
                   5. Statutory Grievance Redressal & Nodal Officer
                 </h3>
                 <p>
-                  In accordance with Section 8(9) & Section 13 of the DPDP Act 2023, the designated Grievance Officer and Data Protection Officer is:
+                  In accordance with Section 8(9) & Section 13 of the DPDP Act 2023, the designated project lead and data privacy custodian is:
                 </p>
                 <div className="p-4 rounded-xl bg-zinc-900 border border-zinc-700/80 font-mono text-zinc-300 space-y-1.5">
-                  <div><strong>Nodal Officer:</strong> Data Protection & Grievance Redressal Office</div>
-                  <div><strong>Legal Entity:</strong> Anusandhan Technologies Private Limited</div>
-                  <div><strong>Physical Address:</strong> Tech Innovation Hub, Outer Ring Road, Bengaluru, Karnataka, 560103, India</div>
-                  <div><strong>Official Email:</strong> <span className="text-amber-400">grievance@anusandhan.ai</span> / <span className="text-amber-400">privacy@anusandhan.ai</span></div>
-                  <div><strong>Response Time:</strong> Acknowledgment within 48 hours; resolution within 30 calendar days.</div>
+                  <div><strong>Lead & Custodian:</strong> Soumyadeep Sarkar</div>
+                  <div><strong>Initiative:</strong> Anusandhan (Open Academic Research Initiative)</div>
+                  <div><strong>GitHub Project:</strong> <a href="https://github.com/soumyadeepsarkar-2004/Anusandhan" target="_blank" rel="noreferrer" className="text-amber-400 underline">github.com/soumyadeepsarkar-2004/Anusandhan</a></div>
+                  <div><strong>Official Contact:</strong> <a href="mailto:soumyadeepsarkar2004@outlook.com" className="text-amber-400 underline">soumyadeepsarkar2004@outlook.com</a></div>
+                  <div><strong>Response Time:</strong> Acknowledgment within 48 hours.</div>
                   <div className="text-[11px] text-zinc-400 pt-1">Escalation Authority: Data Protection Board of India (DPBI) at <a href="https://dpbi.gov.in" target="_blank" rel="noreferrer" className="underline text-amber-300">https://dpbi.gov.in</a></div>
                 </div>
               </div>
@@ -164,7 +164,7 @@ export const PrivacyPolicyModal: React.FC<PrivacyPolicyModalProps> = ({ isOpen, 
                   १. वैधानिक भूमिका एवं परिचय
                 </h3>
                 <p>
-                  यह गोपनीयता सूचना <strong>डिजिटल व्यक्तिगत डेटा संरक्षण अधिनियम, 2023 (DPDP Act 2023)</strong> की धारा 5 के अनुपालन में अनुसंधान टेक्नोलॉजीज प्राइवेट लिमिटेड द्वारा जारी की गई है।
+                  यह गोपनीयता सूचना <strong>डिजिटल व्यक्तिगत डेटा संरक्षण अधिनियम, 2023 (DPDP Act 2023)</strong> की धारा 5 के अनुपालन में अनुसंधान (सौम्यदीप सरकार द्वारा संचालित ओपन एकेडेमिक रिसर्च इनिशिएटिव) द्वारा जारी की गई है।
                 </p>
                 <p>
                   हम छात्र आवेदक को &quot;डेटा प्रिंसिपल&quot; और अनुसंधान को &quot;डेटा फिड्यूशरी&quot; के रूप में वर्गीकृत करते हैं।
@@ -199,13 +199,14 @@ export const PrivacyPolicyModal: React.FC<PrivacyPolicyModalProps> = ({ isOpen, 
 
               <div className="space-y-2">
                 <h3 className="text-sm font-semibold text-amber-400 uppercase tracking-wider font-mono">
-                  ४. शिकायत निवारण अधिकारी (Grievance Officer)
+                  ४. संपर्क एवं समाधान (Grievance & Support)
                 </h3>
                 <div className="p-4 rounded-xl bg-white/[0.04] backdrop-blur-md border border-white/12 font-mono text-zinc-300 space-y-1.5">
-                  <div><strong>अधिकारी:</strong> डेटा सुरक्षा एवं शिकायत निवारण कार्यालय</div>
-                  <div><strong>संस्था:</strong> Anusandhan Technologies Pvt. Ltd., Bengaluru, India</div>
-                  <div><strong>ईमेल:</strong> grievance@anusandhan.ai</div>
-                  <div><strong>समय सीमा:</strong> 48 घंटों में पावती; 30 दिनों में पूर्ण समाधान।</div>
+                  <div><strong>परियोजना प्रमुख:</strong> सौम्यदीप सरकार (Soumyadeep Sarkar)</div>
+                  <div><strong>पहल:</strong> अनुसंधान ओपन रिसर्च प्रोजेक्ट</div>
+                  <div><strong>ईमेल:</strong> soumyadeepsarkar2004@outlook.com</div>
+                  <div><strong>गिटहब:</strong> github.com/soumyadeepsarkar-2004/Anusandhan</div>
+                  <div><strong>समय सीमा:</strong> 48 घंटों में पावती; त्वरित समाधान।</div>
                 </div>
               </div>
             </>

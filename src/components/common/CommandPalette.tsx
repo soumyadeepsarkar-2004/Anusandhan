@@ -281,13 +281,13 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
     {
       id: 'act-contact-support',
       category: 'Legal & Compliance',
-      title: 'Contact Scholar Support & Grievance Desk',
-      subtitle: 'Reach our Data Protection Officer and technical support team at support@anusandhan.ai',
+      title: 'Contact Scholar Support & Project Lead',
+      subtitle: 'Reach project lead Soumyadeep Sarkar at soumyadeepsarkar2004@outlook.com',
       icon: Mail,
       badge: 'Support',
       badgeColor: 'text-blue-400 bg-blue-400/10 border-blue-400/20',
       action: () => {
-        window.location.href = 'mailto:support@anusandhan.ai';
+        window.location.href = 'mailto:soumyadeepsarkar2004@outlook.com';
         onClose();
       }
     }

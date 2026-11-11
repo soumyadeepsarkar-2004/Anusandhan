@@ -616,7 +616,7 @@ export const StudentProfileHub: React.FC<StudentProfileHubProps> = ({
             </div>
 
             <a
-              href="mailto:support@anusandhan.ai"
+              href="mailto:soumyadeepsarkar2004@outlook.com"
               className="w-full px-3 py-2 rounded-xl bg-white/[0.06] hover:bg-sky-500/15 border border-white/12 hover:border-sky-500/40 text-xs font-semibold text-zinc-200 hover:text-sky-300 transition-all text-center cursor-pointer shadow-sm block"
             >
               Contact Support

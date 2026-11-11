@@ -260,9 +260,9 @@ router.get('/invoice/:orderId', authenticateToken, (req, res) => {
     invoiceNumber: `INV-${orderId.slice(6).toUpperCase()}`,
     date: order.paidAt || order.createdAt,
     company: {
-      name: 'Anusandhan AI Technologies (अनुसंधान AI)',
-      address: 'Bengaluru Innovation Hub, Karnataka, India',
-      gstin: '29ABCDE1234F1Z5',
+      name: 'Anusandhan (Open Academic Research Initiative)',
+      lead: 'Soumyadeep Sarkar',
+      contact: 'soumyadeepsarkar2004@outlook.com',
       sacCode: '998431' // Online portal services
     },
     customer: {

@@ -254,7 +254,7 @@ const FooterComponent: React.FC<FooterProps> = ({ onOpenPrivacy, onOpenTerms, on
         {/* Bottom Bar Strip - High Contrast, Theme-Adaptive Interactive Action Badges */}
         <div className="pt-6 border-t border-[var(--border-subtle)] flex flex-col md:flex-row items-center justify-between text-xs font-mono gap-4">
           <div className="text-[var(--text-secondary)] text-center md:text-left text-[11px]">
-            © 2026–2027 Anusandhan Technologies Pvt. Ltd. · All research rights reserved.
+            © 2026–2027 Anusandhan · Open Research Intelligence Project · Created by Soumyadeep Sarkar
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-2">
@@ -285,7 +285,7 @@ const FooterComponent: React.FC<FooterProps> = ({ onOpenPrivacy, onOpenTerms, on
             </button>
 
             <a 
-              href="mailto:support@anusandhan.ai" 
+              href="mailto:soumyadeepsarkar2004@outlook.com" 
               className="px-3.5 py-1.5 rounded-full bg-[var(--surface-card)] hover:bg-amber-500/10 border border-[var(--border-subtle)] hover:border-amber-500/40 text-[var(--text-secondary)] hover:text-[var(--text-primary)] font-medium transition-all inline-flex items-center gap-1.5 shadow-sm text-xs"
             >
               <span>Support & Inquiries</span>

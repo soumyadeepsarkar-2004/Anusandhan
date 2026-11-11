@@ -388,7 +388,7 @@ export const IntakeDiagnosticFlow: React.FC<IntakeDiagnosticFlowProps> = ({
                         Terms of Service
                       </button>
                       <span>·</span>
-                      <span>DPO: grievance@anusandhan.ai</span>
+                      <span>Lead Contact: soumyadeepsarkar2004@outlook.com</span>
                     </div>
 
                     <button

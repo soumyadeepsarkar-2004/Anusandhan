@@ -34,6 +34,7 @@ import voiceRoutes from './routes/voiceRoutes.js';
 import agentRoutes from './routes/agentRoutes.js';
 import ingestionRoutes from './routes/ingestionRoutes.js';
 import billingRoutes from './routes/billingRoutes.js';
+import syncRoutes from './routes/syncRoutes.js';
 import { ingestionScheduler } from './services/dataIngestionScheduler.js';
 import { PythonBridge } from './services/pythonBridge.js';
 import { cache } from './services/redisCache.js';
@@ -205,6 +206,7 @@ app.use('/api/voice', aiLimiter, voiceRoutes);
 app.use('/api/agents', aiLimiter, agentRoutes);
 app.use('/api/ingest', apiLimiter, ingestionRoutes);
 app.use('/api/billing', apiLimiter, billingRoutes);
+app.use('/api/sync', apiLimiter, syncRoutes);
 
 // 4. Asynchronous Background Job Queue Endpoints (BullMQ / In-Memory Worker)
 // Enforces authentication, associates jobs with req.user.id, and validates tenant isolation
