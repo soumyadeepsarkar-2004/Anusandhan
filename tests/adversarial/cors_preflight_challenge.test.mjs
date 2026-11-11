@@ -44,6 +44,16 @@ test.after(async () => {
   if (gatewayServer) {
     await new Promise((resolve) => gatewayServer.close(resolve));
   }
+  try {
+    const mongoose = await import('mongoose');
+    if (mongoose.default && mongoose.default.connection) {
+      await mongoose.default.disconnect();
+    }
+  } catch {}
+  // Guarantee clean process termination: mongoose + ingestion scheduler keep the event loop alive
+  setTimeout(() => {
+    process.exit(0);
+  }, 300);
 });
 
 // -------------------------------------------------------------

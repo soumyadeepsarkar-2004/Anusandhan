@@ -25,9 +25,9 @@ export const InteractiveRRSStudio: React.FC<InteractiveRRSStudioProps> = ({ onLa
 
   const totalScore = Math.min(99, paperScore + repoScore + eduScore + orcidScore + toolingScore + gpaScore);
 
-  let tier = 'Developing Scholar';
-  let replyLikelihood = '3.5%';
-  let tierColor = 'text-zinc-400';
+  let tier;
+  let replyLikelihood;
+  let tierColor;
 
   if (totalScore >= 85) {
     tier = 'Elite Global Fellow (DAAD/Mitacs Top 5%)';

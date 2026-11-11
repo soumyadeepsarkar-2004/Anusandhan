@@ -153,7 +153,7 @@ cd server && npm install && cd ..
 
 # Python AI Backend dependencies
 cd backend
-uv sync # or pip install -r requirements.txt
+pip install -r requirements.txt   # no pyproject.toml — `uv sync` will fail here
 cd ..
 ```
 
@@ -196,7 +196,6 @@ docker run -p 5000:5000 -e JWT_SECRET="your_secure_secret" anusandhan-pro
 ```
 
 - **Render.com**: Connect repo and select **Blueprint** using [render.yaml](file:///c:/PROJECTS/ResearchIntern_Pro/render.yaml).
-- **Railway.app**: Deploy with 1-click using [railway.json](file:///c:/PROJECTS/ResearchIntern_Pro/railway.json).
 - **Fly.io**: Deploy using `fly deploy` using [fly.toml](file:///c:/PROJECTS/ResearchIntern_Pro/fly.toml).
 
 ### Option B: Multi-Tier Docker Compose (Full Stack + Microservices)

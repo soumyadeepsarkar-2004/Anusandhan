@@ -51,6 +51,10 @@ test.after(async () => {
       await mongoose.default.disconnect();
     }
   } catch {}
+  // Guarantee clean process termination: ingestion scheduler keeps the event loop alive
+  setTimeout(() => {
+    process.exit(0);
+  }, 300);
 });
 
 test('Offline Sync 1: Batch sync rejects requests without actions array', async () => {

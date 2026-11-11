@@ -578,7 +578,7 @@ router.post('/oauth', async (req, res) => {
     }
 
     const normalizedEmail = verifiedEmail.toLowerCase().trim();
-    const effectiveName = verifiedName.trim() || normalizedEmail.split('@')[0].replace(/[._\-]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    const effectiveName = verifiedName.trim() || normalizedEmail.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 
     let user = await findUserByEmail(normalizedEmail);
     if (!user) {
@@ -684,7 +684,7 @@ router.post('/google', async (req, res) => {
   }
 
   const normalizedEmail = verifiedEmail.toLowerCase().trim();
-  const effectiveName = verifiedName.trim() || normalizedEmail.split('@')[0].replace(/[._\-]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+  const effectiveName = verifiedName.trim() || normalizedEmail.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 
   try {
     let user = await findUserByEmail(normalizedEmail);

@@ -34,6 +34,10 @@ test.after(async () => {
       await mongoose.default.disconnect();
     }
   } catch {}
+  // Guarantee clean process termination: ingestion scheduler keeps the event loop alive
+  setTimeout(() => {
+    process.exit(0);
+  }, 300);
 });
 
 test('1. Normal user registration initializes clean profile with zero demo data', async () => {

@@ -241,7 +241,7 @@ export const OpportunityExplorer: React.FC<OpportunityExplorerProps> = ({
   });
 
   const scrapedCount = currentList.filter(p => Boolean((p as any).isLiveScraped)).length;
-  const coreFacultyCount = currentList.filter(p => !Boolean((p as any).isLiveScraped)).length;
+  const coreFacultyCount = currentList.filter(p => !(p as any).isLiveScraped).length;
 
   // Filter fellowships with dynamic lifecycle categorization ('active' | 'upcoming' | 'passed')
   const currentFellowships = isGatewayConnected ? liveFellowships : fellowships;

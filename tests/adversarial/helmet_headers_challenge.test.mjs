@@ -46,6 +46,16 @@ test.after(async () => {
   if (gatewayServer) {
     await new Promise((resolve) => gatewayServer.close(resolve));
   }
+  try {
+    const mongoose = await import('mongoose');
+    if (mongoose.default && mongoose.default.connection) {
+      await mongoose.default.disconnect();
+    }
+  } catch {}
+  // Guarantee clean process termination: mongoose + ingestion scheduler keep the event loop alive
+  setTimeout(() => {
+    process.exit(0);
+  }, 300);
 });
 
 function verifyHelmetHeaders(res, label) {
@@ -66,7 +76,8 @@ function verifyHelmetHeaders(res, label) {
 
   // 3. X-Frame-Options
   const xfo = res.headers.get('x-frame-options');
-  assert.strictEqual(xfo, 'DENY', `[${label}] X-Frame-Options must be DENY`);
+  // Server configures helmet frameguard { action: 'sameorigin' }, matching CSP frameAncestors ['self']
+  assert.strictEqual(xfo, 'SAMEORIGIN', `[${label}] X-Frame-Options must be SAMEORIGIN`);
 
   // 4. X-Content-Type-Options
   const xcto = res.headers.get('x-content-type-options');

@@ -769,9 +769,9 @@ class DataIngestionService {
       const openDate = f.openDate ? new Date(f.openDate) : new Date('2025-01-01');
       const deadlineDate = new Date(f.targetDeadline);
       
-      let status = 'active';
-      let statusLabel = '';
-      let deadlineDaysLeft = 0;
+      let status;
+      let statusLabel;
+      let deadlineDaysLeft;
       let opensInDays = 0;
 
       if (now < openDate) {
@@ -937,7 +937,7 @@ class DataIngestionService {
                 domain = 'Natural & Physical Sciences';
               }
 
-              const arxivMatch = paperUrl.match(/arxiv\.org\/abs\/([0-9]+\.[0-9]+(?:v[0-9]+)?)/i) || paperUrl.match(/arxiv\.org\/abs\/([a-zA-Z\-]+(?:\.[a-zA-Z]+)?\/[0-9]+)/i);
+              const arxivMatch = paperUrl.match(/arxiv\.org\/abs\/([0-9]+\.[0-9]+(?:v[0-9]+)?)/i) || paperUrl.match(/arxiv\.org\/abs\/([a-zA-Z-]+(?:\.[a-zA-Z]+)?\/[0-9]+)/i);
               const arxivPaperId = arxivMatch ? arxivMatch[1].replace(/[^a-zA-Z0-9._-]/g, '_') : (idMatch ? idMatch[1].split('/').pop().replace(/[^a-zA-Z0-9._-]/g, '_') : `paper_${idx}`);
               const safeId = `posting_arxiv_${arxivPaperId}`;
 

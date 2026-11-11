@@ -36,21 +36,18 @@ function createMemoryDbMock() {
     run(sql, params, cb) {
       if (typeof params === 'function') {
         cb = params;
-        params = [];
       }
       if (cb) setImmediate(() => cb.call({ lastID: 1, changes: 1 }, null));
     },
     get(sql, params, cb) {
       if (typeof params === 'function') {
         cb = params;
-        params = [];
       }
       if (cb) setImmediate(() => cb(null, null));
     },
     all(sql, params, cb) {
       if (typeof params === 'function') {
         cb = params;
-        params = [];
       }
       if (cb) setImmediate(() => cb(null, []));
     },

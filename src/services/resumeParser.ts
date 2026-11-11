@@ -77,7 +77,7 @@ export function parseResumeText(rawText: string): Partial<StudentProfile> {
     if (/^(curriculum vitae|resume|cv|contact|email|phone|address|education|experience|summary|skills|profile|projects)/i.test(line)) continue;
     if (/@|http|\.com|\.edu|\d/.test(line)) continue;
     const words = line.split(/\s+/);
-    if (words.length >= 2 && words.length <= 4 && words.every(w => /^[A-Z][a-zA-Z'\-]*$/.test(w))) {
+    if (words.length >= 2 && words.length <= 4 && words.every(w => /^[A-Z][a-zA-Z'-]*$/.test(w))) {
       detectedName = line;
       break;
     }
@@ -89,7 +89,7 @@ export function parseResumeText(rawText: string): Partial<StudentProfile> {
   if (emailMatch) {
     detectedEmail = emailMatch[0].toLowerCase();
     if (!detectedName) {
-      const parts = emailMatch[0].split('@')[0].split(/[._\-]/).filter(p => p.length > 1);
+      const parts = emailMatch[0].split('@')[0].split(/[._-]/).filter(p => p.length > 1);
       detectedName = parts.map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' ');
     }
   }
@@ -141,8 +141,8 @@ export function parseResumeText(rawText: string): Partial<StudentProfile> {
   }
 
   // 8. Extract Linked Accounts
-  const githubMatch = rawText.match(/github\.com\/([a-zA-Z0-9_\-]+)/i);
-  const linkedinMatch = rawText.match(/linkedin\.com\/in\/([a-zA-Z0-9_\-]+)/i);
+  const githubMatch = rawText.match(/github\.com\/([a-zA-Z0-9_-]+)/i);
+  const linkedinMatch = rawText.match(/linkedin\.com\/in\/([a-zA-Z0-9_-]+)/i);
 
   return {
     fullName: detectedName || undefined,

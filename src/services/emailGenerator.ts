@@ -10,7 +10,7 @@ export function generateColdEmail(professor: Professor, student: StudentProfile)
 
   const proofLink = student.featuredProject?.repoUrl || student.linkedAccounts?.githubUrl || '';
 
-  let projectParagraph = '';
+  let projectParagraph;
   if (student.featuredProject?.title && student.featuredProject?.description) {
     projectParagraph = `In my project "${student.featuredProject.title}", I investigated ${student.featuredProject.description}${studentSkills ? ` using ${studentSkills}` : ''}.${proofLink ? ` My reproducible baseline and experiments are available here: ${proofLink}.` : ''}`;
   } else if (studentSkills) {

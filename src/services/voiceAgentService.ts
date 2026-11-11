@@ -207,8 +207,8 @@ export function processVoiceQuery(query: string, student: StudentProfile, engine
     q.includes('yeh kya hai')
   ) {
     const activeTab = context?.currentTab || 'discover';
-    let screenDescriptionHinglish = '';
-    let screenDescriptionEnglish = '';
+    let screenDescriptionHinglish;
+    let screenDescriptionEnglish;
 
     switch (activeTab) {
       case 'discover':

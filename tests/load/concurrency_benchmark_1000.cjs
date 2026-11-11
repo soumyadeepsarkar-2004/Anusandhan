@@ -218,8 +218,8 @@ async function setupBenchmarkUser() {
 // Workload Generator
 async function executeRandomWorkload(userId) {
   const rand = Math.random();
-  let category = '';
-  let result = null;
+  let category;
+  let result;
 
   // Simulate distinct client IP and authenticated session per virtual user
   const virtualIp = `10.0.${Math.floor(userId / 256)}.${userId % 256}`;

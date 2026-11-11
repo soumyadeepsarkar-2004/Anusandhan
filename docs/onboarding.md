@@ -69,10 +69,10 @@ npm install
 cd ..
 ```
 
-#### Step 3: Set Up Python AI Microservice (with `uv`)
+#### Step 3: Set Up Python AI Microservice
 ```bash
 cd backend
-uv sync
+pip install -r requirements.txt   # no pyproject.toml — `uv sync` will fail here
 cd ..
 ```
 
