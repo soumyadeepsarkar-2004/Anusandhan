@@ -361,7 +361,9 @@ test('Security M1: Helmet security headers are present on all responses', async 
   const res = await fetch(`${BASE_URL}/api/health`);
   assert.strictEqual(res.status, 200);
   assert.ok(res.headers.get('content-security-policy'), 'CSP header must be present');
-  assert.strictEqual(res.headers.get('x-frame-options'), 'DENY');
+  // Server configures helmet frameguard { action: 'sameorigin' } (server.js), which matches
+  // the CSP frameAncestors ['self'] directive. Keep this expectation in sync with server config.
+  assert.strictEqual(res.headers.get('x-frame-options'), 'SAMEORIGIN');
   assert.strictEqual(res.headers.get('x-content-type-options'), 'nosniff');
   assert.strictEqual(res.headers.get('cross-origin-resource-policy'), 'cross-origin');
   assert.ok(res.headers.get('strict-transport-security'), 'HSTS header must be present');

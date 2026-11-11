@@ -758,7 +758,7 @@ class DataIngestionService {
     this.nextSweepTimestamp = new Date(Date.now() + this.intervalMs).toISOString();
     this.isSweepRunning = false;
     this.latestIngestedFaculty = [...TRACKED_FACULTY_SEEDS, ...ADDITIONAL_FACULTY_SEEDS];
-    this.scrapedPostings = [];
+    this.scrapedPostings = this.getInitialCuratedPostings();
     this.latestIngestedFellowships = this.computeDynamicFellowships();
     this.ingestionHistory = [];
   }
@@ -1076,7 +1076,22 @@ class DataIngestionService {
     }
 
     // 2. Resilient Curated Live Postings Pool (Guarantees fresh postings across top labs even during network air-gaps)
-    const curatedInternetPostings = [
+    const curatedInternetPostings = this.getInitialCuratedPostings();
+
+    // Deduplicate and merge newly scraped postings
+    const existingIds = new Set(scrapedList.map(s => s.id));
+    for (const curated of curatedInternetPostings) {
+      if (!existingIds.has(curated.id)) {
+        scrapedList.push(curated);
+        existingIds.add(curated.id);
+      }
+    }
+
+    return scrapedList;
+  }
+
+  getInitialCuratedPostings() {
+    return [
       {
         id: 'posting_sergey_levine',
         profId: 'posting_sergey_levine',
@@ -1398,17 +1413,6 @@ class DataIngestionService {
         matchScore: 94
       }
     ];
-
-    // Deduplicate and merge newly scraped postings
-    const existingIds = new Set(scrapedList.map(s => s.id));
-    for (const curated of curatedInternetPostings) {
-      if (!existingIds.has(curated.id)) {
-        scrapedList.push(curated);
-        existingIds.add(curated.id);
-      }
-    }
-
-    return scrapedList;
   }
 
   /**
