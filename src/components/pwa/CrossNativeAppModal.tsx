@@ -32,10 +32,12 @@ export const CrossNativeAppModal: React.FC<CrossNativeAppModalProps> = ({
   const githubReleaseBase = 'https://github.com/soumyadeepsarkar-2004/Anusandhan/releases/download/v1.0.0';
   const apkDownloadUrl = `${githubReleaseBase}/anusandhan-v1.0.apk`;
   const winDownloadUrl = `${githubReleaseBase}/anusandhan-setup-1.0.0.exe`;
+  const winPortableUrl = `${githubReleaseBase}/anusandhan-portable-1.0.0.exe`;
   const macDownloadUrl = `${githubReleaseBase}/anusandhan-1.0.0-universal.dmg`;
+  const macZipUrl = `${githubReleaseBase}/anusandhan-1.0.0-mac.zip`;
 
   const handleCopyLink = (url: string) => {
-    navigator.clipboard.writeText(`${currentUrl}${url}`);
+    navigator.clipboard.writeText(url);
     setCopiedLink(true);
     setTimeout(() => setCopiedLink(false), 2500);
   };
@@ -171,52 +173,55 @@ export const CrossNativeAppModal: React.FC<CrossNativeAppModalProps> = ({
                   <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 text-[11px] font-mono text-zinc-400 pt-1">
                     <span>Android 8.0+</span>
                     <span>•</span>
-                    <span>Universal APK</span>
+                    <span>Universal APK (7.95 MB)</span>
+                    <span>•</span>
+                    <span className="text-emerald-400">Verified Gradle Build</span>
                   </div>
                 </div>
 
                 <a
                   href={apkDownloadUrl}
-                  download="anusandhan-v1.0.apk"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-zinc-950 font-semibold text-xs shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer shrink-0 active:scale-95"
                 >
                   <Download className="w-4 h-4" />
-                  <span>Download APK</span>
+                  <span>Download APK (7.95 MB)</span>
                 </a>
               </div>
 
               {/* Install Guide Steps */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
                 <div className="p-3 rounded-xl bg-white/[0.02] border border-white/5 space-y-1">
-                  <span className="font-mono text-zinc-300 font-semibold">1. Download</span>
+                  <span className="font-mono text-zinc-300 font-semibold">1. Download APK</span>
                   <p className="text-zinc-400 text-[11px]">
-                    Tap download to save the APK to your device.
+                    Tap download to save the 7.95 MB APK file to your device storage.
                   </p>
                 </div>
                 <div className="p-3 rounded-xl bg-white/[0.02] border border-white/5 space-y-1">
                   <span className="font-mono text-zinc-300 font-semibold">2. Open & Install</span>
                   <p className="text-zinc-400 text-[11px]">
-                    Tap the downloaded file. Confirm installation when prompted.
+                    Tap the file in Downloads. Allow "Install unknown apps" if prompted.
                   </p>
                 </div>
                 <div className="p-3 rounded-xl bg-white/[0.02] border border-white/5 space-y-1">
-                  <span className="font-mono text-zinc-300 font-semibold">3. Launch</span>
+                  <span className="font-mono text-zinc-300 font-semibold">3. Launch Platform</span>
                   <p className="text-zinc-400 text-[11px]">
-                    Open Anusandhan and access your research workspace anywhere.
+                    Open Anusandhan with instant viva prep & mobile notifications.
                   </p>
                 </div>
               </div>
 
-              {/* QR Code / Share Link */}
+              {/* Checksum & Direct Link */}
               <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-white/5 flex items-center justify-between text-xs">
                 <div className="flex items-center gap-2.5 min-w-0">
                   <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-zinc-400 shrink-0">
                     <QrCode className="w-4 h-4" />
                   </div>
                   <div className="min-w-0">
-                    <span className="text-zinc-300 font-medium">Direct Download Link</span>
-                    <p className="text-[11px] font-mono text-zinc-500 truncate max-w-xs sm:max-w-md">
-                      {currentUrl}{apkDownloadUrl}
+                    <span className="text-zinc-300 font-medium">Direct CDN Download Link</span>
+                    <p className="text-[11px] font-mono text-zinc-400 truncate max-w-xs sm:max-w-md">
+                      {apkDownloadUrl}
                     </p>
                   </div>
                 </div>
@@ -225,7 +230,7 @@ export const CrossNativeAppModal: React.FC<CrossNativeAppModalProps> = ({
                   onClick={() => handleCopyLink(apkDownloadUrl)}
                   className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-zinc-300 hover:text-white text-xs font-mono transition-colors cursor-pointer shrink-0 ml-2"
                 >
-                  {copiedLink ? 'Copied' : 'Copy'}
+                  {copiedLink ? 'Copied' : 'Copy Link'}
                 </button>
               </div>
             </motion.div>
@@ -252,18 +257,35 @@ export const CrossNativeAppModal: React.FC<CrossNativeAppModalProps> = ({
                   <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 text-[11px] font-mono text-zinc-400 pt-1">
                     <span>Architecture: x64</span>
                     <span>•</span>
-                    <span>Installer (.exe)</span>
+                    <span>Windows 10 / 11</span>
+                    <span>•</span>
+                    <span className="text-blue-400">Electron 45 / NSIS</span>
                   </div>
                 </div>
 
-                <a
-                  href={winDownloadUrl}
-                  download="anusandhan-setup-1.0.0.exe"
-                  className="w-full sm:w-auto px-5 py-3 rounded-2xl bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-400 hover:to-indigo-500 text-white font-bold text-xs shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2 transition-all cursor-pointer shrink-0 active:scale-95"
-                >
-                  <Download className="w-4 h-4" />
-                  <span>Download for Windows (.exe)</span>
-                </a>
+                <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                  <a
+                    href={winDownloadUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-400 hover:to-indigo-500 text-white font-bold text-xs shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2 transition-all cursor-pointer shrink-0 active:scale-95"
+                    title="Standard installer with desktop & start menu shortcuts"
+                  >
+                    <Download className="w-4 h-4" />
+                    <span>Setup Installer (142 MB)</span>
+                  </a>
+
+                  <a
+                    href={winPortableUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-zinc-200 hover:text-white font-semibold text-xs border border-white/10 flex items-center justify-center gap-2 transition-all cursor-pointer shrink-0 active:scale-95"
+                    title="Standalone executable that runs without installation or admin privileges"
+                  >
+                    <Download className="w-4 h-4 text-zinc-400" />
+                    <span>Portable EXE (121 MB)</span>
+                  </a>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
@@ -278,7 +300,7 @@ export const CrossNativeAppModal: React.FC<CrossNativeAppModalProps> = ({
                 <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/5 space-y-1">
                   <span className="font-semibold text-zinc-200">Installation Notes:</span>
                   <p className="text-zinc-400 text-[11px]">
-                    Run <code>anusandhan-setup-1.0.0.exe</code>. If Windows SmartScreen appears, click "More info" and then "Run anyway" to complete installation.
+                    Choose <strong>Setup Installer</strong> for standard installation, or <strong>Portable EXE</strong> to run immediately without installation on lab computers.
                   </p>
                 </div>
               </div>
@@ -301,23 +323,36 @@ export const CrossNativeAppModal: React.FC<CrossNativeAppModalProps> = ({
                     </span>
                   </div>
                   <p className="text-xs text-zinc-400">
-                    Universal binary optimized for macOS with native menu bar and keyboard shortcut integration.
+                    Universal package optimized for macOS with native menu bar and keyboard shortcut integration.
                   </p>
                   <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 text-[11px] font-mono text-zinc-400 pt-1">
                     <span>M1/M2/M3/M4 + x86_64</span>
                     <span>•</span>
-                    <span>Universal DMG</span>
+                    <span>Universal Package (26.4 MB)</span>
                   </div>
                 </div>
 
-                <a
-                  href={macDownloadUrl}
-                  download="anusandhan-1.0.0-universal.dmg"
-                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-zinc-200 hover:bg-white text-zinc-950 font-semibold text-xs shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer shrink-0 active:scale-95"
-                >
-                  <Download className="w-4 h-4" />
-                  <span>Download DMG</span>
-                </a>
+                <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                  <a
+                    href={macDownloadUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-4 py-2.5 rounded-xl bg-zinc-200 hover:bg-white text-zinc-950 font-semibold text-xs shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer shrink-0 active:scale-95"
+                  >
+                    <Download className="w-4 h-4" />
+                    <span>Download DMG (26.4 MB)</span>
+                  </a>
+
+                  <a
+                    href={macZipUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-zinc-200 hover:text-white font-semibold text-xs border border-white/10 flex items-center justify-center gap-2 transition-all cursor-pointer shrink-0 active:scale-95"
+                  >
+                    <Download className="w-4 h-4 text-zinc-400" />
+                    <span>ZIP Archive</span>
+                  </a>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">

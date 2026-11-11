@@ -3,6 +3,33 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "framework": "vite",
+  "redirects": [
+    {
+      "source": "/downloads/anusandhan-v1.0.apk",
+      "destination": "https://github.com/soumyadeepsarkar-2004/Anusandhan/releases/download/v1.0.0/anusandhan-v1.0.apk",
+      "permanent": false
+    },
+    {
+      "source": "/downloads/anusandhan-setup-1.0.0.exe",
+      "destination": "https://github.com/soumyadeepsarkar-2004/Anusandhan/releases/download/v1.0.0/anusandhan-setup-1.0.0.exe",
+      "permanent": false
+    },
+    {
+      "source": "/downloads/anusandhan-portable-1.0.0.exe",
+      "destination": "https://github.com/soumyadeepsarkar-2004/Anusandhan/releases/download/v1.0.0/anusandhan-portable-1.0.0.exe",
+      "permanent": false
+    },
+    {
+      "source": "/downloads/anusandhan-1.0.0-universal.dmg",
+      "destination": "https://github.com/soumyadeepsarkar-2004/Anusandhan/releases/download/v1.0.0/anusandhan-1.0.0-universal.dmg",
+      "permanent": false
+    },
+    {
+      "source": "/downloads/anusandhan-1.0.0-mac.zip",
+      "destination": "https://github.com/soumyadeepsarkar-2004/Anusandhan/releases/download/v1.0.0/anusandhan-1.0.0-mac.zip",
+      "permanent": false
+    }
+  ],
   "headers": [
     {
       "source": "/downloads/(.*)",

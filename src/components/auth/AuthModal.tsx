@@ -45,9 +45,77 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [cvDragOver, setCvDragOver] = useState(false);
   const [cvPassword, setCvPassword] = useState('');
 
+  // Initialize Google Identity Services (GIS) One Tap / ID Token listener
+  React.useEffect(() => {
+    if (typeof window !== 'undefined' && (window as any).google?.accounts?.id) {
+      try {
+        const googleClientId = oauthConfig.googleClientId || '312891928374-anusandhan.apps.googleusercontent.com';
+        (window as any).google.accounts.id.initialize({
+          client_id: googleClientId,
+          callback: async (response: any) => {
+            if (response?.credential) {
+              setIsSubmitting(true);
+              setErrorMessage(null);
+              try {
+                await oauthLogin('google', { credential: response.credential });
+                confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } });
+                onSuccess();
+                onClose();
+              } catch (err: any) {
+                setErrorMessage(err.message || 'Cryptographic verification of Google identity failed.');
+              } finally {
+                setIsSubmitting(false);
+              }
+            }
+          },
+          auto_select: false,
+          cancel_on_tap_outside: true
+        });
+      } catch (e) {
+        console.warn('[GIS ID initialize notice]:', e);
+      }
+    }
+  }, [oauthConfig.googleClientId]);
+
   const handleOAuth = async (provider: 'google' | 'linkedin' | 'github') => {
     setErrorMessage(null);
     setIsSubmitting(true);
+
+    // 1. For Google, prefer official GIS Token Client for smooth account picker popup
+    if (provider === 'google' && typeof window !== 'undefined' && (window as any).google?.accounts?.oauth2) {
+      try {
+        const googleClientId = oauthConfig.googleClientId || '312891928374-anusandhan.apps.googleusercontent.com';
+        const client = (window as any).google.accounts.oauth2.initTokenClient({
+          client_id: googleClientId,
+          scope: 'openid email profile',
+          callback: async (tokenResponse: any) => {
+            if (tokenResponse.error) {
+              setErrorMessage(tokenResponse.error_description || tokenResponse.error || 'Google Sign-In was cancelled or encountered an issue.');
+              setIsSubmitting(false);
+              return;
+            }
+            if (tokenResponse.access_token) {
+              try {
+                await oauthLogin('google', { credential: tokenResponse.access_token });
+                confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } });
+                onSuccess();
+                onClose();
+              } catch (authErr: any) {
+                setErrorMessage(authErr.message || 'Failed to authenticate Google identity with server.');
+              } finally {
+                setIsSubmitting(false);
+              }
+            }
+          }
+        });
+        client.requestAccessToken({ prompt: 'select_account' });
+        return;
+      } catch (gisErr: any) {
+        console.warn('[GIS Token Client fallback to redirect/popup]:', gisErr);
+      }
+    }
+
+    // 2. Standard OAuth Popup / Authorization Code flow
     try {
       await oauthLogin(provider);
       confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } });

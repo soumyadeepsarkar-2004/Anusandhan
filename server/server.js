@@ -86,19 +86,27 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      imgSrc: ["'self'", "data:", "https:"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "https://accounts.google.com", "https://apis.google.com"],
+      frameSrc: ["'self'", "https://accounts.google.com"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      imgSrc: ["'self'", "data:", "https:", "blob:"],
       connectSrc: [
         "'self'",
         "http://localhost:5173",
         "http://localhost:3000",
+        "http://localhost:5000",
+        "https://anusandhan.vercel.app",
         "https://anusandhan.ai",
-        "http://127.0.0.1:8000"
+        "http://127.0.0.1:8000",
+        "https://accounts.google.com",
+        "https://oauth2.googleapis.com",
+        "https://www.googleapis.com",
+        "https://api.linkedin.com",
+        "https://api.github.com"
       ],
       fontSrc: ["'self'", "https:", "data:"],
       objectSrc: ["'none'"],
-      frameAncestors: ["'none'"],
+      frameAncestors: ["'self'"],
       upgradeInsecureRequests: process.env.NODE_ENV === 'production' ? [] : null,
     },
   },
@@ -108,7 +116,7 @@ app.use(helmet({
     preload: true,
   },
   frameguard: {
-    action: 'deny',
+    action: 'sameorigin',
   },
   xContentTypeOptions: true,
   crossOriginResourcePolicy: { policy: 'cross-origin' },
@@ -117,6 +125,8 @@ app.use(helmet({
 const defaultAllowedOrigins = [
   'http://localhost:5173',
   'http://localhost:3000',
+  'http://localhost:5000',
+  'https://anusandhan.vercel.app',
   'https://anusandhan.ai'
 ];
 

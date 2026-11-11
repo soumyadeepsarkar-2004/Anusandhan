@@ -537,25 +537,40 @@ router.post('/oauth', async (req, res) => {
 
     // Enforce authentic cryptographic token verification for Google
     if (provider === 'google') {
-      const rawToken = credential || idToken;
+      const rawToken = credential || idToken || req.body.accessToken;
       if (!rawToken) {
         return res.status(401).json({ error: 'Google sign-in requires a valid Google Identity Services (GIS) credential token.' });
       }
 
       try {
-        const verifyRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(rawToken)}`);
-        if (!verifyRes.ok) {
-          return res.status(401).json({ error: 'Cryptographic verification of Google ID token failed with Google OAuth servers.' });
+        let verifyRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(rawToken)}`);
+        if (verifyRes.ok) {
+          const payload = await verifyRes.json();
+          if (payload.email) {
+            verifiedEmail = payload.email;
+            verifiedName = payload.name || payload.given_name || verifiedName;
+            verifiedAvatar = payload.picture || verifiedAvatar;
+          }
+        } else {
+          // Fallback: Verify as OAuth2 Bearer Access Token against Google UserInfo
+          const userRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+            headers: { Authorization: `Bearer ${rawToken}` }
+          });
+          if (userRes.ok) {
+            const payload = await userRes.json();
+            if (payload.email) {
+              verifiedEmail = payload.email;
+              verifiedName = payload.name || payload.given_name || verifiedName;
+              verifiedAvatar = payload.picture || verifiedAvatar;
+            }
+          }
         }
-        const payload = await verifyRes.json();
-        if (!payload.email) {
-          return res.status(401).json({ error: 'Google ID token did not contain a verified email address.' });
+
+        if (!verifiedEmail) {
+          return res.status(401).json({ error: 'Cryptographic verification of Google identity failed with Google OAuth servers.' });
         }
-        verifiedEmail = payload.email;
-        verifiedName = payload.name || payload.given_name || verifiedName;
-        verifiedAvatar = payload.picture || verifiedAvatar;
       } catch (tokenErr) {
-        return res.status(401).json({ error: 'Failed to contact Google OAuth tokeninfo verification endpoint: ' + tokenErr.message });
+        return res.status(401).json({ error: 'Failed to contact Google OAuth verification endpoint: ' + tokenErr.message });
       }
     } else {
       // GitHub & LinkedIn must exchange code via /api/auth/oauth/exchange
@@ -626,11 +641,11 @@ router.post('/oauth', async (req, res) => {
  */
 router.post('/google', async (req, res) => {
   req.body.provider = 'google';
-  let { fullName, avatarUrl, university, fieldOfStudy, credential, idToken } = req.body;
+  let { fullName, avatarUrl, university, fieldOfStudy, credential, idToken, accessToken } = req.body;
 
-  const rawToken = credential || idToken;
+  const rawToken = credential || idToken || accessToken;
   if (!rawToken) {
-    return res.status(401).json({ error: 'Google Sign-In requires an authentic Google Identity Services (GIS) credential or ID token.' });
+    return res.status(401).json({ error: 'Google Sign-In requires an authentic Google Identity Services (GIS) credential, ID token, or Access Token.' });
   }
 
   let verifiedEmail = null;
@@ -638,19 +653,34 @@ router.post('/google', async (req, res) => {
   let verifiedAvatar = avatarUrl || '';
 
   try {
-    const verifyRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(rawToken)}`);
-    if (!verifyRes.ok) {
-      return res.status(401).json({ error: 'Cryptographic verification of Google ID token failed with Google OAuth servers.' });
+    let verifyRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(rawToken)}`);
+    if (verifyRes.ok) {
+      const payload = await verifyRes.json();
+      if (payload.email) {
+        verifiedEmail = payload.email;
+        verifiedName = payload.name || payload.given_name || verifiedName;
+        verifiedAvatar = payload.picture || verifiedAvatar;
+      }
+    } else {
+      // Fallback: Verify as OAuth2 Bearer Access Token against Google UserInfo API
+      const userRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+        headers: { Authorization: `Bearer ${rawToken}` }
+      });
+      if (userRes.ok) {
+        const payload = await userRes.json();
+        if (payload.email) {
+          verifiedEmail = payload.email;
+          verifiedName = payload.name || payload.given_name || verifiedName;
+          verifiedAvatar = payload.picture || verifiedAvatar;
+        }
+      }
     }
-    const payload = await verifyRes.json();
-    if (!payload.email) {
-      return res.status(401).json({ error: 'Google ID token did not contain a verified email address.' });
+
+    if (!verifiedEmail) {
+      return res.status(401).json({ error: 'Cryptographic verification of Google identity failed with Google OAuth servers.' });
     }
-    verifiedEmail = payload.email;
-    verifiedName = payload.name || payload.given_name || verifiedName;
-    verifiedAvatar = payload.picture || verifiedAvatar;
   } catch (tokenErr) {
-    return res.status(401).json({ error: 'Failed to contact Google OAuth tokeninfo verification endpoint: ' + tokenErr.message });
+    return res.status(401).json({ error: 'Failed to contact Google OAuth verification endpoint: ' + tokenErr.message });
   }
 
   const normalizedEmail = verifiedEmail.toLowerCase().trim();

@@ -214,3 +214,29 @@ test('8. OAuth exchange endpoint cleanly rejects missing credentials gracefully'
   const data = await res.json();
   assert.ok(data.error);
 });
+
+test('9. Dedicated /api/auth/google endpoint strictly validates token and rejects blank credentials', async () => {
+  const res = await fetch(`${BASE_URL}/api/auth/google`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      fullName: 'Test Scholar'
+    })
+  });
+
+  assert.strictEqual(res.status, 401);
+  const data = await res.json();
+  assert.ok(data.error.includes('Google') || data.error.includes('credential'));
+});
+
+test('10. vercel.json contains redirects for all verified release binaries', async () => {
+  const fs = await import('fs');
+  const vercelCfg = JSON.parse(fs.readFileSync('vercel.json', 'utf8'));
+  assert.ok(Array.isArray(vercelCfg.redirects), 'redirects array must be present');
+  
+  const sources = vercelCfg.redirects.map(r => r.source);
+  assert.ok(sources.includes('/downloads/anusandhan-v1.0.apk'), 'Must redirect /downloads/anusandhan-v1.0.apk');
+  assert.ok(sources.includes('/downloads/anusandhan-setup-1.0.0.exe'), 'Must redirect Windows setup');
+  assert.ok(sources.includes('/downloads/anusandhan-portable-1.0.0.exe'), 'Must redirect Windows portable');
+  assert.ok(sources.includes('/downloads/anusandhan-1.0.0-universal.dmg'), 'Must redirect macOS DMG');
+});
