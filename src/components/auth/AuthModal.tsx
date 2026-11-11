@@ -49,7 +49,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   React.useEffect(() => {
     if (typeof window !== 'undefined' && (window as any).google?.accounts?.id) {
       try {
-        const googleClientId = oauthConfig.googleClientId || '312891928374-anusandhan.apps.googleusercontent.com';
+        const googleClientId = oauthConfig.googleClientId || '387379934962-d6ejkrm9ln7u9c2i1qvktio3p67062m7.apps.googleusercontent.com';
         (window as any).google.accounts.id.initialize({
           client_id: googleClientId,
           callback: async (response: any) => {
@@ -84,7 +84,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     // 1. For Google, prefer official GIS Token Client for smooth account picker popup
     if (provider === 'google' && typeof window !== 'undefined' && (window as any).google?.accounts?.oauth2) {
       try {
-        const googleClientId = oauthConfig.googleClientId || '312891928374-anusandhan.apps.googleusercontent.com';
+        const googleClientId = oauthConfig.googleClientId || '387379934962-d6ejkrm9ln7u9c2i1qvktio3p67062m7.apps.googleusercontent.com';
         const client = (window as any).google.accounts.oauth2.initTokenClient({
           client_id: googleClientId,
           scope: 'openid email profile',
