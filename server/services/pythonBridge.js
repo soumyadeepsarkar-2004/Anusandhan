@@ -7,7 +7,10 @@ import http from 'http';
 import https from 'https';
 import axios from 'axios';
 
-const rawPythonUrl = process.env.PYTHON_SERVICE_URL || 'http://127.0.0.1:8000/api/v1';
+let rawPythonUrl = process.env.PYTHON_SERVICE_URL || process.env.FASTAPI_BACKEND_URL || 'http://127.0.0.1:8000/api/v1';
+if (rawPythonUrl && !rawPythonUrl.startsWith('http://') && !rawPythonUrl.startsWith('https://')) {
+  rawPythonUrl = `http://${rawPythonUrl}`;
+}
 const PYTHON_SERVICE_URL = rawPythonUrl.endsWith('/api/v1')
   ? rawPythonUrl
   : `${rawPythonUrl.replace(/\/+$/, '')}/api/v1`;

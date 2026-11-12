@@ -17,7 +17,7 @@ This document specifies the operational architecture that enables Anusandhan (�
 
 ---
 
-## 2. The $0 Perpetual Cloud Architecture
+## 2. The $0 Perpetual Cloud Architecture (Cloudflare Workers + Vercel Edge)
 
 To ensure the platform operates continuously without recurring credit card bills or unexpected server shutdowns:
 
@@ -25,31 +25,31 @@ To ensure the platform operates continuously without recurring credit card bills
 [ All Clients: Web / PWA / Android / Windows / Mac ]
                          │
                          ▼
-             https://anusandhan.vercel.app
-             ┌───────────────────────────┐
-             │    Vercel Edge Network    │  (Cost: $0 / month)
-             │   - React 18 SPA (Static) │  - 100 GB Bandwidth
-             │   - Express API Gateway   │  - Free SSL / DDoS Protection
-             │     (/api/index.js)       │  - Auto-scaling Serverless
-             └─────────────┬─────────────┘
-                           │
-       ┌───────────────────┼───────────────────┐
-       ▼                   ▼                   ▼
-┌──────────────┐    ┌──────────────┐    ┌──────────────┐
-│MongoDB Atlas │    │Upstash Redis │    │Python AI Hub │
-│ M0 Free Tier │    │  Free Tier   │    │Render/HF/Node│
-│ - 512MB RAM  │    │ - 10k cmds/d │    │ - Circuit    │
-│ - 500 conns  │    │ - LRU backup │    │   Breaker    │
-│ (Cost: $0/mo)│    │ (Cost: $0/mo)│    │ (Cost: $0/mo)│
-└──────────────┘    └──────────────┘    └──────────────┘
+        Cloudflare Edge (300+ Locations) / Vercel Edge
+        ┌──────────────────────────────────────────────┐
+        │   Cloudflare Workers + Vercel Edge Gateway   │  (Cost: $0 / month)
+        │   - React 18 SPA (Static / 500 builds/mo)    │  - Unlimited Bandwidth
+        │   - Edge Fast-Path /api/health (<10ms)       │  - Free SSL / DDoS Protection
+        │   - 100,000 Free Worker Requests / day       │  - Auto-scaling Serverless
+        └──────────────────────┬───────────────────────┘
+                               │
+           ┌───────────────────┼───────────────────┐
+           ▼                   ▼                   ▼
+    ┌──────────────┐    ┌──────────────┐    ┌──────────────┐
+    │MongoDB Atlas │    │Upstash Redis │    │Python AI Hub │
+    │ M0 Free Tier │    │  Free Tier   │    │Hugging Face /│
+    │ - 512MB RAM  │    │ - 10k cmds/d │    │Local Heuristi│
+    │ - 500 conns  │    │ - LRU backup │    │- Circuit Brk │
+    │ (Cost: $0/mo)│    │ (Cost: $0/mo)│    │ (Cost: $0/mo)│
+    └──────────────┘    └──────────────┘    └──────────────┘
 ```
 
 ### Required Active Services:
-1. **Primary Gateway & Frontend:** Hosted on **Vercel** (`anusandhan.vercel.app`). Automatically builds and deploys on every git push to `main`.
+1. **Edge Gateway & Frontend:** Hosted on **Cloudflare Workers / Vercel** (`anusandhan.vercel.app` & `server/cloudflare-worker.js`).
 2. **Database:** **MongoDB Atlas (M0 Free Tier)**. Stores user profiles, application history, and synchronized offline records.
 3. **Local Database & Sync:** **SQLite / IndexedDB** on client devices. Runs completely offline; syncs when online.
 4. **AI Microservice Bridge:**
-   - **Cloud Mode:** Deployed on Render / Hugging Face Spaces / Fly.io free tiers.
+   - **Cloud Mode:** Deployed on Hugging Face Spaces / Docker free tiers.
    - **Fail-Safe Fallback:** If the external Python container is cold or sleeping, Node.js Gateway's [`pythonBridge.js`](file:///c:/PROJECTS/ResearchIntern_Pro/server/services/pythonBridge.js) **Circuit Breaker** automatically switches to embedded deterministic heuristic algorithms. Users never see a 500 error.
 
 ---
