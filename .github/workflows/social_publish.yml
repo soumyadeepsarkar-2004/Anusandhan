@@ -1,0 +1,38 @@
+name: Social Media Autonomous Publishing
+
+on:
+  schedule:
+    - cron: '0 4 * * *' # Daily at 04:00 UTC (09:30 AM IST)
+  workflow_dispatch:
+    inputs:
+      day:
+        description: 'Target Content Key (e.g. day1, scrape)'
+        required: false
+        default: 'scrape'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run Autonomous Multi-Platform Dispatcher
+        env:
+          LINKEDIN_ORG_ID: ${{ secrets.LINKEDIN_ORG_ID || '145427516' }}
+          LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
+          X_API_KEY: ${{ secrets.X_API_KEY }}
+          X_BEARER_TOKEN: ${{ secrets.X_BEARER_TOKEN }}
+          INSTAGRAM_ACCOUNT_ID: ${{ secrets.INSTAGRAM_ACCOUNT_ID }}
+          INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
+        run: |
+          if [ "${{ github.event.inputs.day }}" = "scrape" ] || [ "${{ github.event_name }}" = "schedule" ]; then
+            node scripts/social_autoposter.js --scrape --live
+          else
+            node scripts/social_autoposter.js --day=${{ github.event.inputs.day || 'day1' }} --live
+          fi
