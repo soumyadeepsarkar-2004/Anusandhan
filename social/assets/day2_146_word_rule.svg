@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080" width="1080" height="1080">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0A0F1D" />
+      <stop offset="50%" stop-color="#0F172A" />
+      <stop offset="100%" stop-color="#050B14" />
+    </linearGradient>
+    <linearGradient id="cyanGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#06B6D4" />
+      <stop offset="100%" stop-color="#3B82F6" />
+    </linearGradient>
+    <linearGradient id="greenGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#10B981" />
+      <stop offset="100%" stop-color="#059669" />
+    </linearGradient>
+    <linearGradient id="cardBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1E293B" stop-opacity="0.8" />
+      <stop offset="100%" stop-color="#0F172A" stop-opacity="0.9" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1080" height="1080" fill="url(#bg)" />
+
+  <!-- Top Badge -->
+  <rect x="70" y="60" width="340" height="42" rx="21" fill="#0F2840" stroke="#0284C7" stroke-width="2" />
+  <text x="240" y="87" fill="#38BDF8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="700" letter-spacing="2" text-anchor="middle">FACULTY RESPONSE AUDIT</text>
+
+  <!-- Main Title -->
+  <text x="70" y="150" fill="#FFFFFF" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="44" font-weight="800">
+    The 146-Word Formula
+  </text>
+  <text x="70" y="195" fill="#94A3B8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="22" font-weight="400">
+    Why emails &gt;300 words get deleted, and how 146 words hits 24%+ reply rate
+  </text>
+
+  <!-- Response Rate Comparative Stats -->
+  <rect x="70" y="235" width="460" height="90" rx="16" fill="#1C1917" stroke="#EF4444" stroke-width="1.5" />
+  <text x="100" y="270" fill="#EF4444" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="700">Generic Templates (&gt;300 Words)</text>
+  <text x="100" y="305" fill="#F87171" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="30" font-weight="800">&lt; 3.0% <tspan font-size="16" fill="#A8A29E" font-weight="500">Reply Rate</tspan></text>
+
+  <rect x="550" y="235" width="460" height="90" rx="16" fill="#06281E" stroke="#10B981" stroke-width="1.5" />
+  <text x="580" y="270" fill="#10B981" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="700">146-Word Precision Pitch</text>
+  <text x="580" y="305" fill="#34D399" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="30" font-weight="800">&gt; 24.6% <tspan font-size="16" fill="#6EE7B7" font-weight="500">Reply Rate (8x Boost)</tspan></text>
+
+  <!-- Section 1: The Alignment Hook -->
+  <rect x="70" y="355" width="940" height="175" rx="18" fill="url(#cardBg)" stroke="#334155" stroke-width="1.5" />
+  <circle cx="115" cy="400" r="22" fill="#0284C7" />
+  <text x="115" y="407" fill="#FFFFFF" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="800" text-anchor="middle">01</text>
+  <text x="155" y="405" fill="#FFFFFF" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="22" font-weight="700">The Alignment Hook</text>
+  <rect x="880" y="380" width="110" height="32" rx="16" fill="#0F2840" />
+  <text x="935" y="402" fill="#38BDF8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="700" text-anchor="middle">30 WORDS</text>
+  <text x="100" y="455" fill="#CBD5E1" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="400">
+    Who you are + exact research interest alignment. State your university, primary technical stack,
+  </text>
+  <text x="100" y="490" fill="#94A3B8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="17" font-weight="400">
+    and the specific subfield of their laboratory you have already verified code in.
+  </text>
+
+  <!-- Section 2: The Technical Bridge -->
+  <rect x="70" y="555" width="940" height="195" rx="18" fill="url(#cardBg)" stroke="#38BDF8" stroke-width="2" />
+  <circle cx="115" cy="600" r="22" fill="#0EA5E9" />
+  <text x="115" y="607" fill="#FFFFFF" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="800" text-anchor="middle">02</text>
+  <text x="155" y="605" fill="#FFFFFF" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="22" font-weight="700">The Technical Bridge (Paper Citation)</text>
+  <rect x="880" y="580" width="110" height="32" rx="16" fill="#082F49" />
+  <text x="935" y="602" fill="#7DD3FC" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="700" text-anchor="middle">75 WORDS</text>
+  <text x="100" y="655" fill="#E2E8F0" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="500">
+    Deconstruct their recent publication (from the last 3-6 months). Reference the specific algorithm,
+  </text>
+  <text x="100" y="690" fill="#CBD5E1" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="17" font-weight="400">
+    computational gap, or benchmark dataset where your reproducible GitHub project adds immediate value.
+  </text>
+
+  <!-- Section 3: The Frictionless Ask -->
+  <rect x="70" y="775" width="940" height="175" rx="18" fill="url(#cardBg)" stroke="#334155" stroke-width="1.5" />
+  <circle cx="115" cy="820" r="22" fill="#10B981" />
+  <text x="115" y="827" fill="#FFFFFF" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="800" text-anchor="middle">03</text>
+  <text x="155" y="825" fill="#FFFFFF" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="22" font-weight="700">The Frictionless Ask</text>
+  <rect x="880" y="800" width="110" height="32" rx="16" fill="#064E3B" />
+  <text x="935" y="822" fill="#6EE7B7" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="700" text-anchor="middle">41 WORDS</text>
+  <text x="100" y="875" fill="#CBD5E1" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="400">
+    Clean, zero-pressure close with your verified Research Dossier link. Propose a brief 10-min technical call.
+  </text>
+  <text x="100" y="910" fill="#94A3B8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="17" font-weight="400">
+    Zero flattering fluff ("esteemed professor"), 100% academic substance.
+  </text>
+
+  <!-- Footer Branding -->
+  <line x1="70" y1="990" x2="1010" y2="990" stroke="#1E293B" stroke-width="2" />
+  <text x="70" y="1035" fill="#F8FAFC" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="22" font-weight="800" letter-spacing="1">
+    ANUSANDHAN <tspan fill="#38BDF8">अनुसंधान</tspan>
+  </text>
+  <text x="1010" y="1035" fill="#64748B" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="500" text-anchor="end">
+    100% Free &amp; Open Source • anusandhan.vercel.app
+  </text>
+</svg>
