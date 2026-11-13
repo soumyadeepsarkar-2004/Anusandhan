@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1584 396" width="1584" height="396">
+  <defs>
+    <linearGradient id="bgBanner" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#050B14" />
+      <stop offset="50%" stop-color="#0B132B" />
+      <stop offset="100%" stop-color="#030712" />
+    </linearGradient>
+    <linearGradient id="cyanBlue" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#06B6D4" />
+      <stop offset="50%" stop-color="#3B82F6" />
+      <stop offset="100%" stop-color="#10B981" />
+    </linearGradient>
+    <filter id="bannerGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1584" height="396" fill="url(#bgBanner)" />
+
+  <!-- Background Grid Lines -->
+  <g stroke="#1E293B" stroke-width="1" opacity="0.35">
+    <line x1="0" y1="66" x2="1584" y2="66" />
+    <line x1="0" y1="132" x2="1584" y2="132" />
+    <line x1="0" y1="198" x2="1584" y2="198" />
+    <line x1="0" y1="264" x2="1584" y2="264" />
+    <line x1="0" y1="330" x2="1584" y2="330" />
+    
+    <line x1="198" y1="0" x2="198" y2="396" />
+    <line x1="396" y1="0" x2="396" y2="396" />
+    <line x1="594" y1="0" x2="594" y2="396" />
+    <line x1="792" y1="0" x2="792" y2="396" />
+    <line x1="990" y1="0" x2="990" y2="396" />
+    <line x1="1188" y1="0" x2="1188" y2="396" />
+    <line x1="1386" y1="0" x2="1386" y2="396" />
+  </g>
+
+  <!-- Right-side Radar Scanning Graphics -->
+  <g transform="translate(1320, 198)">
+    <circle cx="0" cy="0" r="160" fill="none" stroke="#1E293B" stroke-width="1.5" stroke-dasharray="6,6"/>
+    <circle cx="0" cy="0" r="110" fill="none" stroke="#0E7490" stroke-width="1.5" opacity="0.6"/>
+    <circle cx="0" cy="0" r="60" fill="none" stroke="#06B6D4" stroke-width="1.5" filter="url(#bannerGlow)"/>
+    <line x1="0" y1="0" x2="113" y2="-113" stroke="url(#cyanBlue)" stroke-width="2" />
+    <circle cx="80" cy="-80" r="5" fill="#10B981" filter="url(#bannerGlow)"/>
+    <circle cx="-50" cy="40" r="4" fill="#06B6D4" filter="url(#bannerGlow)"/>
+    <circle cx="30" cy="90" r="4" fill="#3B82F6" filter="url(#bannerGlow)"/>
+  </g>
+
+  <!-- Left Side Logo + Headline -->
+  <g transform="translate(90, 80)">
+    <!-- Brand Title -->
+    <text x="0" y="55" font-family="'Inter', system-ui, sans-serif" font-weight="900" font-size="52" fill="#ffffff" letter-spacing="3">ANUSANDHAN</text>
+    <text x="420" y="55" font-family="'Noto Sans Devanagari', sans-serif" font-weight="700" font-size="36" fill="#06B6D4">| अनुसंधान</text>
+    
+    <!-- Subtitle -->
+    <text x="0" y="105" font-family="'Inter', system-ui, sans-serif" font-weight="600" font-size="24" fill="#E2E8F0">Autonomous Academic Research Internship Intelligence &amp; Outreach Platform</text>
+    <text x="0" y="140" font-family="'Inter', system-ui, sans-serif" font-weight="400" font-size="17" fill="#94A3B8">Ending generic cold email spam with 146-word precision pitches &amp; 5-pillar Research Readiness Scores (RRS™)</text>
+    
+    <!-- Badges Row -->
+    <g transform="translate(0, 175)">
+      <!-- Badge 1: Fellowships -->
+      <rect x="0" y="0" width="230" height="36" rx="18" fill="#0F172A" stroke="#334155" stroke-width="1.5"/>
+      <text x="115" y="23" font-family="'Inter', sans-serif" font-weight="600" font-size="14" fill="#38BDF8" text-anchor="middle">DAAD • CERN • MITACS • IISC</text>
+
+      <!-- Badge 2: Open Source -->
+      <rect x="245" y="0" width="160" height="36" rx="18" fill="#0F172A" stroke="#10B981" stroke-width="1.5"/>
+      <text x="325" y="23" font-family="'Inter', sans-serif" font-weight="600" font-size="14" fill="#34D399" text-anchor="middle">100% OPEN SOURCE</text>
+
+      <!-- Badge 3: Domain -->
+      <rect x="420" y="0" width="220" height="36" rx="18" fill="#0F172A" stroke="#6366F1" stroke-width="1.5"/>
+      <text x="530" y="23" font-family="'Inter', sans-serif" font-weight="600" font-size="14" fill="#A5B4FC" text-anchor="middle">anusandhan.vercel.app</text>
+    </g>
+  </g>
+</svg>
