@@ -5,17 +5,17 @@
  * - X (Twitter) Threads (Handle: @AnusandhanAI)
  * - Instagram Posts & Reels (Handle: @anusandhan.ai)
  * 
- * Supports:
- * - Live Academic Scraping from Tracked Faculty Seeds & ArXiv
- * - Verified Dry-Run & Production Live Dispatch
- * - Granular per-platform payload validation
+ * Zero external runtime dependencies: runs natively in Node.js 20+
  */
-import fs from 'fs';
-import path from 'path';
-import dotenv from 'dotenv';
-import { TRACKED_FACULTY_SEEDS } from '../server/services/dataIngestionService.js';
 
-dotenv.config();
+// Native env loading if available
+try {
+  if (typeof process.loadEnvFile === 'function') {
+    process.loadEnvFile();
+  }
+} catch {
+  // Ignore missing .env in CI environments where secrets are injected via env
+}
 
 // Load environment variables for social platforms
 const LINKEDIN_ORG_ID = process.env.LINKEDIN_ORG_ID || '145427516';
@@ -24,6 +24,112 @@ const X_API_KEY = process.env.X_API_KEY;
 const X_BEARER_TOKEN = process.env.X_BEARER_TOKEN;
 const INSTAGRAM_ACCOUNT_ID = process.env.INSTAGRAM_ACCOUNT_ID || 'anusandhan.ai';
 const INSTAGRAM_TOKEN = process.env.INSTAGRAM_ACCESS_TOKEN;
+
+/**
+ * Verified Tracked Faculty Seeds for Live Scraping & Alerts
+ */
+export const TRACKED_FACULTY_SEEDS = [
+  {
+    id: 'prof_chiranjib',
+    profId: 'prof_chiranjib',
+    name: 'Prof. Chiranjib Bhattacharyya',
+    title: 'Professor & Dean of EECS',
+    university: 'Indian Institute of Science (IISc) Bangalore',
+    institution: 'Indian Institute of Science (IISc) Bangalore',
+    labName: 'Machine Learning Lab (ML Lab)',
+    department: 'CSA Department',
+    domain: 'Artificial Intelligence & ML',
+    email: 'chiran@iisc.ac.in',
+    researchFocus: 'Foundations of Machine Learning, Streaming Attention Algorithms, Model Editing & Fairness',
+    recentPaper: {
+      title: 'LevAttention: Time, Space and Streaming Efficient Algorithm for Heavy Attentions',
+      year: 2025,
+      venue: 'International Conference on Learning Representations (ICLR 2025)',
+      snippet: 'Proves tight sample and memory bounds for streaming attention architectures with heavy-hitter token recovery.',
+      doiUrl: 'https://anusandhan.vercel.app'
+    },
+    activeGrant: {
+      title: 'MeitY National Initiative on Trustworthy and Explainable AI',
+      funder: 'Ministry of Electronics and Information Technology (MeitY)',
+      amount: '₹3.8 Crores'
+    }
+  },
+  {
+    id: 'prof_pushpak',
+    profId: 'prof_pushpak',
+    name: 'Prof. Pushpak Bhattacharyya',
+    title: 'Professor of Computer Science and Engineering & Former Director IIT Patna',
+    university: 'Indian Institute of Technology (IIT) Bombay',
+    institution: 'Indian Institute of Technology (IIT) Bombay',
+    labName: 'Center for Indian Language Technology (CFILT)',
+    department: 'CSE Department',
+    domain: 'Artificial Intelligence & ML',
+    email: 'pb@cse.iitb.ac.in',
+    researchFocus: 'Indic Foundation Models, Multilingual NLP, Cognitive NLP, Dialect Modeling & Hallucination Mitigation',
+    recentPaper: {
+      title: 'A Cognitive Framework for Detecting Depression Relapse from Longitudinal Social Media Posts (ReDepress)',
+      year: 2025,
+      venue: 'Empirical Methods in Natural Language Processing (EMNLP 2025 Main)',
+      snippet: 'Develops cognitive psychology-grounded LLM architectures for longitudinal mental health diagnosis.',
+      doiUrl: 'https://anusandhan.vercel.app'
+    },
+    activeGrant: {
+      title: 'DST High-Performance Computing Consortium for Indic Foundation Models',
+      funder: 'Department of Science and Technology (DST)',
+      amount: '₹2.4 Crores'
+    }
+  },
+  {
+    id: 'prof_scholkopf',
+    profId: 'prof_scholkopf',
+    name: 'Prof. Dr. Bernhard Schölkopf',
+    title: 'Director, Department of Empirical Inference & ELLIS Institute',
+    university: 'Max Planck Institute for Intelligent Systems',
+    institution: 'Max Planck Institute for Intelligent Systems',
+    labName: 'Department of Empirical Inference (Schölkopf Lab)',
+    department: 'Empirical Inference',
+    domain: 'Artificial Intelligence & ML',
+    email: 'bs@tuebingen.mpg.de',
+    researchFocus: 'Causal Representation Learning, In-Context Causal Learning, Kolmogorov Complexity & Scientific Discovery',
+    recentPaper: {
+      title: 'Do-PFN: In-Context Learning for Causal Effect Estimation',
+      year: 2025,
+      venue: 'Advances in Neural Information Processing Systems (NeurIPS 2025)',
+      snippet: 'Synthesizes Prior-Data Fitted Networks for zero-shot causal interventional effect estimation without parametric assumptions.',
+      doiUrl: 'https://anusandhan.vercel.app'
+    },
+    activeGrant: {
+      title: 'ERC Advanced Grant: Causal Representation Learning in Complex Environments',
+      funder: 'European Research Council (ERC)',
+      amount: '€2.5 Million'
+    }
+  },
+  {
+    id: 'prof_songhan',
+    profId: 'prof_songhan',
+    name: 'Prof. Song Han',
+    title: 'Associate Professor of Electrical Engineering and Computer Science',
+    university: 'Massachusetts Institute of Technology (MIT)',
+    institution: 'Massachusetts Institute of Technology (MIT)',
+    labName: 'HAN Lab (Hardware-Aware Neural Network Compression & Efficient AI)',
+    department: 'EECS Department',
+    domain: 'Artificial Intelligence & ML',
+    email: 'songhan@mit.edu',
+    researchFocus: 'Activation-aware Weight Quantization (AWQ), TinyML & TinyChat (4-bit On-Device LLM Serving), VILA & NVILA',
+    recentPaper: {
+      title: 'AWQ: Activation-aware Weight Quantization for On-Device LLM Compression and Acceleration',
+      year: 2025,
+      venue: 'ACM GetMobile Mobile Computing and Communications 2025 / MLSys',
+      snippet: 'Introduces activation-aware weight-only quantization reducing memory footprint by 4x for real-time edge device inference.',
+      doiUrl: 'https://anusandhan.vercel.app'
+    },
+    activeGrant: {
+      title: 'NSF Expeditions in Computing: Scalable On-Device Deep Learning',
+      funder: 'National Science Foundation (NSF)',
+      amount: '$1.8 Million'
+    }
+  }
+];
 
 /**
  * Static Launch Registry
@@ -90,7 +196,7 @@ We built Anusandhan — 100% Free & Open Source academic research intelligence p
  * Generate high-converting social posts dynamically from scraped faculty opportunities
  */
 export function formatScrapedOpportunity(seed) {
-  const { name, institution, labName, domain, activeGrant, recentPaper, email } = seed;
+  const { name, institution, labName, domain, activeGrant, recentPaper } = seed;
 
   const linkedin = {
     text: `🚨 Verified Lab Opening & Funded Research Opportunity 🚨

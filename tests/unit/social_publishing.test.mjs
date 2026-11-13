@@ -4,13 +4,13 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {
   POST_REGISTRY,
+  TRACKED_FACULTY_SEEDS,
   formatScrapedOpportunity,
   publishToLinkedIn,
   publishToX,
   publishToInstagram,
   scrapeAndPostAll
 } from '../../scripts/social_autoposter.js';
-import { TRACKED_FACULTY_SEEDS } from '../../server/services/dataIngestionService.js';
 
 test('1. Post Registry contains valid launch content for Day 1', () => {
   const day1 = POST_REGISTRY.day1;
